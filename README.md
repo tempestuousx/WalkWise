@@ -17,3 +17,5 @@ GPS dog-walk tracking, one-handed behavioral logging, weather context, analytics
 5. [Liquid glass design system](docs/05-liquid-glass.md): rendering tiers, tokens, motion, component specs
 6. [Roadmap and acceptance criteria](docs/06-roadmap.md)
 7. [Risks and open questions](docs/07-risks-and-questions.md)
+
+Design preview: [`docs/preview/index.html`](docs/preview/index.html), a clickable browser mockup with sample data (not the app).

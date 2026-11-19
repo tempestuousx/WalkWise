@@ -1,0 +1,1193 @@
+<title>Walkwise Preview</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Nunito:wght@700;800&display=swap">
+<style>
+/* Layout: explanation + controls column beside a phone-sized interactive prototype; stacks on narrow screens.
+   Palette: milky white, cool silver, sky, aqua, blush, lavender glass tints over charcoal type (Walkwise tokens, docs/05). */
+:root {
+  --font-ui: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-num: "Nunito", ui-rounded, "SF Pro Rounded", system-ui, sans-serif;
+
+  --page-bg: #E8EDF2;
+  --page-fg: #1B2028;
+  --page-muted: #4A5361;
+  --page-line: rgba(27, 32, 40, 0.12);
+  --bezel: #12161C;
+
+  --base: #EEF2F6;
+  --amb1: #BCD8F3; --amb2: #BDE5DF; --amb3: #F2D2DA; --amb4: #D9D3F1; --amb5: #D6DDE6;
+  --leaf: rgba(64, 58, 92, 0.13);
+  --shaft: rgba(255, 255, 255, 0.35);
+
+  --text: #1B2028; --text2: #454E5C; --text3: #5F6877;
+  --glass-top: rgba(255, 255, 255, 0.62);
+  --glass-bot: rgba(255, 255, 255, 0.30);
+  --glass-border: rgba(255, 255, 255, 0.78);
+  --rim: rgba(255, 255, 255, 0.95);
+  --rim-low: rgba(255, 255, 255, 0.45);
+  --inner-shadow: rgba(30, 45, 70, 0.08);
+  --drop: rgba(38, 58, 88, 0.16);
+  --hl: rgba(255, 255, 255, 0.55);
+  --solid-glass: #F8FAFC;
+  --out-top: rgba(255, 255, 255, 0.88);
+  --out-bot: rgba(255, 255, 255, 0.74);
+  --scrim: rgba(20, 28, 40, 0.22);
+  --radial-fill: rgba(255, 255, 255, 0.82);
+
+  --sky: #9CCBF2; --aqua: #9BDDD0; --lav: #C2B5F0; --blush: #F2BACB; --peach: #F6C89C; --mint: #B3E2C1;
+  --c-nature: #2E8B57; --c-behavior: #D9682A; --c-training: #2F6FD0; --c-custom: #8458CC;
+  --accent: #2867B8; --danger: #C2413A; --ok: #2E8B57;
+
+  --land: #EAF0F4; --block: #DFE6ED; --street: #FFFFFF; --street-case: #CDD7E1; --park: #CBE8D6; --park-path: #E9F5EE; --water: #BCDFEA;
+  --route: #2867B8; --route-glow: rgba(40, 103, 184, 0.25); --halo: #FFFFFF;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --page-bg: #0B0E13; --page-fg: #EEF2F6; --page-muted: #AEB7C3; --page-line: rgba(255, 255, 255, 0.12);
+    --base: #0C1016;
+    --amb1: #1D3A5C; --amb2: #1A4643; --amb3: #4A2B35; --amb4: #332C52; --amb5: #2A3039;
+    --leaf: rgba(0, 0, 0, 0.28); --shaft: rgba(255, 255, 255, 0.06);
+    --text: #F3F6F9; --text2: #C3CAD4; --text3: #9AA3B0;
+    --glass-top: rgba(52, 62, 80, 0.62); --glass-bot: rgba(24, 30, 42, 0.42);
+    --glass-border: rgba(255, 255, 255, 0.16); --rim: rgba(255, 255, 255, 0.30); --rim-low: rgba(255, 255, 255, 0.08);
+    --inner-shadow: rgba(0, 0, 0, 0.30); --drop: rgba(0, 0, 0, 0.50); --hl: rgba(255, 255, 255, 0.10);
+    --solid-glass: #1A212C; --out-top: rgba(24, 30, 40, 0.90); --out-bot: rgba(18, 23, 31, 0.80);
+    --scrim: rgba(0, 0, 0, 0.45); --radial-fill: rgba(30, 37, 49, 0.88);
+    --sky: #2C5E8C; --aqua: #2A6E64; --lav: #4E4384; --blush: #6E3A4C; --peach: #7A5230; --mint: #2F6243;
+    --c-nature: #5CC68C; --c-behavior: #F29554; --c-training: #6FA0F2; --c-custom: #B394F0;
+    --accent: #6FA8F0; --danger: #FF6B62; --ok: #5CC68C;
+    --land: #121821; --block: #18202B; --street: #2A3441; --street-case: #10151C; --park: #17321F; --park-path: #22402C; --water: #14303B;
+    --route: #6FA8F0; --route-glow: rgba(111, 168, 240, 0.25); --halo: rgba(255, 255, 255, 0.92);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --page-bg: #0B0E13; --page-fg: #EEF2F6; --page-muted: #AEB7C3; --page-line: rgba(255, 255, 255, 0.12);
+  --base: #0C1016;
+  --amb1: #1D3A5C; --amb2: #1A4643; --amb3: #4A2B35; --amb4: #332C52; --amb5: #2A3039;
+  --leaf: rgba(0, 0, 0, 0.28); --shaft: rgba(255, 255, 255, 0.06);
+  --text: #F3F6F9; --text2: #C3CAD4; --text3: #9AA3B0;
+  --glass-top: rgba(52, 62, 80, 0.62); --glass-bot: rgba(24, 30, 42, 0.42);
+  --glass-border: rgba(255, 255, 255, 0.16); --rim: rgba(255, 255, 255, 0.30); --rim-low: rgba(255, 255, 255, 0.08);
+  --inner-shadow: rgba(0, 0, 0, 0.30); --drop: rgba(0, 0, 0, 0.50); --hl: rgba(255, 255, 255, 0.10);
+  --solid-glass: #1A212C; --out-top: rgba(24, 30, 40, 0.90); --out-bot: rgba(18, 23, 31, 0.80);
+  --scrim: rgba(0, 0, 0, 0.45); --radial-fill: rgba(30, 37, 49, 0.88);
+  --sky: #2C5E8C; --aqua: #2A6E64; --lav: #4E4384; --blush: #6E3A4C; --peach: #7A5230; --mint: #2F6243;
+  --c-nature: #5CC68C; --c-behavior: #F29554; --c-training: #6FA0F2; --c-custom: #B394F0;
+  --accent: #6FA8F0; --danger: #FF6B62; --ok: #5CC68C;
+  --land: #121821; --block: #18202B; --street: #2A3441; --street-case: #10151C; --park: #17321F; --park-path: #22402C; --water: #14303B;
+  --route: #6FA8F0; --route-glow: rgba(111, 168, 240, 0.25); --halo: rgba(255, 255, 255, 0.92);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { background: var(--page-bg); color: var(--page-fg); }
+body { font-family: var(--font-ui); font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+button { font: inherit; color: inherit; cursor: pointer; border: 0; background: none; padding: 0; }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.page {
+  max-width: 1120px; margin: 0 auto;
+  padding-block: 28px 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 40px; align-items: start;
+}
+.side { display: grid; gap: 22px; min-width: 0; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 20px); }
+.brand { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.brand h1 { margin: 0; font-size: 34px; letter-spacing: -0.02em; font-weight: 800; }
+.badge { font-size: 11.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--page-muted); border: 1px solid var(--page-line); border-radius: 999px; padding: 3px 10px; }
+.lede { margin: 0; color: var(--page-muted); max-width: 60ch; }
+.try { margin: 0; padding-left: 20px; display: grid; gap: 6px; color: var(--page-fg); max-width: 60ch; }
+.try b { font-weight: 700; }
+.ctl { display: grid; gap: 14px; border-top: 1px solid var(--page-line); padding-top: 18px; }
+.ctl-row { display: grid; gap: 6px; }
+.ctl-label { font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--page-muted); }
+.seg { display: flex; flex-wrap: wrap; gap: 6px; }
+.seg button { border: 1px solid var(--page-line); border-radius: 999px; padding: 6px 12px; font-size: 13.5px; font-weight: 600; }
+.seg button[aria-pressed="true"] { background: var(--page-fg); color: var(--page-bg); border-color: var(--page-fg); }
+.note { font-size: 13px; color: var(--page-muted); margin: 0; max-width: 60ch; }
+
+/* ───────── Phone ───────── */
+.phone { width: 410px; max-width: 100%; padding: 10px; border-radius: 58px; background: var(--bezel); box-shadow: 0 30px 80px -30px rgba(0, 0, 0, 0.55); }
+.screen {
+  position: relative; height: 840px; border-radius: 48px; overflow: hidden; isolation: isolate;
+  background: var(--base); color: var(--text); font-size: 15px; user-select: none; -webkit-user-select: none;
+}
+@media (max-width: 900px) {
+  .page { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .side { position: static; }
+  .phone { margin: 0 auto; }
+}
+@media (max-width: 460px) {
+  .phone { padding: 0; border-radius: 30px; background: none; box-shadow: none; }
+  .screen { border-radius: 30px; height: 780px; }
+}
+
+.ambient { position: absolute; inset: -24px; width: calc(100% + 48px); height: calc(100% + 48px); filter: blur(5px); z-index: 0; animation: drift 40s ease-in-out infinite alternate; }
+@keyframes drift { from { transform: translate3d(-6px, -4px, 0) scale(1.02); } to { transform: translate3d(8px, 6px, 0) scale(1.04); } }
+
+.statusbar { position: absolute; top: 0; left: 0; right: 0; height: 44px; z-index: 40; display: flex; align-items: center; justify-content: space-between; padding: 0 30px; font-weight: 700; font-size: 14px; pointer-events: none; }
+.statusbar .dots { display: flex; gap: 5px; align-items: center; }
+.statusbar .bat { width: 24px; height: 11px; border: 1.5px solid currentColor; border-radius: 3px; position: relative; }
+.statusbar .bat::after { content: ""; position: absolute; inset: 1.5px 6px 1.5px 1.5px; background: currentColor; border-radius: 1px; }
+
+.view { position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden; z-index: 1; padding: 56px 18px 130px; scrollbar-width: none; }
+.view::-webkit-scrollbar { display: none; }
+.view.flush { padding: 0 0 130px; }
+.stack { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+
+/* ───────── Glass levels ───────── */
+.g {
+  position: relative; isolation: isolate;
+  background: linear-gradient(180deg, var(--glass-top), var(--glass-bot));
+  -webkit-backdrop-filter: blur(var(--blur, 24px)) saturate(170%);
+  backdrop-filter: blur(var(--blur, 24px)) saturate(170%);
+  border: 1px solid var(--glass-border);
+  box-shadow: inset 0 1.5px 0 var(--rim), inset 0 -1px 0 var(--rim-low), inset 0 -14px 22px -10px var(--inner-shadow), 0 12px 30px -10px var(--drop);
+}
+.g::before {
+  content: ""; position: absolute; inset: 1px; border-radius: inherit; z-index: -1; pointer-events: none;
+  background: radial-gradient(120% 70% at 28% -12%, var(--hl), transparent 58%);
+}
+.lv-panel { border-radius: 30px; --blur: 30px; }
+.lv-card { border-radius: 26px; --blur: 22px; padding: 16px; }
+.lv-control { border-radius: 999px; --blur: 18px; }
+.lv-orb { border-radius: 50%; --blur: 18px; }
+.tint {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--t) 28%, var(--glass-top)), color-mix(in srgb, var(--t) 82%, transparent));
+  border-color: color-mix(in srgb, var(--t) 25%, var(--glass-border));
+  box-shadow: inset 0 1.5px 0 var(--rim), inset 0 -1.5px 0 var(--rim-low), inset 0 -14px 22px -10px var(--inner-shadow),
+    0 16px 26px -12px color-mix(in srgb, var(--t) 90%, transparent), 0 4px 10px -4px var(--drop);
+}
+.irid { background: linear-gradient(135deg, color-mix(in srgb, var(--blush) 70%, var(--glass-top)), color-mix(in srgb, var(--lav) 70%, var(--glass-top)) 50%, color-mix(in srgb, var(--aqua) 70%, var(--glass-top))); }
+.outdoor { --glass-top: var(--out-top); --glass-bot: var(--out-bot); }
+.tier-solid .g { -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--solid-glass); }
+.tier-solid .g::before { display: none; }
+.tier-solid .tint { background: color-mix(in srgb, var(--t) 55%, var(--solid-glass)); }
+.tier-solid .irid { background: color-mix(in srgb, var(--lav) 45%, var(--solid-glass)); }
+.tier-solid .ambient { opacity: 0.55; }
+
+.press { transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.press:active { transform: scale(0.96); }
+
+/* ───────── Shared bits ───────── */
+.h-title { font-size: 28px; font-weight: 800; letter-spacing: -0.02em; margin: 0; text-wrap: balance; }
+.h-sec { font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text2); margin: 0; }
+.muted { color: var(--text2); }
+.small { font-size: 13px; }
+.num { font-family: var(--font-num); font-variant-numeric: tabular-nums; font-weight: 800; letter-spacing: -0.01em; }
+.row { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.between { justify-content: space-between; }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 7px 13px; font-size: 13px; font-weight: 600; white-space: nowrap; min-height: 34px; }
+.chip[aria-pressed="true"] { --t: var(--lav); }
+.chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 4px 2px 10px; margin: -4px -2px -10px; }
+.chips::-webkit-scrollbar { display: none; }
+.icon { width: 20px; height: 20px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+.icon-btn { width: 46px; height: 46px; display: grid; place-items: center; flex: none; }
+.avatar { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: 17px; flex: none; color: var(--text);
+  background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--t) 40%, var(--glass-top)), var(--t)); border: 2px solid var(--glass-border); box-shadow: 0 6px 14px -6px var(--drop); }
+.avatar.sm { width: 30px; height: 30px; font-size: 13px; border-width: 1.5px; }
+.stat-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.stat { padding: 14px 16px; border-radius: 22px; }
+.stat .v { font-size: 26px; line-height: 1.1; }
+.stat .l { font-size: 12.5px; color: var(--text2); font-weight: 600; }
+.est { font-size: 10.5px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text2); border: 1px solid var(--glass-border); border-radius: 999px; padding: 1px 6px; vertical-align: middle; margin-left: 4px; }
+.sample { font-size: 11px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text2); }
+.list { display: grid; }
+.list > * + * { border-top: 1px solid color-mix(in srgb, var(--text) 9%, transparent); }
+.li { display: flex; align-items: center; gap: 12px; padding: 11px 2px; min-height: 52px; text-align: left; width: 100%; }
+.li .grow { flex: 1; min-width: 0; }
+.li .t1 { font-weight: 700; }
+.li .t2 { font-size: 13px; color: var(--text2); }
+.dot { width: 10px; height: 10px; border-radius: 50%; flex: none; background: var(--c); }
+.shape { width: 14px; height: 14px; flex: none; }
+
+/* ───────── Tab bar ───────── */
+.tabbar { position: absolute; left: 14px; right: 14px; bottom: 18px; height: 70px; z-index: 30; display: grid; grid-template-columns: repeat(5, 1fr); align-items: center; padding: 0 6px; }
+.tab { display: grid; justify-items: center; gap: 2px; font-size: 11px; font-weight: 700; color: var(--text2); padding: 8px 0; }
+.tab[aria-current="page"] { color: var(--text); }
+.tab[aria-current="page"] .icon { stroke-width: 2.3; }
+.tab .bar { width: 18px; height: 3px; border-radius: 3px; background: transparent; }
+.tab[aria-current="page"] .bar { background: color-mix(in srgb, var(--lav) 70%, var(--accent)); }
+.orb-slot { display: grid; place-items: center; }
+.start-orb { width: 66px; height: 66px; margin-top: -30px; display: grid; place-items: center; --t: var(--sky); }
+.start-orb .icon { width: 26px; height: 26px; stroke-width: 2.2; }
+.live-pill { margin-top: -26px; height: 52px; padding: 0 14px; display: flex; align-items: center; gap: 8px; --t: var(--blush); font-weight: 800; }
+.rec { width: 9px; height: 9px; border-radius: 50%; background: var(--danger); animation: blink 1.4s ease-in-out infinite; }
+@keyframes blink { 50% { opacity: 0.35; } }
+
+/* ───────── Dashboard ───────── */
+.greet { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.hero { display: grid; justify-items: center; gap: 12px; padding: 26px 18px 22px; text-align: center; }
+.hero-orb { width: 150px; height: 150px; display: grid; place-items: center; align-content: center; gap: 2px; --t: var(--sky); }
+.hero-orb .big { font-size: 21px; font-weight: 800; letter-spacing: -0.01em; }
+.hero-orb .sub { font-size: 12px; font-weight: 700; color: var(--text2); }
+.hero-orb .icon { width: 34px; height: 34px; stroke-width: 2.2; }
+.textlink { font-weight: 700; font-size: 14px; color: var(--accent); padding: 8px 12px; border-radius: 999px; }
+.walk-card { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 14px; align-items: center; text-align: left; width: 100%; }
+.thumb { width: 112px; height: 112px; border-radius: 18px; overflow: hidden; border: 1px solid var(--glass-border); }
+.thumb svg { width: 100%; height: 100%; display: block; }
+.ev-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
+.ev-chip { font-size: 11.5px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: color-mix(in srgb, var(--c) 16%, transparent); color: var(--text); }
+.banner { --t: var(--peach); padding: 12px 14px; display: flex; align-items: center; gap: 10px; border-radius: 20px; text-align: left; width: 100%; font-weight: 700; }
+.mini-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; text-align: center; }
+.mini-stats .v { font-size: 22px; }
+.mini-stats .l { font-size: 12px; color: var(--text2); font-weight: 600; }
+.dog-row { display: flex; gap: 14px; overflow-x: auto; scrollbar-width: none; padding: 2px 2px 8px; }
+.dog-row::-webkit-scrollbar { display: none; }
+.dog-row button { display: grid; justify-items: center; gap: 4px; font-size: 12.5px; font-weight: 700; }
+.dog-row .avatar { width: 56px; height: 56px; font-size: 20px; }
+
+/* ───────── Active walk ───────── */
+.mapwrap { position: absolute; inset: 0; z-index: 0; }
+.mapwrap svg { width: 100%; height: 100%; display: block; }
+.m-land { fill: var(--land); } .m-block { fill: var(--block); } .m-park { fill: var(--park); } .m-water { fill: var(--water); }
+.m-case { stroke: var(--street-case); fill: none; stroke-linecap: round; } .m-street { stroke: var(--street); fill: none; stroke-linecap: round; }
+.m-ppath { stroke: var(--park-path); fill: none; stroke-width: 3; stroke-dasharray: 2 5; stroke-linecap: round; }
+.m-route { stroke: var(--route); fill: none; stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; }
+.m-route-glow { stroke: var(--route-glow); fill: none; stroke-width: 16; stroke-linecap: round; stroke-linejoin: round; }
+.m-ghost { stroke: var(--route); opacity: 0.18; fill: none; stroke-width: 3; stroke-dasharray: 3 7; stroke-linecap: round; }
+.m-start { fill: var(--halo); stroke: var(--ok); stroke-width: 4; }
+.m-pos { fill: var(--route); stroke: var(--halo); stroke-width: 3.5; }
+.m-pos-pulse { fill: var(--route); opacity: 0.22; animation: pulse 2s ease-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes pulse { from { transform: scale(0.6); opacity: 0.35; } to { transform: scale(2.2); opacity: 0; } }
+.mk { stroke: var(--halo); stroke-width: 2.6; paint-order: stroke; cursor: pointer; }
+.mk-cluster { fill: var(--radial-fill); stroke: var(--halo); stroke-width: 2; cursor: pointer; }
+.mk-count { font: 800 10.5px var(--font-ui); fill: var(--text); text-anchor: middle; dominant-baseline: central; pointer-events: none; }
+.mk-focus { animation: focusmk 1.2s ease-in-out 3; transform-box: fill-box; transform-origin: center; }
+@keyframes focusmk { 50% { transform: scale(1.7); } }
+.m-label { font: 700 9px var(--font-ui); fill: var(--text3); letter-spacing: 0.04em; }
+
+.hud-top { position: absolute; top: 50px; left: 14px; right: 14px; z-index: 10; display: flex; align-items: center; gap: 8px; }
+.status-pill { display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 14px; font-weight: 800; font-size: 14px; }
+.gps { display: flex; align-items: end; gap: 2px; height: 12px; }
+.gps i { width: 3px; border-radius: 1px; background: var(--ok); display: block; }
+.metrics { position: absolute; left: 14px; right: 14px; bottom: 132px; z-index: 10; padding: 16px 18px 14px; display: grid; gap: 10px; transition: opacity 0.3s; }
+.metrics.paused .mrow { opacity: 0.55; }
+.mrow { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.mrow .v { font-size: 30px; line-height: 1.05; }
+.mrow .l { font-size: 12px; font-weight: 700; color: var(--text2); }
+.dogline { display: flex; align-items: center; gap: 8px; min-height: 36px; }
+.dogline .names { flex: 1; min-width: 0; font-weight: 700; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.thumbzone { position: absolute; left: 14px; right: 14px; bottom: 26px; z-index: 12; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; }
+.side-btn { width: 64px; height: 64px; display: grid; place-items: center; justify-self: center; font-size: 11px; font-weight: 800; position: relative; }
+.side-btn .icon { width: 24px; height: 24px; }
+.ql { width: 92px; height: 92px; display: grid; place-items: center; align-content: center; gap: 1px; --t: var(--aqua); touch-action: none; font-weight: 800; font-size: 13px; }
+.ql .icon { width: 28px; height: 28px; stroke-width: 2.2; }
+.hold-ring { position: absolute; inset: -4px; border-radius: 50%; pointer-events: none; background: conic-gradient(var(--danger) calc(var(--p, 0) * 1turn), transparent 0); -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px)); mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px)); }
+.speed-note { position: absolute; top: 98px; left: 0; right: 0; text-align: center; z-index: 9; font-size: 11.5px; font-weight: 700; color: var(--text2); pointer-events: none; }
+
+/* Radial menu */
+.radial-scrim { position: absolute; inset: 0; z-index: 50; background: radial-gradient(circle at var(--cx) var(--cy), var(--scrim), transparent 70%); }
+.radial-disc { position: absolute; z-index: 51; border-radius: 50%; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); pointer-events: none; -webkit-mask: linear-gradient(#000 50%, transparent 58%); mask: linear-gradient(#000 50%, transparent 58%); }
+.radial { position: absolute; inset: 0; z-index: 52; width: 100%; height: 100%; overflow: visible; }
+.radial .sec { fill: var(--radial-fill); stroke: var(--glass-border); stroke-width: 1.2; transition: fill 0.12s; }
+.radial .sec.on { stroke: var(--halo); stroke-width: 2; }
+.radial .lbl { font: 700 11.5px var(--font-ui); fill: var(--text); text-anchor: middle; dominant-baseline: central; pointer-events: none; }
+.radial .lbl.s { font-size: 10.5px; }
+.radial .ctr { fill: var(--radial-fill); stroke: var(--glass-border); stroke-width: 1.5; }
+.radial .ctr-t { font: 800 13px var(--font-ui); fill: var(--text); text-anchor: middle; pointer-events: none; }
+.radial .ctr-s { font: 600 9.5px var(--font-ui); fill: var(--text2); text-anchor: middle; pointer-events: none; }
+.radial .ring { transform-origin: var(--cx) var(--cy); animation: ringin 0.32s cubic-bezier(0.34, 1.56, 0.64, 1); }
+@keyframes ringin { from { transform: scale(0.72); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.radial.tapmode .sec { cursor: pointer; }
+.radial.tapmode .sec:hover { stroke: var(--halo); stroke-width: 2; }
+
+/* Toast, sheet, popover */
+.toast { position: absolute; left: 16px; right: 16px; bottom: 210px; z-index: 60; padding: 10px 10px 10px 16px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; border-radius: 24px; font-weight: 700; font-size: 14px; animation: toastin 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.toast.low { bottom: 104px; }
+.toast.top { top: 104px; bottom: auto; }
+.toast .msg { flex: 1 1 140px; min-width: 0; }
+.toast .acts { display: flex; gap: 6px; flex-wrap: wrap; }
+.toast .chip { min-height: 32px; padding: 5px 11px; }
+@keyframes toastin { from { transform: translateY(14px) scale(0.96); opacity: 0; } }
+.sheet-scrim { position: absolute; inset: 0; z-index: 70; background: var(--scrim); animation: fade 0.25s; }
+@keyframes fade { from { opacity: 0; } }
+.sheet { position: absolute; left: 8px; right: 8px; bottom: 8px; z-index: 71; border-radius: 34px; padding: 10px 18px 22px; max-height: 78%; overflow-y: auto; animation: sheetin 0.38s cubic-bezier(0.22, 1.2, 0.36, 1); }
+@keyframes sheetin { from { transform: translateY(60%); opacity: 0; } }
+.handle { width: 40px; height: 5px; border-radius: 3px; background: color-mix(in srgb, var(--text) 25%, transparent); margin: 2px auto 12px; }
+.sheet h3 { margin: 0 0 4px; font-size: 20px; font-weight: 800; }
+.btn { min-height: 50px; padding: 0 20px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 800; border-radius: 999px; }
+.btn.primary { --t: var(--sky); }
+.btn.full { width: 100%; }
+.pop { position: absolute; z-index: 65; width: 240px; padding: 12px 14px; border-radius: 20px; font-size: 13.5px; animation: toastin 0.28s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.pop dl { margin: 6px 0 0; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 3px 10px; }
+.pop dt { color: var(--text2); font-weight: 600; }
+.pop dd { margin: 0; font-weight: 700; }
+
+/* ───────── Report ───────── */
+.topbar { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+.map-card { padding: 0; overflow: hidden; }
+.map-card svg { width: 100%; height: 300px; display: block; }
+.legend { display: flex; flex-wrap: wrap; gap: 12px; padding: 10px 16px 14px; font-size: 12.5px; font-weight: 700; color: var(--text2); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.bd-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 7px 0; }
+.bd-row .n { font-size: 18px; }
+.bd-cat { display: flex; align-items: center; gap: 8px; font-weight: 800; margin-top: 10px; }
+.wx { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.wx .v { font-size: 20px; }
+.wx .l { font-size: 12px; color: var(--text2); font-weight: 600; }
+.actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.actions button { display: grid; justify-items: center; gap: 4px; padding: 12px 6px; border-radius: 20px; font-size: 12.5px; font-weight: 700; }
+
+/* ───────── Calendar ───────── */
+.statstrip { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 2px 2px 10px; margin: 0 -2px -6px; }
+.statstrip::-webkit-scrollbar { display: none; }
+.statstrip .stat { flex: none; min-width: 92px; padding: 10px 14px; border-radius: 20px; }
+.statstrip .v { font-size: 20px; }
+.cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; text-align: center; }
+.cal .wd { font-size: 11px; font-weight: 800; color: var(--text2); padding: 4px 0; }
+.day { aspect-ratio: 1; max-width: 100%; display: grid; place-items: center; align-content: center; gap: 3px; border-radius: 14px; font-weight: 700; font-size: 14px; border: 1px solid transparent; }
+.day.today { border-color: color-mix(in srgb, var(--accent) 60%, transparent); }
+.day[aria-pressed="true"] { --t: var(--lav); }
+.day .marks { display: flex; gap: 3px; height: 6px; }
+.day .marks i { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); display: block; }
+.day .marks i.sched { background: transparent; border: 1.5px solid var(--accent); }
+.day.empty { visibility: hidden; }
+
+/* ───────── Dogs & profile ───────── */
+.search { display: flex; align-items: center; gap: 8px; padding: 0 16px; height: 48px; }
+.search input { flex: 1; min-width: 0; border: 0; background: transparent; font: inherit; color: var(--text); outline: none; }
+.search input::placeholder { color: var(--text3); }
+.letter { font-size: 12px; font-weight: 800; color: var(--text2); letter-spacing: 0.06em; margin: 6px 4px -4px; }
+.photo { position: relative; height: 360px; overflow: hidden; }
+.photo .fill { position: absolute; inset: 0; }
+.photo .paw { position: absolute; width: 150px; height: 150px; left: 50%; top: 46%; transform: translate(-50%, -50%); fill: color-mix(in srgb, var(--text) 16%, transparent); }
+.photo .ph-label { position: absolute; left: 0; right: 0; top: calc(46% + 90px); text-align: center; font-size: 12.5px; font-weight: 700; color: var(--text2); }
+.photo .tl { position: absolute; top: 52px; left: 14px; right: 14px; display: flex; justify-content: space-between; }
+.photo .hh { position: absolute; top: 108px; left: 14px; right: 14px; }
+.photo .br { position: absolute; right: 14px; bottom: 48px; }
+.pro-sheet { margin-top: -34px; border-radius: 34px 34px 0 0; padding: 22px 18px 20px; display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); border-bottom: 0; }
+.attr { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.attr > div { padding: 12px 8px; border-radius: 20px; text-align: center; display: grid; gap: 1px; }
+.attr .k { font-size: 11px; font-weight: 800; letter-spacing: 0.08em; color: var(--text2); }
+.attr .v { font-size: 17px; font-weight: 800; }
+.attr .s { font-size: 12px; color: var(--text2); font-weight: 600; }
+.beh { width: 100%; }
+.spark { display: flex; align-items: end; gap: 2px; height: 22px; width: 58px; flex: none; }
+.spark i { flex: 1; border-radius: 2px 2px 0 0; background: var(--c); opacity: 0.75; display: block; }
+.incidents { display: grid; gap: 6px; padding: 0 0 10px 26px; }
+.incident { text-align: left; padding: 9px 12px; border-radius: 16px; font-size: 13px; display: grid; gap: 1px; }
+
+/* ───────── Insights ───────── */
+.bars { display: flex; align-items: end; gap: 5px; height: 64px; }
+.bars i { flex: 1; border-radius: 5px 5px 2px 2px; background: color-mix(in srgb, var(--c) 70%, transparent); display: block; min-height: 3px; }
+.bar-x { display: flex; justify-content: space-between; font-size: 10.5px; color: var(--text3); font-weight: 700; margin-top: 4px; }
+.kv { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 10px 0; }
+.kv .v { font-size: 19px; }
+.kv .l { font-size: 11.5px; color: var(--text2); font-weight: 600; }
+.foot { font-size: 12.5px; color: var(--text2); padding: 4px 6px; }
+
+.reduce-motion *, .reduce-motion *::before, .reduce-motion *::after { animation: none !important; transition-duration: 0.01s !important; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition-duration: 0.01s !important; }
+}
+</style>
+
+<div class="page">
+  <section class="side" aria-label="About this preview">
+    <div class="brand"><h1>Walkwise</h1><span class="badge">Design preview</span></div>
+    <p class="lede">A clickable mockup of the planned app, built from the liquid-glass references you shared. It runs in the browser with sample dogs and a simulated walk. It is not the app: GPS, maps, weather, and saving all come in the real build.</p>
+    <ol class="try">
+      <li>Tap <b>Start</b>. The walk is simulated and runs 6 times faster than real time.</li>
+      <li><b>Press and hold Quick Log</b>, slide up into a category, keep sliding outward onto an event, and let go to log it.</li>
+      <li>On a <b>Behavior</b> or <b>Training</b> event, hold still for a moment to get the trigger ring. Drag down to cancel.</li>
+      <li><b>Tap</b> Quick Log instead to use the tap-only menu.</li>
+      <li><b>Hold End</b> to finish. With no dog assigned you get the "Who did you walk?" step, then the report card.</li>
+    </ol>
+    <div class="ctl">
+      <div class="ctl-row"><span class="ctl-label" id="lbl-theme">Theme</span>
+        <div class="seg" role="group" aria-labelledby="lbl-theme" id="ctl-theme">
+          <button id="th-system" aria-pressed="true" data-v="system">System</button>
+          <button id="th-light" aria-pressed="false" data-v="light">Light</button>
+          <button id="th-dark" aria-pressed="false" data-v="dark">Dark</button>
+        </div></div>
+      <div class="ctl-row"><span class="ctl-label" id="lbl-glass">Glass</span>
+        <div class="seg" role="group" aria-labelledby="lbl-glass" id="ctl-glass">
+          <button id="gl-layered" aria-pressed="true" data-v="layered">Layered glass</button>
+          <button id="gl-solid" aria-pressed="false" data-v="solid">Reduced transparency</button>
+        </div></div>
+      <div class="ctl-row"><span class="ctl-label" id="lbl-motion">Motion</span>
+        <div class="seg" role="group" aria-labelledby="lbl-motion" id="ctl-motion">
+          <button id="mo-full" aria-pressed="true" data-v="full">Full</button>
+          <button id="mo-reduced" aria-pressed="false" data-v="reduced">Reduced</button>
+        </div></div>
+      <div class="ctl-row"><span class="ctl-label" id="lbl-jump">Jump to</span>
+        <div class="seg" role="group" aria-labelledby="lbl-jump" id="ctl-jump">
+          <button id="jp-home" data-v="home">Home</button>
+          <button id="jp-walk" data-v="active">Active walk</button>
+          <button id="jp-report" data-v="report">Report card</button>
+          <button id="jp-cal" data-v="calendar">Calendar</button>
+          <button id="jp-dogs" data-v="dogs">Dogs</button>
+          <button id="jp-profile" data-v="profile">Dog profile</button>
+          <button id="jp-ins" data-v="insights">Insights</button>
+        </div></div>
+      <p class="note">In the app, iOS 26 uses Apple's native Liquid Glass. This browser version imitates the layered tier used on Android and older iPhones. The map is a drawn stand-in for Google Maps.</p>
+    </div>
+  </section>
+
+  <div class="phone">
+    <div class="screen" id="screen">
+      <canvas class="ambient" id="ambient" aria-hidden="true"></canvas>
+      <div class="statusbar" aria-hidden="true"><span id="sb-time">9:41</span><span class="dots"><svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M2 9a15 15 0 0 1 20 0M5.5 12.5a10 10 0 0 1 13 0M9 16a5 5 0 0 1 6 0"/><circle cx="12" cy="19" r="1"/></svg><span class="bat"></span></span></div>
+
+      <div class="view" id="v-home"></div>
+      <div class="view flush" id="v-active" hidden></div>
+      <div class="view" id="v-report" hidden></div>
+      <div class="view" id="v-calendar" hidden></div>
+      <div class="view" id="v-dogs" hidden></div>
+      <div class="view flush" id="v-profile" hidden></div>
+      <div class="view" id="v-insights" hidden></div>
+
+      <nav class="tabbar g lv-panel" id="tabbar" aria-label="Main">
+        <button class="tab" data-tab="home" aria-current="page"><svg class="icon" viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/></svg>Home<span class="bar"></span></button>
+        <button class="tab" data-tab="calendar"><svg class="icon" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>Calendar<span class="bar"></span></button>
+        <div class="orb-slot" id="orbslot"></div>
+        <button class="tab" data-tab="dogs"><svg class="icon" viewBox="0 0 24 24"><circle cx="7" cy="9" r="2"/><circle cx="12" cy="6" r="2"/><circle cx="17" cy="9" r="2"/><path d="M8 17c0-3 2-5 4-5s4 2 4 5c0 2-2 2-4 2s-4 0-4-2z"/></svg>Dogs<span class="bar"></span></button>
+        <button class="tab" data-tab="insights"><svg class="icon" viewBox="0 0 24 24"><path d="M5 19V11M10 19V6M15 19v-5M20 19V9"/></svg>Insights<span class="bar"></span></button>
+      </nav>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+const $ = (s, r = document) => r.querySelector(s);
+const screen = $('#screen');
+const SPEED = 6;
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+/* ── Icons ── */
+const I = {
+  play: '<path d="M8 5.5v13l10-6.5z" fill="currentColor" stroke="none"/>',
+  pause: '<path d="M8 5v14M16 5v14"/>',
+  stop: '<rect x="6.5" y="6.5" width="11" height="11" rx="2.5" fill="currentColor" stroke="none"/>',
+  back: '<path d="M15 5l-7 7 7 7"/>',
+  down: '<path d="M6 9l6 6 6-6"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  phone: '<path d="M6 4h3l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v3a2 2 0 0 1-2 2A16 16 0 0 1 4 6a2 2 0 0 1 2-2z"/>',
+  edit: '<path d="M4 20h4L19 9l-4-4L4 16z"/>',
+  expand: '<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>',
+  share: '<path d="M12 15V4M8 8l4-4 4 4M5 13v6h14v-6"/>',
+  image: '<rect x="4" y="5" width="16" height="14" rx="3"/><circle cx="9" cy="10" r="1.6"/><path d="M5 18l5-5 4 4 2-2 3 3"/>',
+  pdf: '<path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M9.5 13h5M9.5 16.5h5"/>',
+  search: '<circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/>',
+  x: '<path d="M6 6l12 12M18 6L6 18"/>',
+  chev: '<path d="M9 6l6 6-6 6"/>',
+  log: '<circle cx="12" cy="12" r="3.2" fill="currentColor" stroke="none"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/>',
+  dog: '<circle cx="7" cy="9" r="2"/><circle cx="12" cy="6" r="2"/><circle cx="17" cy="9" r="2"/><path d="M8 17c0-3 2-5 4-5s4 2 4 5c0 2-2 2-4 2s-4 0-4-2z"/>',
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4"/>',
+  leaf: '<path d="M5 19c0-8 6-13 14-14-1 8-6 14-14 14zM5 19l7-7"/>',
+};
+const icon = (n, extra = '') => `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" ${extra}>${I[n]}</svg>`;
+
+/* ── Taxonomy ── */
+const CATS = [
+  { key: 'nature', name: 'Nature', c: '--c-nature', shape: 'circle', trig: false, items: [['pee','Pee','Pee'],['poop','Poop','Poop'],['marking','Marking','Mark'],['sniffing','Sniffing','Sniff'],['drinking','Drinking water','Drink'],['resting','Resting','Rest'],['n-other','Other','Other']] },
+  { key: 'behavior', name: 'Behavior', c: '--c-behavior', shape: 'tri', trig: true, items: [['pulling','Pulling','Pull'],['barking','Barking','Bark'],['lunging','Lunging','Lunge'],['jumping','Jumping','Jump'],['freezing','Freezing','Freeze'],['reactivity','Reactivity','React'],['distraction','Distraction','Distract'],['loose','Loose-leash walking','Loose'],['calm','Calm behavior','Calm'],['b-other','Other','Other']] },
+  { key: 'training', name: 'Training', c: '--c-training', shape: 'square', trig: true, items: [['recall','Successful recall','Recall'],['heel','Heel','Heel'],['sit','Sit','Sit'],['leaveit','Leave it','Leave'],['redirect','Successful redirection','Redirect'],['cue','Responded to cue','Cue'],['t-other','Other','Other']] },
+  { key: 'custom', name: 'Additional', c: '--c-custom', shape: 'diamond', trig: false, items: [['voice','Voice note','Voice'],['photo','Photo','Photo'],['custom','Custom event','Custom']] },
+];
+const TYPE = {}; CATS.forEach((c, ci) => c.items.forEach(([k, n, s]) => TYPE[k] = { key: k, name: n, short: s, cat: c, ci }));
+const NOUN = k => { const c = TYPE[k].cat.key; if (c === 'behavior') return (k === 'loose' || k === 'calm') ? 'observation' : 'incident'; if (c === 'training') return 'observation'; return 'event'; };
+const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
+const TRIGGERS = [['Another dog','Dog'],['Person','Person'],['Bicycle','Bike'],['Vehicle','Vehicle'],['Wildlife','Wildlife'],['Loud noise','Noise'],['Unfamiliar environment','New place'],['Food','Food'],['Unknown','Unknown']];
+const OUTCOMES = ['Successfully redirected', 'Continued behavior', 'Settled independently', 'Required assistance'];
+
+/* ── Sample dogs ── */
+const DOGS = [
+  { id: 'biscuit', name: 'Biscuit', breed: 'Golden Retriever', sex: 'Female', size: 'Large', range: '51 to 99 lb', age: '3 yrs', stage: 'Adult', rel: 'personal', hh: 'mine', t: '--peach' },
+  { id: 'juno', name: 'Juno', breed: 'Border Collie', sex: 'Female', size: 'Medium', range: '26 to 50 lb', age: '5 yrs', stage: 'Adult', rel: 'client', owner: 'Priya Shah', phone: '(555) 014-2231', hh: 'shah', t: '--aqua' },
+  { id: 'maple', name: 'Maple', breed: 'Labrador Retriever', sex: 'Male', size: 'Large', range: '51 to 99 lb', age: '8 yrs', stage: 'Senior', rel: 'client', owner: 'Priya Shah', phone: '(555) 014-2231', hh: 'shah', t: '--sky' },
+  { id: 'olive', name: 'Olive', breed: 'Greyhound', sex: 'Female', size: 'Large', range: '51 to 99 lb', age: '6 yrs', stage: 'Adult', rel: 'client', owner: 'Dana Ortiz', phone: '(555) 011-7782', hh: 'ortiz', t: '--lav' },
+  { id: 'pepper', name: 'Pepper', breed: 'French Bulldog', sex: 'Male', size: 'Small', range: 'up to 25 lb', age: '2 yrs', stage: 'Adult', rel: 'client', owner: 'Marcus Lee', phone: '(555) 019-4410', hh: 'lee', t: '--blush' },
+  { id: 'ziggy', name: 'Ziggy', breed: 'Beagle mix', sex: 'Male', size: 'Medium', range: '26 to 50 lb', age: 'about 1 yr', stage: 'Puppy', rel: 'personal', hh: 'mine', t: '--mint' },
+];
+const DOG = Object.fromEntries(DOGS.map(d => [d.id, d]));
+const avatar = (d, cls = '') => `<span class="avatar ${cls}" style="--t:var(${d.t})" aria-hidden="true">${d.name[0]}</span>`;
+
+/* ── Map geometry ── */
+const STREETS_H = [90, 230, 370, 510, 650, 760], STREETS_V = [40, 150, 260, 360];
+const WAY = [[40,650],[40,510],[150,510],[150,370],[172,346],[196,312],[226,272],[260,230],[360,230],[360,370],[360,510],[260,510],[260,650],[150,650],[40,650]];
+const SEG = []; let TOTAL = 0;
+for (let i = 1; i < WAY.length; i++) { const [x0, y0] = WAY[i-1], [x1, y1] = WAY[i]; const l = Math.hypot(x1-x0, y1-y0); SEG.push({ x0, y0, x1, y1, l, s: TOTAL }); TOTAL += l; }
+const ROUTE_M = 3060, M_PER_U = ROUTE_M / TOTAL;
+function pointAt(u) { u = Math.max(0, Math.min(TOTAL, u)); for (const s of SEG) if (u <= s.s + s.l) { const f = (u - s.s) / s.l; return [s.x0 + (s.x1 - s.x0) * f, s.y0 + (s.y1 - s.y0) * f]; } return WAY[WAY.length - 1]; }
+function pathUpTo(u) { const pts = [WAY[0]]; for (const s of SEG) { if (u >= s.s + s.l) pts.push([s.x1, s.y1]); else { if (u > s.s) pts.push(pointAt(u)); break; } } return pts.map(p => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' '); }
+
+function baseMap() {
+  let g = '<rect class="m-land" x="-200" y="-200" width="800" height="1200"/>';
+  const xs = [-200, ...STREETS_V, 600], ys = [-200, ...STREETS_H, 1000];
+  for (let i = 0; i < xs.length - 1; i++) for (let j = 0; j < ys.length - 1; j++) {
+    const x = xs[i] + 9, y = ys[j] + 9, w = xs[i+1] - xs[i] - 18, h = ys[j+1] - ys[j] - 18;
+    if (w <= 0 || h <= 0) continue;
+    const park = xs[i] === 150 && ys[j] === 230;
+    g += `<rect class="${park ? 'm-park' : 'm-block'}" x="${x}" y="${y}" width="${w}" height="${h}" rx="7"/>`;
+  }
+  g += '<path class="m-water" d="M-200,560 C-40,560 10,600 40,700 C70,800 140,840 200,1000 L-200,1000 Z"/>';
+  g += '<path class="m-ppath" d="M160,360 C190,330 210,300 250,240"/><path class="m-ppath" d="M165,250 C200,280 230,320 252,360"/>';
+  const lines = [...STREETS_H.map(y => `M-200,${y} H600`), ...STREETS_V.map(x => `M${x},-200 V1000`), 'M-200,330 L600,90'];
+  g += lines.map(d => `<path class="m-case" stroke-width="15" d="${d}"/>`).join('') + lines.map(d => `<path class="m-street" stroke-width="11" d="${d}"/>`).join('');
+  g += '<text class="m-label" x="176" y="300">ELM PARK</text><text class="m-label" x="272" y="224">ORCHARD AVE</text>';
+  return g;
+}
+const BASE = baseMap();
+function shapeSvg(shape, x, y, c, cls = 'mk', attrs = '') {
+  const s = `class="${cls}" style="fill:var(${c})" ${attrs}`;
+  if (shape === 'circle') return `<circle ${s} cx="${x}" cy="${y}" r="6.8"/>`;
+  if (shape === 'tri') return `<path ${s} d="M${x},${y-8} L${x+7.6},${y+5.6} L${x-7.6},${y+5.6} Z" stroke-linejoin="round"/>`;
+  if (shape === 'square') return `<rect ${s} x="${x-6.3}" y="${y-6.3}" width="12.6" height="12.6" rx="3"/>`;
+  return `<path ${s} d="M${x},${y-8.4} L${x+8.4},${y} L${x},${y+8.4} L${x-8.4},${y} Z" stroke-linejoin="round"/>`;
+}
+const legendShape = cat => `<svg class="shape" viewBox="-10 -10 20 20" aria-hidden="true">${shapeSvg(cat.shape, 0, 0, cat.c, '', 'stroke="none"')}</svg>`;
+function clusters(events) {
+  const out = [];
+  for (const e of events) {
+    const [x, y] = e.xy; const near = out.find(c => Math.hypot(c.x - x, c.y - y) < 15);
+    if (near) near.items.push(e); else out.push({ x, y, items: [e] });
+  }
+  return out;
+}
+function mapSvg(walk, { live = false, viewBox = '-10 140 420 840', interactive = false, slice = true, focus = null } = {}) {
+  const u = walk.u;
+  let g = BASE;
+  if (live) g += `<polyline class="m-ghost" points="${WAY.map(p => p.join(',')).join(' ')}"/>`;
+  const pts = pathUpTo(u);
+  g += `<polyline class="m-route-glow" points="${pts}"/><polyline class="m-route" points="${pts}" id="${live ? 'live-route' : ''}"/>`;
+  g += `<circle class="m-start" cx="${WAY[0][0]}" cy="${WAY[0][1]}" r="7"/>`;
+  clusters(walk.events).forEach((c, i) => {
+    if (c.items.length === 1) {
+      const e = c.items[0], t = TYPE[e.key];
+      g += shapeSvg(t.cat.shape, c.x, c.y, t.cat.c, 'mk' + (focus === e.id ? ' mk-focus' : ''), interactive ? `data-ev="${e.id}" tabindex="0" role="button" aria-label="${esc(t.name)}"` : '');
+    } else {
+      g += `<circle class="mk-cluster" cx="${c.x}" cy="${c.y}" r="11" ${interactive ? `data-cl="${i}" tabindex="0" role="button" aria-label="${c.items.length} events here"` : ''}/><text class="mk-count" x="${c.x}" y="${c.y}">${c.items.length}</text>`;
+    }
+  });
+  if (live) { const [px, py] = pointAt(u); g += `<g id="live-pos"><circle class="m-pos-pulse" cx="${px}" cy="${py}" r="14"/><circle class="m-pos" cx="${px}" cy="${py}" r="8"/></g>`; }
+  else { const [px, py] = pointAt(u); g += `<circle class="m-start" style="stroke:var(--danger)" cx="${px}" cy="${py}" r="6"/>`; }
+  return `<svg viewBox="${viewBox}" preserveAspectRatio="${slice ? 'xMidYMid slice' : 'xMidYMid meet'}" role="img" aria-label="Walk route map with ${walk.events.length} logged events">${g}</svg>`;
+}
+
+/* ── Formatting ── */
+const fmtTime = s => { s = Math.floor(s); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), ss = s % 60; return h ? `${h}:${String(m).padStart(2,'0')}:${String(ss).padStart(2,'0')}` : `${m}:${String(ss).padStart(2,'0')}`; };
+const miles = m => m / 1609.344;
+const fmtMi = m => miles(m).toFixed(2);
+const fmtPace = (s, m) => { if (m < 60) return '--'; const tot = Math.round(s / miles(m)); return `${Math.floor(tot / 60)}'${String(tot % 60).padStart(2, '0')}"`; };
+const clock = d => d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+const dateLong = d => d.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' });
+const dogNames = ids => ids.map(i => DOG[i].name).join(' & ');
+
+/* ── State ── */
+let uid = 1;
+const mkEvent = (key, u, t, extra = {}) => ({ id: 'e' + (uid++), key, u, xy: jitter(pointAt(u), uid), t, trigger: null, outcome: null, note: '', ...extra });
+function jitter([x, y], seed) { const a = (seed * 137.5) % 360 * Math.PI / 180; return [x + Math.cos(a) * 3, y + Math.sin(a) * 3]; }
+function sampleWalk() {
+  const start = new Date(); start.setHours(17, 12, 0, 0);
+  const evs = [
+    ['sniffing', 60, 140], ['pee', 140, 260, ], ['pulling', 250, 420, { trigger: 'Another dog', outcome: 'Successfully redirected' }],
+    ['loose', 420, 700], ['barking', 520, 830, { trigger: 'Bicycle', outcome: 'Settled independently' }], ['recall', 600, 980],
+    ['poop', 760, 1240], ['pulling', 900, 1480, { trigger: 'Wildlife', outcome: 'Continued behavior', note: 'Squirrel on the fence line.' }],
+    ['loose', 1040, 1700], ['sit', 1180, 1900], ['pulling', 1300, 2080, { trigger: 'Another dog' }], ['drinking', 1400, 2300], ['calm', 1500, 2480],
+  ];
+  return { id: 'sample', sample: true, start, sim: 2580, distM: ROUTE_M, u: TOTAL, dogs: ['juno', 'maple'], cls: 'Private client',
+    events: evs.map(([k, u, t, x]) => mkEvent(k, Math.min(u, TOTAL), t, Object.assign({ dogs: ['juno', 'maple'] }, x || {}))) };
+}
+const SAMPLE = sampleWalk();
+let walk = null;        // active or last session walk
+let lastDone = null;    // completed walk from this session
+let reportWalk = SAMPLE;
+let reportFocus = null;
+let current = 'home';
+
+/* ── Toast / sheet / popover ── */
+let toastTimer = null;
+function toast(msg, actions = [], low = false) {
+  $('.toast', screen)?.remove(); clearTimeout(toastTimer);
+  const el = document.createElement('div');
+  el.className = 'toast g lv-control ' + (current === 'active' && !low ? 'top' : 'low');
+  el.setAttribute('role', 'status');
+  el.innerHTML = `<span class="msg">${msg}</span><span class="acts">${actions.map((a, i) => `<button class="chip g lv-control press" data-i="${i}">${esc(a.label)}</button>`).join('')}</span>`;
+  el.addEventListener('click', e => { const b = e.target.closest('[data-i]'); if (!b) return; el.remove(); actions[+b.dataset.i].run(); });
+  screen.appendChild(el);
+  toastTimer = setTimeout(() => el.remove(), actions.length ? 6000 : 2600);
+}
+function sheet(html, bind, onDismiss) {
+  closeSheet();
+  const s = document.createElement('div'); s.className = 'sheet-scrim'; s.addEventListener('click', () => { closeSheet(); onDismiss && onDismiss(); });
+  const p = document.createElement('div'); p.className = 'sheet g lv-panel'; p.setAttribute('role', 'dialog'); p.innerHTML = '<div class="handle"></div>' + html;
+  screen.append(s, p); bind && bind(p);
+}
+function closeSheet() { screen.querySelectorAll('.sheet, .sheet-scrim').forEach(n => n.remove()); }
+function closePop() { $('.pop', screen)?.remove(); }
+
+/* ── Navigation ── */
+const VIEWS = ['home', 'active', 'report', 'calendar', 'dogs', 'profile', 'insights'];
+function go(name, opts = {}) {
+  current = name; closePop(); closeSheet(); closeRadial();
+  VIEWS.forEach(v => { $('#v-' + v).hidden = v !== name; });
+  $('#tabbar').hidden = name === 'active' || name === 'profile';
+  document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-current', t.dataset.tab === name ? 'page' : 'false'));
+  ({ home: renderHome, active: renderActive, report: renderReport, calendar: renderCalendar, dogs: renderDogs, profile: renderProfile, insights: renderInsights })[name](opts);
+  $('#v-' + name).scrollTop = 0;
+  renderOrb();
+}
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => go(t.dataset.tab)));
+
+function renderOrb() {
+  const slot = $('#orbslot');
+  if (walk && (walk.status === 'recording' || walk.status === 'paused')) {
+    slot.innerHTML = `<button class="live-pill g lv-control tint press" id="orb-live" aria-label="Return to active walk"><span class="rec" ${walk.status === 'paused' ? 'style="animation:none;background:var(--text3)"' : ''}></span><span class="num" id="orb-time">${fmtTime(walk.sim)}</span></button>`;
+    $('#orb-live').onclick = () => go('active');
+  } else {
+    slot.innerHTML = `<button class="start-orb g lv-orb tint press" id="orb-start" aria-label="Start walk">${icon('play')}</button>`;
+    $('#orb-start').onclick = startWalk;
+  }
+}
+
+/* ── Walk engine (simulated) ── */
+function startWalk(preDogs = []) {
+  if (walk && (walk.status === 'recording' || walk.status === 'paused')) { go('active'); return; }
+  walk = { id: 'w' + Date.now(), start: new Date(), sim: 0, distM: 0, u: 0, dogs: Array.isArray(preDogs) ? preDogs : [], events: [], status: 'recording', cls: 'Personal' };
+  go('active');
+  toast('Recording started. No dog needed to begin.', [], false);
+}
+setInterval(() => {
+  if (!walk || walk.status !== 'recording') return;
+  walk.sim += 0.25 * SPEED;
+  walk.distM = Math.min(ROUTE_M, walk.distM + 1.35 * 0.25 * SPEED);
+  walk.u = walk.distM / M_PER_U;
+  updateHud();
+}, 250);
+function updateHud() {
+  const t = $('#orb-time'); if (t) t.textContent = fmtTime(walk.sim);
+  if (current !== 'active') return;
+  $('#hud-time').textContent = fmtTime(walk.sim);
+  $('#hud-top-time').textContent = fmtTime(walk.sim);
+  $('#hud-dist').textContent = fmtMi(walk.distM);
+  $('#hud-pace').textContent = fmtPace(walk.sim, walk.distM);
+  const r = $('#live-route'); if (r) { const p = pathUpTo(walk.u); r.setAttribute('points', p); r.previousElementSibling.setAttribute('points', p); }
+  const pos = $('#live-pos'); if (pos) { const [x, y] = pointAt(walk.u); pos.querySelectorAll('circle').forEach(c => { c.setAttribute('cx', x); c.setAttribute('cy', y); }); }
+}
+
+/* ── Home ── */
+function renderHome() {
+  const h = new Date().getHours();
+  const hello = h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
+  const recent = lastDone || SAMPLE;
+  const active = walk && (walk.status === 'recording' || walk.status === 'paused');
+  const unassigned = lastDone && !lastDone.dogs.length;
+  const counts = {}; recent.events.forEach(e => counts[e.key] = (counts[e.key] || 0) + 1);
+  const chips = Object.entries(counts).slice(0, 5).map(([k, n]) => `<span class="ev-chip" style="--c:var(${TYPE[k].cat.c})">${esc(TYPE[k].short)} ${n}</span>`).join('');
+  const obs = [...recent.events].reverse().slice(0, 4).map(e => { const t = TYPE[e.key]; return `<button class="li" data-open-ev="${e.id}"><svg class="shape" viewBox="-10 -10 20 20">${shapeSvg(t.cat.shape, 0, 0, t.cat.c, '', 'stroke="none"')}</svg><span class="grow"><span class="t1">${esc(t.name)}</span><br><span class="t2">${e.trigger ? 'Trigger: ' + esc(e.trigger) + ' · ' : ''}${clock(new Date(recent.start.getTime() + e.t * 1000))}${e.dogs && e.dogs.length ? ' · ' + dogNames(e.dogs) : ''}</span></span></button>`; }).join('') || '<p class="muted small" style="margin:6px 0">Nothing logged on this walk.</p>';
+  $('#v-home').innerHTML = `
+    <div class="stack">
+      <div class="greet"><div><p class="h-sec" style="margin-bottom:2px">${dateLong(new Date())}</p><h1 class="h-title">${hello}</h1></div>
+        <button class="avatar press" style="--t:var(--lav)" aria-label="Settings">W</button></div>
+      ${unassigned ? `<button class="banner g tint press" id="hb-assign">${icon('dog')}<span style="flex:1">1 walk needs a dog</span>${icon('chev')}</button>` : ''}
+      <section class="g lv-panel hero" aria-label="Start a walk">
+        ${active ? `<button class="hero-orb g lv-orb tint press" id="h-resume" style="--t:var(--blush)"><span class="rec"></span><span class="big num">${fmtTime(walk.sim)}</span><span class="sub">Walk in progress</span></button>
+          <p class="muted small" style="margin:0">Recording continues while you look around the app.</p>`
+        : `<button class="hero-orb g lv-orb tint press" id="h-start">${icon('play')}<span class="big">Start walk</span><span class="sub">GPS starts right away</span></button>
+          <button class="textlink press" id="h-choose">Choose dogs first</button>`}
+      </section>
+      <section class="g lv-card"><div class="row between" style="margin-bottom:10px"><h2 class="h-sec">${lastDone ? 'Your last walk' : 'Most recent walk'}</h2>${recent.sample ? '<span class="sample">Sample</span>' : ''}</div>
+        <button class="walk-card press" id="h-recent"><span class="thumb">${mapSvg(recent, { viewBox: '10 200 380 480' })}</span>
+          <span style="min-width:0"><span class="t1" style="font-weight:800;display:block">${recent.dogs.length ? dogNames(recent.dogs) : 'Unassigned walk'}</span>
+          <span class="muted small" style="display:block">${clock(recent.start)} · ${recent.cls}</span>
+          <span class="num" style="font-size:20px;display:block;margin-top:4px">${fmtMi(recent.distM)} mi · ${fmtTime(recent.sim)}</span>
+          <span class="ev-chips">${chips}</span></span></button></section>
+      <section class="g lv-card"><div class="row between" style="margin-bottom:4px"><h2 class="h-sec">Upcoming</h2><span class="sample">Sample</span></div>
+        <div class="list">
+          <button class="li" data-go="calendar">${avatar(DOG.juno, 'sm')}<span class="grow"><span class="t1">Juno & Maple</span><br><span class="t2">Tomorrow · 7:30 AM · Private client</span></span>${icon('chev')}</button>
+          <button class="li" data-go="calendar">${avatar(DOG.olive, 'sm')}<span class="grow"><span class="t1">Olive</span><br><span class="t2">Tomorrow · 12:15 PM · Rover</span></span>${icon('chev')}</button>
+        </div></section>
+      <section><div class="row between" style="margin:0 4px 8px"><h2 class="h-sec">Dogs</h2><button class="textlink" data-go="dogs" style="padding:0">See all</button></div>
+        <div class="dog-row">${DOGS.map(d => `<button data-dog="${d.id}" class="press">${avatar(d)}${d.name}</button>`).join('')}</div></section>
+      <section class="g lv-card"><div class="row between" style="margin-bottom:10px"><h2 class="h-sec">This week</h2><span class="sample">Sample</span></div>
+        <div class="mini-stats"><div><div class="v num">9</div><div class="l">walks</div></div><div><div class="v num">14.2</div><div class="l">miles</div></div><div><div class="v num">6.1</div><div class="l">hours</div></div></div></section>
+      <section class="g lv-card"><h2 class="h-sec" style="margin-bottom:2px">Recent observations</h2><div class="list">${obs}</div></section>
+    </div>`;
+  const v = $('#v-home');
+  $('#h-start', v) && ($('#h-start', v).onclick = () => startWalk());
+  $('#h-resume', v) && ($('#h-resume', v).onclick = () => go('active'));
+  $('#h-choose', v) && ($('#h-choose', v).onclick = () => dogPicker([], 'Choose dogs, then start', 'Start walk', ids => startWalk(ids)));
+  $('#h-recent', v).onclick = () => { reportWalk = recent; go('report'); };
+  $('#hb-assign', v) && ($('#hb-assign', v).onclick = () => { reportWalk = lastDone; go('report'); });
+  v.querySelectorAll('[data-go]').forEach(b => b.onclick = () => go(b.dataset.go));
+  v.querySelectorAll('[data-dog]').forEach(b => b.onclick = () => { profileId = b.dataset.dog; go('profile'); });
+  v.querySelectorAll('[data-open-ev]').forEach(b => b.onclick = () => { reportWalk = recent; go('report', { focus: b.dataset.openEv }); });
+}
+
+function dogPicker(selected, title, cta, done, laterLabel = null, later = null) {
+  const sel = new Set(selected);
+  const rows = DOGS.map(d => `<button class="li" data-pick="${d.id}" aria-pressed="${sel.has(d.id)}">${avatar(d, 'sm')}<span class="grow"><span class="t1">${d.name}</span><br><span class="t2">${esc(d.breed)}${d.owner ? ' · ' + esc(d.owner) : ''}</span></span><span class="chk" style="width:24px;height:24px;border-radius:50%;display:grid;place-items:center;border:2px solid var(--glass-border)"></span></button>`).join('');
+  sheet(`<h3>${title}</h3><p class="muted small" style="margin:0 0 6px">Adding or changing dogs never resets the timer, distance, route, or logged events.</p><div class="list" id="pick">${rows}</div>
+    <div style="display:grid;gap:8px;margin-top:12px"><button class="btn primary full g tint press" id="pick-done">${cta}</button>${laterLabel ? `<button class="btn full press" id="pick-later">${laterLabel}</button>` : ''}</div>`, p => {
+    const paint = () => p.querySelectorAll('[data-pick]').forEach(b => { const on = sel.has(b.dataset.pick); b.setAttribute('aria-pressed', on); const c = b.querySelector('.chk'); c.style.background = on ? 'var(--accent)' : 'transparent'; c.style.borderColor = on ? 'var(--accent)' : 'var(--glass-border)'; });
+    paint();
+    p.querySelectorAll('[data-pick]').forEach(b => b.onclick = () => { sel.has(b.dataset.pick) ? sel.delete(b.dataset.pick) : sel.add(b.dataset.pick); paint(); });
+    $('#pick-done', p).onclick = () => { closeSheet(); done([...sel]); };
+    if (later) $('#pick-later', p).onclick = () => { closeSheet(); later(); };
+  }, later);
+}
+
+/* ── Active walk ── */
+function renderActive() {
+  if (!walk) { walk = { id: 'w' + Date.now(), start: new Date(), sim: 0, distM: 0, u: 0, dogs: [], events: [], status: 'recording', cls: 'Personal' }; }
+  const paused = walk.status === 'paused';
+  $('#v-active').innerHTML = `
+    <div class="mapwrap" id="live-map">${mapSvg(walk, { live: true })}</div>
+    <div class="hud-top">
+      <button class="icon-btn g lv-orb outdoor press" id="a-min" aria-label="Back to Home while recording">${icon('down')}</button>
+      <div class="status-pill g lv-control outdoor" role="status"><span class="rec" ${paused ? 'style="animation:none;background:var(--text3)"' : ''}></span><span>${paused ? 'Paused' : 'Recording'}</span><span class="num" id="hud-top-time">${fmtTime(walk.sim)}</span></div>
+      <div class="status-pill g lv-control outdoor" style="margin-left:auto" aria-label="GPS signal good"><span class="gps"><i style="height:5px"></i><i style="height:8px"></i><i style="height:12px"></i></span>GPS</div>
+    </div>
+    <p class="speed-note">Simulated walk · 6× speed</p>
+    <section class="metrics g lv-panel outdoor ${paused ? 'paused' : ''}" aria-label="Walk stats">
+      <div class="mrow">
+        <div><div class="v num" id="hud-time">${fmtTime(walk.sim)}</div><div class="l">Time</div></div>
+        <div><div class="v num" id="hud-dist">${fmtMi(walk.distM)}</div><div class="l">Miles</div></div>
+        <div><div class="v num" id="hud-pace">${fmtPace(walk.sim, walk.distM)}</div><div class="l">Pace /mi</div></div>
+      </div>
+      <div class="dogline">${walk.dogs.length ? walk.dogs.map(i => avatar(DOG[i], 'sm')).join('') + `<span class="names">${dogNames(walk.dogs)}</span>` : '<span class="names muted">No dog assigned yet</span>'}
+        <button class="chip g lv-control tint press" style="--t:var(--lav)" id="a-dog">${icon('plus', 'style="width:16px;height:16px"')}${walk.dogs.length ? 'Dogs' : 'Add dog'}</button></div>
+    </section>
+    <div class="thumbzone">
+      <button class="side-btn g lv-orb outdoor press" id="a-pause" aria-label="${paused ? 'Resume' : 'Pause'}">${icon(paused ? 'play' : 'pause')}</button>
+      <button class="ql g lv-orb tint" id="ql" aria-label="Quick Log. Press and hold, then slide to log an observation. Tap for menu.">${icon('log')}<span>Quick Log</span></button>
+      <button class="side-btn g lv-orb outdoor" id="a-end" aria-label="End walk. Press and hold.">${icon('stop')}<span>Hold</span><span class="hold-ring" id="hold-ring"></span></button>
+    </div>`;
+  const mapEl = $('#live-map');
+  $('#a-min').onclick = () => go('home');
+  $('#a-pause').onclick = () => { walk.status = walk.status === 'paused' ? 'recording' : 'paused'; renderActive(); renderOrb(); toast(walk.status === 'paused' ? 'Paused. Distance stops counting until you resume.' : 'Resumed.'); };
+  $('#a-dog').onclick = () => dogPicker(walk.dogs, 'Dogs on this walk', 'Done', ids => { reattribute(ids); walk.dogs = ids; renderActive(); toast(ids.length ? `${dogNames(ids)} added. Route and timer unchanged.` : 'No dogs assigned.'); });
+  bindHold($('#a-end'), endWalk);
+  bindQuickLog($('#ql'));
+}
+function reattribute(ids) {
+  // Events logged before any dog was assigned get the first dogs assigned.
+  if (!walk.dogs.length && ids.length) walk.events.forEach(e => { if (!e.dogs || !e.dogs.length) e.dogs = [...ids]; });
+}
+function refreshLiveMap() { const m = $('#live-map'); if (m) m.innerHTML = mapSvg(walk, { live: true }); }
+
+function bindHold(btn, done) {
+  let raf = 0, t0 = 0;
+  const ring = $('#hold-ring');
+  const stop = (completed) => { cancelAnimationFrame(raf); ring.style.setProperty('--p', 0); if (!completed && performance.now() - t0 < 600 && t0) toast('Hold to end the walk.'); t0 = 0; };
+  btn.addEventListener('pointerdown', e => { e.preventDefault(); t0 = performance.now(); const step = () => { const p = Math.min(1, (performance.now() - t0) / 600); ring.style.setProperty('--p', p); if (p >= 1) { t0 = 0; ring.style.setProperty('--p', 0); done(); return; } raf = requestAnimationFrame(step); }; raf = requestAnimationFrame(step); });
+  btn.addEventListener('pointerup', () => { if (t0) stop(false); });
+  btn.addEventListener('pointerleave', () => { if (t0) { cancelAnimationFrame(raf); ring.style.setProperty('--p', 0); t0 = 0; } });
+  btn.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); done(); } });
+}
+function endWalk() {
+  walk.status = 'ended';
+  const finish = () => { lastDone = walk; reportWalk = walk; walk = null; go('report'); };
+  if (!walk.dogs.length) {
+    dogPicker([], 'Who did you walk?', 'Save report', ids => { reattribute(ids); walk.dogs = ids; finish(); }, 'Later: save as unassigned', () => { finish(); toast('Saved as an unassigned walk. Assign a dog any time.'); });
+  } else finish();
+}
+
+/* ── Quick Log radial menu ── */
+const R = { open: false, mode: 'gesture', level: 1, cat: null, hover: null, locked: null, cancel: false, cx: 0, cy: 0, ccx: 0, ccy: 0 };
+const G = { R0: 44, R1i: 52, R1o: 128, R2i: 134, R2o: 190 };
+let gs = null, holdT = null, dwellT = null, dwellAnchor = null, dwellKey = '';
+function sectorIdx(ang, n) { if (ang > 0) ang = ang < 90 ? 0 : -180; return Math.max(0, Math.min(n - 1, Math.floor((ang + 180) / (180 / n)))); }
+function arcPath(cx, cy, ri, ro, a0, a1) {
+  const rad = d => d * Math.PI / 180, p = (r, a) => [cx + r * Math.cos(rad(a)), cy + r * Math.sin(rad(a))];
+  const [x0, y0] = p(ro, a0), [x1, y1] = p(ro, a1), [x2, y2] = p(ri, a1), [x3, y3] = p(ri, a0);
+  return `M${x0.toFixed(1)},${y0.toFixed(1)} A${ro},${ro} 0 0 1 ${x1.toFixed(1)},${y1.toFixed(1)} L${x2.toFixed(1)},${y2.toFixed(1)} A${ri},${ri} 0 0 0 ${x3.toFixed(1)},${y3.toFixed(1)} Z`;
+}
+function openRadial(mode) {
+  const sr = screen.getBoundingClientRect(), br = $('#ql').getBoundingClientRect();
+  Object.assign(R, { open: true, mode, level: 1, cat: null, hover: null, locked: null, cancel: false,
+    ccx: br.left + br.width / 2, ccy: br.top + br.height / 2, cx: br.left + br.width / 2 - sr.left, cy: br.top + br.height / 2 - sr.top });
+  const scrim = document.createElement('div'); scrim.className = 'radial-scrim'; scrim.id = 'r-scrim';
+  scrim.style.setProperty('--cx', R.cx + 'px'); scrim.style.setProperty('--cy', R.cy + 'px');
+  const disc = document.createElement('div'); disc.className = 'radial-disc'; disc.id = 'r-disc';
+  Object.assign(disc.style, { left: (R.cx - G.R2o - 6) + 'px', top: (R.cy - G.R2o - 6) + 'px', width: (2 * G.R2o + 12) + 'px', height: (2 * G.R2o + 12) + 'px' });
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); svg.setAttribute('class', 'radial' + (mode === 'tap' ? ' tapmode' : '')); svg.id = 'r-svg';
+  svg.style.pointerEvents = mode === 'tap' ? 'auto' : 'none';
+  svg.style.setProperty('--cx', R.cx + 'px'); svg.style.setProperty('--cy', R.cy + 'px');
+  screen.append(scrim, disc, svg);
+  if (mode === 'tap') { scrim.addEventListener('click', closeRadial); svg.addEventListener('click', onTapRadial); }
+  drawRadial(true);
+}
+function closeRadial() { R.open = false; ['r-scrim', 'r-disc', 'r-svg'].forEach(id => document.getElementById(id)?.remove()); clearTimeout(dwellT); }
+function drawRadial(fresh = false, ring2Fresh = false) {
+  const svg = $('#r-svg'); if (!svg) return;
+  const { cx, cy } = R; const gap = 1.3; let h = '';
+  const sector = (ring, i, n, ri, ro, label, short, color, on) => {
+    const a0 = -180 + i * 180 / n + gap, a1 = -180 + (i + 1) * 180 / n - gap, mid = (a0 + a1) / 2 * Math.PI / 180, rm = (ri + ro) / 2;
+    const fill = on ? `fill:color-mix(in srgb, var(${color}) 42%, var(--radial-fill))` : (ring === 1 && R.cat === i && R.level === 2 ? `fill:color-mix(in srgb, var(${color}) 22%, var(--radial-fill))` : '');
+    return `<path class="sec ${on ? 'on' : ''}" style="${fill}" data-ring="${ring}" data-idx="${i}" d="${arcPath(cx, cy, ri, ro, a0, a1)}"><title>${esc(label)}</title></path>` +
+      `<text class="lbl ${ring !== 1 ? 's' : ''}" x="${(cx + rm * Math.cos(mid)).toFixed(1)}" y="${(cy + rm * Math.sin(mid)).toFixed(1)}">${esc(short)}</text>`;
+  };
+  if (R.level !== 'trigger') {
+    let r1 = '';
+    CATS.forEach((c, i) => { r1 += sector(1, i, 4, G.R1i, G.R1o, c.name, c.name, c.c, R.hover && R.hover.ring === 1 && R.hover.idx === i); });
+    h += `<g class="${fresh ? 'ring' : ''}">${r1}</g>`;
+    if (R.cat !== null && R.level === 2) {
+      const c = CATS[R.cat]; let r2 = '';
+      c.items.forEach(([k, n, s], i) => { r2 += sector(2, i, c.items.length, G.R2i, G.R2o, n, s, c.c, R.hover && R.hover.ring === 2 && R.hover.idx === i); });
+      h += `<g class="${ring2Fresh ? 'ring' : ''}">${r2}</g>`;
+    }
+  } else {
+    const c = TYPE[R.locked].cat; let rt = '';
+    TRIGGERS.forEach(([n, s], i) => { rt += sector('t', i, TRIGGERS.length, G.R2i - 30, G.R2o - 4, n, s, '--lav', R.hover && R.hover.ring === 't' && R.hover.idx === i); });
+    h += `<g class="ring">${rt}</g>`;
+    h += `<text class="ctr-s" x="${cx}" y="${cy - G.R2i + 14}">Optional trigger</text>`;
+  }
+  let t1 = 'Quick Log', t2 = R.mode === 'tap' ? 'Tap a category' : 'Slide to a category';
+  if (R.cancel) { t1 = 'Cancel'; t2 = 'Release: nothing saved'; }
+  else if (R.level === 'trigger') { t1 = TYPE[R.locked].short; t2 = R.hover ? TRIGGERS[R.hover.idx][0] : 'Release here: no trigger'; }
+  else if (R.hover && R.hover.ring === 2) { const it = CATS[R.cat].items[R.hover.idx]; t1 = it[2]; t2 = CATS[R.cat].trig && R.mode === 'gesture' ? 'Release to log · hold for trigger' : 'Release to log'; if (R.mode === 'tap') t2 = 'Tap to log'; }
+  else if (R.hover && R.hover.ring === 1) { t1 = CATS[R.hover.idx].name; t2 = R.mode === 'tap' ? 'Tap to open' : 'Keep sliding out'; }
+  else if (R.mode === 'tap' && R.level === 2) { t1 = CATS[R.cat].name; t2 = 'Tap center to close'; }
+  h += `<circle class="ctr" data-ring="c" cx="${cx}" cy="${cy}" r="${G.R0}" ${R.cancel ? 'style="stroke:var(--danger);stroke-width:2.5"' : ''}/>`;
+  h += `<text class="ctr-t" x="${cx}" y="${cy - 2}" ${R.cancel ? 'style="fill:var(--danger)"' : ''}>${esc(t1)}</text><text class="ctr-s" x="${cx}" y="${cy + 13}">${esc(t2.length > 24 ? t2.slice(0, 23) + '…' : t2)}</text>`;
+  if (R.mode === 'gesture' && !R.cancel) h += `<text class="ctr-s" x="${cx}" y="${cy + G.R0 + 22}">Drag down to cancel</text>`;
+  svg.innerHTML = h;
+}
+function onGestureMove(x, y) {
+  const dx = x - R.ccx, dy = y - R.ccy, r = Math.hypot(dx, dy), ang = Math.atan2(dy, dx) * 180 / Math.PI;
+  const prevLevel = R.level, prevCat = R.cat, prevKey = JSON.stringify(R.hover) + R.cancel;
+  R.cancel = dy > 34 && r > 40;
+  let ring2Fresh = false;
+  if (R.cancel) R.hover = null;
+  else if (R.level === 'trigger') {
+    R.hover = (r >= G.R2i - 34 && r <= G.R2o + 60) ? { ring: 't', idx: sectorIdx(ang, TRIGGERS.length) } : null;
+  } else if (r < G.R0) R.hover = null;
+  else if (r < G.R1o) { const ci = sectorIdx(ang, 4); R.hover = { ring: 1, idx: ci }; if (R.level === 2 && R.cat !== ci) { R.cat = ci; ring2Fresh = true; } }
+  else {
+    if (R.level !== 2) { R.cat = sectorIdx(ang, 4); R.level = 2; ring2Fresh = true; }
+    R.hover = { ring: 2, idx: sectorIdx(ang, CATS[R.cat].items.length) };
+  }
+  const key = JSON.stringify(R.hover) + R.cancel;
+  if (key !== prevKey || R.level !== prevLevel || R.cat !== prevCat) { drawRadial(false, ring2Fresh); if (R.hover) buzz(); }
+  // Dwell to deepen into triggers
+  const eligible = R.level === 2 && R.hover && R.hover.ring === 2 && CATS[R.cat].trig && CATS[R.cat].items[R.hover.idx][0].indexOf('other') === -1;
+  if (!eligible) { clearTimeout(dwellT); dwellKey = ''; return; }
+  const k = R.cat + ':' + R.hover.idx;
+  if (k !== dwellKey || Math.hypot(x - dwellAnchor[0], y - dwellAnchor[1]) > 9) {
+    dwellKey = k; dwellAnchor = [x, y]; clearTimeout(dwellT);
+    dwellT = setTimeout(() => { if (!R.open || R.level !== 2) return; R.locked = CATS[R.cat].items[R.hover.idx][0]; R.level = 'trigger'; R.hover = null; dwellKey = ''; buzz(); drawRadial(); }, 350);
+  }
+}
+function buzz() { try { navigator.vibrate && navigator.vibrate(8); } catch (e) {} }
+function commitGesture() {
+  clearTimeout(dwellT);
+  if (R.cancel) { closeRadial(); toast('Cancelled. Nothing logged.'); return; }
+  if (R.level === 'trigger') { const trig = R.hover ? TRIGGERS[R.hover.idx][0] : null; const k = R.locked; closeRadial(); logEvent(k, trig); return; }
+  if (R.hover && R.hover.ring === 2) { const k = CATS[R.cat].items[R.hover.idx][0]; closeRadial(); logEvent(k, null); return; }
+  if (R.hover && R.hover.ring === 1) { const ci = R.hover.idx; closeRadial(); openRadial('tap'); R.cat = ci; R.level = 2; drawRadial(false, true); return; }
+  closeRadial(); toast('Cancelled. Nothing logged.');
+}
+function onTapRadial(e) {
+  const t = e.target.closest('[data-ring]'); if (!t) { closeRadial(); return; }
+  const ring = t.dataset.ring, i = +t.dataset.idx;
+  if (ring === 'c') { closeRadial(); return; }
+  if (ring === '1') { R.cat = i; R.level = 2; R.hover = null; drawRadial(false, true); return; }
+  if (ring === '2') { const k = CATS[R.cat].items[i][0]; closeRadial(); logEvent(k, null); }
+}
+function bindQuickLog(btn) {
+  btn.addEventListener('pointerdown', e => {
+    e.preventDefault(); try { btn.setPointerCapture(e.pointerId); } catch (_) {}
+    gs = { x0: e.clientX, y0: e.clientY, opened: false };
+    btn.style.transform = 'scale(0.94)';
+    holdT = setTimeout(() => { if (gs) { gs.opened = true; openRadial('gesture'); buzz(); } }, 180);
+  });
+  btn.addEventListener('pointermove', e => {
+    if (!gs) return;
+    if (!gs.opened && Math.hypot(e.clientX - gs.x0, e.clientY - gs.y0) > 12) { clearTimeout(holdT); gs.opened = true; openRadial('gesture'); }
+    if (gs.opened) onGestureMove(e.clientX, e.clientY);
+  });
+  const up = () => { if (!gs) return; clearTimeout(holdT); btn.style.transform = ''; const opened = gs.opened; gs = null; if (opened) commitGesture(); else openRadial('tap'); };
+  btn.addEventListener('pointerup', up);
+  btn.addEventListener('pointercancel', () => { clearTimeout(holdT); btn.style.transform = ''; gs = null; closeRadial(); });
+  btn.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openRadial('tap'); } });
+}
+function logEvent(key, trigger) {
+  const t = TYPE[key];
+  const ev = mkEvent(key, walk.u, walk.sim, { trigger, dogs: [...walk.dogs] });
+  walk.events.push(ev); refreshLiveMap();
+  const acts = [];
+  if (t.cat.trig && !trigger) acts.push({ label: 'Add trigger', run: () => pickFor(ev, 'trigger') });
+  if (t.cat.trig) acts.push({ label: 'Outcome', run: () => pickFor(ev, 'outcome') });
+  acts.push({ label: 'Undo', run: () => { walk.events = walk.events.filter(x => x !== ev); refreshLiveMap(); toast('Removed.'); } });
+  toast(`<b>${esc(t.name)}</b> logged${trigger ? ' · ' + esc(trigger) : ''}`, acts);
+}
+function pickFor(ev, field) {
+  const opts = field === 'trigger' ? TRIGGERS.map(t => t[0]) : OUTCOMES;
+  sheet(`<h3>${field === 'trigger' ? 'Trigger' : 'Outcome'} <span class="muted small" style="font-weight:600">(optional)</span></h3><p class="muted small" style="margin:0 0 12px">For ${esc(TYPE[ev.key].name)}. You can also edit this later from the report.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">${opts.map((o, i) => `<button class="chip g lv-control press" data-o="${i}">${esc(o)}</button>`).join('')}</div>`, p => {
+    p.querySelectorAll('[data-o]').forEach(b => b.onclick = () => { ev[field] = opts[+b.dataset.o]; closeSheet(); toast(`${field === 'trigger' ? 'Trigger' : 'Outcome'} saved: ${esc(ev[field])}`); });
+  });
+}
+
+/* ── Report ── */
+function renderReport(opts = {}) {
+  const w = reportWalk; const focus = opts.focus || null;
+  const end = new Date(w.start.getTime() + w.sim * 1000);
+  const byCat = CATS.map(c => ({ c, rows: Object.entries(w.events.filter(e => TYPE[e.key].cat === c).reduce((a, e) => (a[e.key] = (a[e.key] || 0) + 1, a), {})) })).filter(x => x.rows.length);
+  const steps = Math.round(miles(w.distM) * 2100);
+  const timeline = [...w.events].sort((a, b) => a.t - b.t).map(e => { const t = TYPE[e.key]; return `<button class="li" data-tl="${e.id}"><svg class="shape" viewBox="-10 -10 20 20">${shapeSvg(t.cat.shape, 0, 0, t.cat.c, '', 'stroke="none"')}</svg><span class="grow"><span class="t1">${esc(t.name)}</span><br><span class="t2">${clock(new Date(w.start.getTime() + e.t * 1000))}${e.trigger ? ' · ' + esc(e.trigger) : ''}${e.outcome ? ' · ' + esc(e.outcome) : ''}</span></span>${icon('chev')}</button>`; }).join('');
+  $('#v-report').innerHTML = `
+    <div class="stack">
+      <div class="topbar"><button class="icon-btn g lv-orb press" id="r-back" aria-label="Back">${icon('back')}</button><span class="h-sec" style="flex:1">Walk report</span>${w.sample ? '<span class="sample">Sample</span>' : ''}</div>
+      <div>
+        ${w.dogs.length ? `<div class="row">${w.dogs.map(i => avatar(DOG[i])).join('')}<h1 class="h-title" style="font-size:25px">${dogNames(w.dogs)}</h1></div>`
+          : `<div class="row between"><h1 class="h-title" style="font-size:25px">Unassigned walk</h1><button class="chip g lv-control tint press" style="--t:var(--peach)" id="r-assign">Assign dog</button></div>`}
+        <p class="muted" style="margin:6px 0 0">${dateLong(w.start)} · ${clock(w.start)} to ${clock(end)} · ${w.cls}</p>
+      </div>
+      <div class="stat-grid">
+        <div class="stat g"><div class="v num">${fmtTime(w.sim)}</div><div class="l">Duration</div></div>
+        <div class="stat g"><div class="v num">${fmtMi(w.distM)} <span style="font-size:15px">mi</span></div><div class="l">Distance</div></div>
+        <div class="stat g"><div class="v num">${fmtPace(w.sim, w.distM)}</div><div class="l">Avg pace /mi</div></div>
+        <div class="stat g"><div class="v num">${steps.toLocaleString()}</div><div class="l">Walker steps<span class="est">est.</span></div></div>
+      </div>
+      <section class="g lv-card map-card" aria-label="Route and events"><div id="r-map" style="position:relative">${mapSvg(w, { viewBox: '10 200 380 480', interactive: true, slice: false, focus })}</div>
+        <div class="legend">${CATS.map(c => `<span>${legendShape(c)}${c.name}</span>`).join('')}<span class="muted" style="font-weight:600">Tap a marker for details</span></div></section>
+      <section class="g lv-card"><h2 class="h-sec">Behavior breakdown</h2>
+        ${byCat.length ? byCat.map(({ c, rows }) => `<div class="bd-cat">${legendShape(c)}${c.name}</div>` + rows.map(([k, n]) => `<div class="bd-row"><span>${esc(TYPE[k].name)}</span><span><span class="num n">${n}</span> <span class="muted small">${NOUN(k)}${n === 1 ? '' : 's'}</span></span></div>`).join('')).join('') : '<p class="muted" style="margin:8px 0 0">Nothing was logged on this walk.</p>'}
+      </section>
+      <section class="g lv-card"><div class="row between"><h2 class="h-sec">Weather</h2><span class="sample">Sample values</span></div>
+        <div class="wx" style="margin-top:10px">
+          <div><div class="v num">64°</div><div class="l">Start · partly cloudy</div></div><div><div class="v num">61°</div><div class="l">End · feels 60°</div></div><div><div class="v num">58%</div><div class="l">Humidity</div></div>
+          <div><div class="v num">6 <span style="font-size:13px">mph</span></div><div class="l">Wind · gusts 14</div></div><div><div class="v num">2</div><div class="l">UV index</div></div><div><div class="v num">0 <span style="font-size:13px">in</span></div><div class="l">Precipitation</div></div>
+        </div><p class="muted small" style="margin:10px 0 0">In the app this comes from Apple Weather, retrieved at the start and end of the walk.</p></section>
+      <section class="g lv-card"><h2 class="h-sec">Timeline</h2><div class="list">${timeline || '<p class="muted small">No events.</p>'}</div></section>
+      <section class="g lv-card"><h2 class="h-sec" style="margin-bottom:10px">Share with the owner</h2>
+        <div class="actions">
+          <button class="g press" data-share="link">${icon('share')}Expiring link</button>
+          <button class="g press" data-share="image">${icon('image')}Image</button>
+          <button class="g press" data-share="pdf">${icon('pdf')}PDF</button>
+        </div><p class="muted small" style="margin:10px 0 0">Nothing saves to the phone unless you tap Save. Exports are backed up to the walk's cloud history.</p></section>
+    </div>`;
+  const v = $('#v-report');
+  $('#r-back', v).onclick = () => go('home');
+  $('#r-assign', v) && ($('#r-assign', v).onclick = () => dogPicker([], 'Who did you walk?', 'Assign', ids => { if (!ids.length) return; w.events.forEach(e => { if (!e.dogs || !e.dogs.length) e.dogs = [...ids]; }); w.dogs = ids; renderReport(); toast(`Assigned to ${dogNames(ids)}.`); }));
+  v.querySelectorAll('[data-share]').forEach(b => b.onclick = () => toast({ link: 'Preview only. Links expire after 30 days and can be revoked.', image: 'Preview only. The image includes the route and every marker.', pdf: 'Preview only. The PDF can include a detailed event appendix.' }[b.dataset.share]));
+  const mapBox = $('#r-map', v);
+  mapBox.addEventListener('click', e => {
+    const evEl = e.target.closest('[data-ev]'), clEl = e.target.closest('[data-cl]');
+    if (evEl) showPop(w, [w.events.find(x => x.id === evEl.dataset.ev)], evEl);
+    else if (clEl) { const c = clusters(w.events)[+clEl.dataset.cl]; showPop(w, c.items, clEl); }
+    else closePop();
+  });
+  mapBox.addEventListener('keydown', e => { if (e.key === 'Enter') e.target.dispatchEvent(new MouseEvent('click', { bubbles: true })); });
+  v.querySelectorAll('[data-tl]').forEach(b => b.onclick = () => { renderReport({ focus: b.dataset.tl }); $('#v-report').scrollTop = $('#r-map').offsetTop - 70; setTimeout(() => { const el = $(`#r-map [data-ev="${b.dataset.tl}"]`); if (el) showPop(w, [w.events.find(x => x.id === b.dataset.tl)], el); else { const c = clusters(w.events).findIndex(c => c.items.some(i => i.id === b.dataset.tl)); const cel = $(`#r-map [data-cl="${c}"]`); cel && showPop(w, clusters(w.events)[c].items, cel); } }, 180); });
+  v.onscroll = closePop;
+  if (focus) setTimeout(() => { $('#v-report').scrollTop = $('#r-map').offsetTop - 70; const el = $(`#r-map [data-ev="${focus}"]`); if (el) showPop(w, [w.events.find(x => x.id === focus)], el); else { const ci = clusters(w.events).findIndex(c => c.items.some(i => i.id === focus)); const cel = $(`#r-map [data-cl="${ci}"]`); cel && showPop(w, clusters(w.events)[ci].items, cel); } }, 180);
+}
+function showPop(w, items, anchor) {
+  closePop();
+  const sr = screen.getBoundingClientRect(), ar = anchor.getBoundingClientRect();
+  const p = document.createElement('div'); p.className = 'pop g lv-card'; p.setAttribute('role', 'dialog');
+  p.innerHTML = items.map((e, i) => { const t = TYPE[e.key]; return `${i ? '<hr style="border:0;border-top:1px solid var(--glass-border);margin:10px 0">' : ''}<div class="row" style="gap:8px"><svg class="shape" viewBox="-10 -10 20 20">${shapeSvg(t.cat.shape, 0, 0, t.cat.c, '', 'stroke="none"')}</svg><b>${esc(t.name)}</b></div>
+    <dl><dt>Time</dt><dd>${clock(new Date(w.start.getTime() + e.t * 1000))}</dd><dt>Dog</dt><dd>${e.dogs && e.dogs.length ? dogNames(e.dogs) : 'Not assigned'}</dd>
+    ${e.trigger ? `<dt>Trigger</dt><dd>${esc(e.trigger)}</dd>` : ''}${e.outcome ? `<dt>Outcome</dt><dd>${esc(e.outcome)}</dd>` : ''}${e.note ? `<dt>Note</dt><dd>${esc(e.note)}</dd>` : ''}</dl>`; }).join('');
+  screen.appendChild(p);
+  const pw = p.offsetWidth, ph = p.offsetHeight;
+  let left = ar.left + ar.width / 2 - sr.left - pw / 2; left = Math.max(10, Math.min(sr.width - pw - 10, left));
+  let top = ar.top - sr.top - ph - 12; if (top < 50) top = ar.bottom - sr.top + 12;
+  p.style.left = left + 'px'; p.style.top = top + 'px';
+}
+
+/* ── Calendar (sample data) ── */
+let calMonth = new Date(); calMonth.setDate(1); let calDog = 'all'; let calSel = null;
+function rng(seed) { return () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }; }
+function monthData(y, m) {
+  const r = rng(y * 12 + m + 7), days = new Date(y, m + 1, 0).getDate(), today = new Date(); const out = {};
+  for (let d = 1; d <= days; d++) {
+    const date = new Date(y, m, d), past = date <= today, list = [];
+    if (past && r() < 0.62) { const n = r() < 0.3 ? 2 : 1; for (let i = 0; i < n; i++) { const a = DOGS[Math.floor(r() * DOGS.length)], b = r() < 0.35 ? DOGS[Math.floor(r() * DOGS.length)] : null; const dogs = [...new Set([a.id, b && b.id].filter(Boolean))]; const mi = 0.8 + r() * 1.9; list.push({ kind: 'done', hour: 7 + Math.floor(r() * 11), dogs, mi, min: Math.round(mi * 19 + r() * 8), tags: Math.floor(r() * 9) }); } }
+    if (!past && r() < 0.4) { const a = DOGS[1 + Math.floor(r() * 4)]; list.push({ kind: 'sched', hour: 7 + Math.floor(r() * 10), dogs: a.hh === 'shah' ? ['juno', 'maple'] : [a.id] }); }
+    out[d] = list;
+  }
+  return out;
+}
+function renderCalendar() {
+  const y = calMonth.getFullYear(), m = calMonth.getMonth(), data = monthData(y, m), first = new Date(y, m, 1).getDay(), days = new Date(y, m + 1, 0).getDate();
+  const keep = w => calDog === 'all' || w.dogs.includes(calDog);
+  let walks = 0, mi = 0, min = 0, tags = 0; const dogs = new Set();
+  Object.values(data).forEach(l => l.filter(w => w.kind === 'done' && keep(w)).forEach(w => { walks++; mi += w.mi; min += w.min; tags += w.tags; w.dogs.forEach(d => dogs.add(d)); }));
+  const today = new Date();
+  let cells = ['S','M','T','W','T','F','S'].map(d => `<div class="wd">${d}</div>`).join('');
+  for (let i = 0; i < first; i++) cells += '<div class="day empty"></div>';
+  for (let d = 1; d <= days; d++) {
+    const l = data[d].filter(keep), done = l.filter(w => w.kind === 'done').length, sch = l.filter(w => w.kind === 'sched').length;
+    const isToday = today.getFullYear() === y && today.getMonth() === m && today.getDate() === d;
+    cells += `<button class="day ${isToday ? 'today' : ''} ${calSel === d ? 'g lv-control tint' : ''}" aria-pressed="${calSel === d}" data-day="${d}" aria-label="${d}: ${done} walks, ${sch} scheduled"><span>${d}</span><span class="marks">${'<i></i>'.repeat(Math.min(done, 2))}${sch ? '<i class="sched"></i>' : ''}</span></button>`;
+  }
+  const sel = calSel ? data[calSel].filter(keep) : [];
+  const fmtH = h => { const d = new Date(); d.setHours(h, (h * 7) % 60, 0, 0); return clock(d); };
+  $('#v-calendar').innerHTML = `
+    <div class="stack">
+      <div class="row between"><h1 class="h-title">${calMonth.toLocaleDateString([], { month: 'long', year: 'numeric' })}</h1>
+        <div class="row" style="gap:6px"><button class="icon-btn g lv-orb press" id="c-prev" aria-label="Previous month">${icon('back')}</button><button class="icon-btn g lv-orb press" id="c-next" aria-label="Next month">${icon('chev')}</button></div></div>
+      <div class="statstrip" aria-label="Month totals">
+        <div class="stat g"><div class="v num">${walks}</div><div class="l">Walks</div></div>
+        <div class="stat g"><div class="v num">${dogs.size}</div><div class="l">Dogs</div></div>
+        <div class="stat g"><div class="v num">${mi.toFixed(1)}</div><div class="l">Miles</div></div>
+        <div class="stat g"><div class="v num">${(min / 60).toFixed(1)}</div><div class="l">Hours</div></div>
+        <div class="stat g"><div class="v num">${Math.round(mi * 2100 / 1000)}k</div><div class="l">Steps<span class="est">est.</span></div></div>
+        <div class="stat g"><div class="v num">${tags}</div><div class="l">Behavior tags</div></div>
+      </div>
+      <div class="chips" role="group" aria-label="Filter by dog"><button class="chip g lv-control ${calDog === 'all' ? 'tint' : ''}" aria-pressed="${calDog === 'all'}" data-cd="all">All dogs</button>${DOGS.map(d => `<button class="chip g lv-control ${calDog === d.id ? 'tint' : ''}" aria-pressed="${calDog === d.id}" data-cd="${d.id}">${d.name}</button>`).join('')}</div>
+      <section class="g lv-card"><div class="cal">${cells}</div>
+        <p class="muted small" style="margin:10px 2px 0"><span class="sample">Sample data</span> · filled dot: walked · ring: scheduled</p></section>
+      ${calSel ? `<section class="g lv-card"><h2 class="h-sec">${new Date(y, m, calSel).toLocaleDateString([], { weekday: 'long', month: 'short', day: 'numeric' })}</h2>
+        <div class="list">${sel.length ? sel.map(w => `<button class="li" ${w.kind === 'done' ? 'data-rep="1"' : ''}>${avatar(DOG[w.dogs[0]], 'sm')}<span class="grow"><span class="t1">${dogNames(w.dogs)}</span><br><span class="t2">${w.kind === 'done' ? `${fmtH(w.hour)} · ${w.mi.toFixed(1)} mi · ${w.min} min · ${w.tags} tags` : `Scheduled ${fmtH(w.hour)} · reminder 30 min before`}</span></span>${w.kind === 'done' ? icon('chev') : ''}</button>`).join('') : '<p class="muted small" style="margin:8px 0 0">No walks this day.</p>'}</div></section>` : ''}
+    </div>`;
+  const v = $('#v-calendar');
+  $('#c-prev', v).onclick = () => { calMonth = new Date(y, m - 1, 1); calSel = null; renderCalendar(); };
+  $('#c-next', v).onclick = () => { calMonth = new Date(y, m + 1, 1); calSel = null; renderCalendar(); };
+  v.querySelectorAll('[data-cd]').forEach(b => b.onclick = () => { calDog = b.dataset.cd; renderCalendar(); });
+  v.querySelectorAll('[data-day]').forEach(b => b.onclick = () => { calSel = +b.dataset.day; renderCalendar(); });
+  v.querySelectorAll('[data-rep]').forEach(b => b.onclick = () => { reportWalk = SAMPLE; go('report'); });
+}
+
+/* ── Dogs directory ── */
+let dogFilter = 'all', dogQuery = '';
+function renderDogs() {
+  $('#v-dogs').innerHTML = `
+    <div class="stack">
+      <h1 class="h-title">Dogs</h1>
+      <label class="search g lv-control">${icon('search')}<input id="dog-q" type="search" placeholder="Search dogs or owners" value="${esc(dogQuery)}" aria-label="Search dogs"></label>
+      <div class="chips" role="group" aria-label="Show">${[['all', 'All'], ['personal', 'My dogs'], ['client', 'Client dogs']].map(([k, l]) => `<button class="chip g lv-control ${dogFilter === k ? 'tint' : ''}" style="--t:var(--lav)" aria-pressed="${dogFilter === k}" data-df="${k}">${l}</button>`).join('')}</div>
+      <div id="dog-list"></div>
+      <p class="muted small" style="margin:0 4px"><span class="sample">Sample dogs</span></p>
+    </div>`;
+  const v = $('#v-dogs');
+  const paint = () => {
+    const q = dogQuery.toLowerCase();
+    const list = DOGS.filter(d => (dogFilter === 'all' || d.rel === dogFilter) && (!q || (d.name + d.breed + (d.owner || '')).toLowerCase().includes(q))).sort((a, b) => a.name.localeCompare(b.name));
+    const groups = {}; list.forEach(d => (groups[d.name[0]] = groups[d.name[0]] || []).push(d));
+    $('#dog-list', v).innerHTML = Object.keys(groups).length ? Object.entries(groups).map(([L, ds]) => `<p class="letter">${L}</p><section class="g lv-card" style="padding:4px 14px;margin-top:8px"><div class="list">${ds.map(d => `<button class="li" data-dog="${d.id}">${avatar(d)}<span class="grow"><span class="t1">${d.name}</span><br><span class="t2">${esc(d.breed)}${d.owner ? ' · ' + esc(d.owner) : ''}</span></span>${icon('chev')}</button>`).join('')}</div></section>`).join('') : '<p class="muted">No dogs match.</p>';
+    $('#dog-list', v).querySelectorAll('[data-dog]').forEach(b => b.onclick = () => { profileId = b.dataset.dog; go('profile'); });
+  };
+  paint();
+  $('#dog-q', v).addEventListener('input', e => { dogQuery = e.target.value; paint(); });
+  v.querySelectorAll('[data-df]').forEach(b => b.onclick = () => { dogFilter = b.dataset.df; renderDogs(); });
+}
+
+/* ── Dog profile ── */
+let profileId = 'juno'; let openBeh = null;
+const BEH = {
+  juno: [['pulling', 12, [3, 2, 2, 1, 2, 1, 1, 0]], ['barking', 7, [1, 2, 1, 1, 0, 1, 1, 0]], ['loose', 18, [1, 2, 2, 3, 2, 3, 2, 3]], ['recall', 9, [0, 1, 1, 1, 2, 1, 2, 1]]],
+  maple: [['loose', 22, [2, 3, 3, 3, 2, 3, 3, 3]], ['sniffing', 31, [4, 3, 4, 5, 3, 4, 4, 4]], ['freezing', 4, [1, 0, 1, 0, 1, 0, 1, 0]]],
+  biscuit: [['jumping', 6, [2, 1, 1, 1, 0, 1, 0, 0]], ['pulling', 9, [2, 2, 1, 1, 1, 1, 1, 0]], ['calm', 14, [1, 1, 2, 2, 2, 2, 2, 2]]],
+  olive: [['freezing', 5, [1, 1, 0, 1, 0, 1, 1, 0]], ['loose', 16, [2, 2, 2, 2, 2, 2, 2, 2]]],
+  pepper: [['barking', 11, [2, 2, 1, 2, 1, 1, 1, 1]], ['reactivity', 6, [1, 1, 1, 1, 0, 1, 1, 0]], ['leaveit', 8, [0, 1, 1, 1, 1, 2, 1, 1]]],
+  ziggy: [['sniffing', 40, [5, 5, 4, 6, 5, 5, 5, 5]], ['distraction', 13, [3, 2, 2, 2, 1, 1, 1, 1]], ['recall', 5, [0, 0, 1, 0, 1, 1, 1, 1]]],
+};
+const OVER = { juno: [58, 71.4, 39.8], maple: [52, 60.2, 37.1], biscuit: [96, 118.0, 62.5], olive: [21, 31.6, 13.2], pepper: [30, 22.4, 15.9], ziggy: [44, 49.7, 30.3] };
+function renderProfile() {
+  const d = DOG[profileId], house = DOGS.filter(x => x.hh === d.hh);
+  const [walks, mi, hrs] = OVER[d.id];
+  const beh = BEH[d.id].map(([k, n, s]) => {
+    const t = TYPE[k], mx = Math.max(...s, 1);
+    const open = openBeh === k;
+    const hist = SAMPLE.events.filter(e => e.key === k).slice(0, 3);
+    const inc = !open ? '' : !hist.length ? '<p class="muted small" style="margin:0 0 10px 26px">The preview only has detailed history for Juno and Maple\'s sample walk.</p>' : `<div class="incidents">${hist.map(e => `<button class="incident g" data-inc="${e.id}"><b>Today · ${clock(new Date(SAMPLE.start.getTime() + e.t * 1000))}</b><span class="muted">Trigger: ${esc(e.trigger || 'not recorded')} · Outcome: ${esc(e.outcome || 'not recorded')}</span><span class="muted">Open on the walk map ›</span></button>`).join('')}</div>`;
+    return `<button class="li beh" data-beh="${k}" aria-expanded="${open}"><svg class="shape" viewBox="-10 -10 20 20">${shapeSvg(t.cat.shape, 0, 0, t.cat.c, '', 'stroke="none"')}</svg><span class="grow"><span class="t1">${esc(t.name)}</span><br><span class="t2">${plural(n, NOUN(k))} recorded</span></span><span class="spark" style="--c:var(${t.cat.c})" aria-hidden="true">${s.map(v => `<i style="height:${Math.max(8, v / mx * 100)}%"></i>`).join('')}</span>${icon(open ? 'down' : 'chev')}</button>${inc}`;
+  }).join('');
+  $('#v-profile').innerHTML = `
+    <div class="photo">
+      <div class="fill" style="background:radial-gradient(120% 90% at 30% 20%, color-mix(in srgb, var(${d.t}) 85%, var(--base)), color-mix(in srgb, var(--lav) 60%, var(--base)) 70%)"></div>
+      <svg class="paw" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="9" r="2.3"/><circle cx="10" cy="5.2" r="2.3"/><circle cx="14.6" cy="5.2" r="2.3"/><circle cx="18.6" cy="9" r="2.3"/><path d="M12.3 10.5c-3.4 0-6.3 4.2-6.3 6.8 0 2 1.6 2.8 3.3 2.8 1.3 0 2-.6 3-.6s1.7.6 3 .6c1.7 0 3.3-.8 3.3-2.8 0-2.6-2.9-6.8-6.3-6.8z"/></svg>
+      <span class="ph-label">Dog photo goes here</span>
+      <div class="tl"><button class="icon-btn g lv-orb press" id="p-back" aria-label="Back">${icon('back')}</button><button class="icon-btn g lv-orb press" id="p-edit" aria-label="Edit profile">${icon('edit')}</button></div>
+      ${house.length > 1 ? `<div class="hh chips" role="tablist" aria-label="Dogs in this household">${house.map(x => `<button class="chip g lv-control ${x.id === d.id ? 'tint' : ''}" style="--t:var(--lav);padding-left:5px" role="tab" aria-selected="${x.id === d.id}" data-hh="${x.id}">${avatar(x, 'sm')}${x.name}</button>`).join('')}</div>` : ''}
+      <div class="br"><button class="icon-btn g lv-orb press" id="p-expand" aria-label="View photo full screen">${icon('expand')}</button></div>
+    </div>
+    <section class="g lv-panel pro-sheet">
+      <div><h1 class="h-title" style="font-size:32px">${d.name}</h1><p class="muted" style="margin:2px 0 0;display:flex;align-items:center;gap:6px">${icon('dog', 'style="width:18px;height:18px"')}${esc(d.breed)}</p></div>
+      <div class="attr">
+        <div class="g tint" style="--t:var(--sky)"><span class="k">SEX</span><span class="v">${d.sex}</span><span class="s">${d.sex === 'Male' ? '♂' : '♀'}</span></div>
+        <div class="g tint" style="--t:var(--aqua)"><span class="k">SIZE</span><span class="v">${d.size}</span><span class="s">${d.range}</span></div>
+        <div class="g"><span class="k">AGE</span><span class="v">${d.age}</span><span class="s">${d.stage}</span></div>
+      </div>
+      ${d.owner ? `<div class="g lv-card row" style="padding:12px 12px 12px 16px"><span class="grow" style="flex:1;min-width:0"><span class="small muted" style="font-weight:700">Owner</span><br><b>${esc(d.owner)}</b><span class="muted small"> · ${d.phone}</span></span><button class="icon-btn g lv-orb tint press" style="--t:var(--mint)" id="p-call" aria-label="Call ${esc(d.owner)}">${icon('phone')}</button></div>` : ''}
+      <section class="g lv-card"><div class="row between" style="margin-bottom:10px"><h2 class="h-sec">Walking overview</h2><span class="sample">Sample</span></div>
+        <div class="mini-stats"><div><div class="v num">${walks}</div><div class="l">walks</div></div><div><div class="v num">${mi}</div><div class="l">miles</div></div><div><div class="v num">${hrs}</div><div class="l">hours</div></div></div>
+        <p class="muted small" style="margin:10px 0 0;text-align:center">Last walk today · average ${Math.round(hrs / walks * 60)} min</p></section>
+      <section class="g lv-card"><h2 class="h-sec" style="margin-bottom:2px">Walk behavior</h2><p class="muted small" style="margin:0 0 4px">Filled in automatically from what you log on walks. Tap one to see each time.</p><div class="list">${beh}</div></section>
+      <section class="g lv-card"><h2 class="h-sec" style="margin-bottom:6px">Notes</h2><p style="margin:0">Friendly and quick to settle. Prefers the park loop over busy streets. Walks with ${house.length > 1 ? house.filter(x => x.id !== d.id).map(x => x.name).join(' and ') : 'other dogs'} and does better with them nearby. Leash and harness hang by the back door.</p></section>
+    </section>`;
+  const v = $('#v-profile');
+  $('#p-back', v).onclick = () => go('dogs');
+  $('#p-edit', v).onclick = () => toast('Preview only. Editing comes in Phase 4.', [], true);
+  $('#p-expand', v).onclick = () => toast('Opens the photo full screen in the app.', [], true);
+  $('#p-call', v) && ($('#p-call', v).onclick = () => toast(`In the app this calls ${esc(d.owner)} at ${d.phone}.`, [], true));
+  v.querySelectorAll('[data-hh]').forEach(b => b.onclick = () => { profileId = b.dataset.hh; openBeh = null; renderProfile(); });
+  v.querySelectorAll('[data-beh]').forEach(b => b.onclick = () => { openBeh = openBeh === b.dataset.beh ? null : b.dataset.beh; const st = v.scrollTop; renderProfile(); v.scrollTop = st; });
+  v.querySelectorAll('[data-inc]').forEach(b => b.onclick = () => { reportWalk = SAMPLE; go('report', { focus: b.dataset.inc }); });
+}
+
+/* ── Insights (sample data) ── */
+let insRange = 'month';
+const INS = {
+  week: { label: 'week', exposure: [6, 8.4, 3.2], x: ['Mon', 'Wed', 'Fri', 'Sun'], rows: [['pulling', 9, [1, 2, 1, 2, 0, 2, 1], 'Another dog (5)'], ['barking', 4, [0, 1, 1, 0, 1, 1, 0], 'Bicycle (2)'], ['loose', 14, [2, 2, 1, 3, 2, 2, 2], 'n/a']] },
+  month: { label: 'month', exposure: [27, 36.9, 14.6], x: ['Wk 1', 'Wk 2', 'Wk 3', 'Wk 4'], rows: [['pulling', 31, [11, 8, 7, 5], 'Another dog (14)'], ['barking', 17, [5, 5, 4, 3], 'Bicycle (6)'], ['loose', 52, [9, 12, 14, 17], 'n/a']] },
+  year: { label: 'year', exposure: [302, 418.5, 166.0], x: ['Jan', 'Apr', 'Jul', 'Oct'], rows: [['pulling', 284, [34, 31, 30, 28, 27, 25, 24, 22, 21, 18, 14, 10], 'Another dog (121)'], ['barking', 176, [18, 17, 16, 16, 15, 15, 14, 14, 13, 13, 13, 12], 'Bicycle (58)'], ['loose', 498, [22, 28, 33, 36, 40, 42, 45, 47, 49, 51, 52, 53], 'n/a']] },
+};
+function renderInsights() {
+  const D = INS[insRange], [walks, mi, hrs] = D.exposure;
+  $('#v-insights').innerHTML = `
+    <div class="stack">
+      <h1 class="h-title">Insights</h1>
+      <div class="chips" role="group" aria-label="Time range">${[['week', 'Past week'], ['month', 'Past month'], ['year', 'Past year']].map(([k, l]) => `<button class="chip g lv-control ${insRange === k ? 'tint' : ''}" style="--t:var(--lav)" aria-pressed="${insRange === k}" data-r="${k}">${l}</button>`).join('')}</div>
+      <section class="g lv-card irid"><p class="h-sec" style="margin:0">All dogs · past ${D.label}</p><p class="num" style="font-size:24px;margin:4px 0 0">${walks} walks · ${mi} mi · ${hrs} h</p><p class="small" style="margin:4px 0 0;color:var(--text2)">Every rate below is measured against this much walking.</p></section>
+      ${D.rows.map(([k, n, series, trig]) => { const t = TYPE[k], mx = Math.max(...series); return `<section class="g lv-card" style="--c:var(${t.cat.c})"><div class="row between"><div class="row" style="gap:8px">${legendShape(t.cat)}<h2 style="margin:0;font-size:17px;font-weight:800">${esc(t.name)}</h2></div><span class="sample">Sample</span></div>
+        <div class="kv"><div><div class="v num">${n}</div><div class="l">${NOUN(k)}s</div></div><div><div class="v num">${(n / mi).toFixed(2)}</div><div class="l">per mile</div></div><div><div class="v num">${(n / hrs).toFixed(1)}</div><div class="l">per hour</div></div></div>
+        <div class="bars" aria-label="Trend">${series.map(v => `<i style="height:${Math.max(4, v / mx * 100)}%"></i>`).join('')}</div><div class="bar-x">${D.x.map(x => `<span>${x}</span>`).join('')}</div>
+        ${trig !== 'n/a' ? `<p class="small" style="margin:10px 0 0"><span class="muted">Most common trigger:</span> <b>${trig}</b></p>` : ''}</section>`; }).join('')}
+      <p class="foot">Based on what you recorded. Counts depend on how often you log and are not a behavioral diagnosis. Comparisons stay hidden until there are enough walks to compare.</p>
+    </div>`;
+  $('#v-insights').querySelectorAll('[data-r]').forEach(b => b.onclick = () => { insRange = b.dataset.r; renderInsights(); });
+}
+
+/* ── Ambient background: pastel light + procedural dappled leaf shadows ── */
+function drawAmbient() {
+  const c = $('#ambient'), r = c.getBoundingClientRect(); if (!r.width) return;
+  const dpr = Math.min(2, window.devicePixelRatio || 1); c.width = r.width * dpr; c.height = r.height * dpr;
+  const ctx = c.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const cs = getComputedStyle(screen), col = n => cs.getPropertyValue(n).trim(), W = r.width, H = r.height;
+  ctx.fillStyle = col('--base'); ctx.fillRect(0, 0, W, H);
+  const hexA = (h, a) => { const m = h.replace('#', ''); const n = parseInt(m.length === 3 ? m.split('').map(x => x + x).join('') : m, 16); return `rgba(${n >> 16 & 255},${n >> 8 & 255},${n & 255},${a})`; };
+  [[0.1, 0.1, 0.62, '--amb1'], [0.95, 0.28, 0.55, '--amb4'], [0.15, 0.6, 0.55, '--amb2'], [0.9, 0.82, 0.6, '--amb3'], [0.5, 0.42, 0.4, '--amb5']].forEach(([x, y, rad, n]) => {
+    const g = ctx.createRadialGradient(x * W, y * H, 0, x * W, y * H, rad * Math.max(W, H)); const v = col(n);
+    g.addColorStop(0, hexA(v, 0.95)); g.addColorStop(1, hexA(v, 0)); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  });
+  ctx.save(); ctx.translate(W * 0.5, H * 0.5); ctx.rotate(-0.55);
+  for (let i = -4; i <= 4; i++) { const g = ctx.createLinearGradient(i * 120 - 40, 0, i * 120 + 40, 0); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(0.5, col('--shaft')); g.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = g; ctx.fillRect(i * 120 - 40, -H, 80, H * 2); }
+  ctx.restore();
+  const rnd = rng(42); ctx.fillStyle = col('--leaf');
+  [[0.05, 0.05], [0.95, 0.18], [0.02, 0.55], [0.98, 0.7]].forEach(([bx, by]) => {
+    for (let i = 0; i < 26; i++) {
+      const x = bx * W + (rnd() - 0.5) * 210, y = by * H + (rnd() - 0.5) * 240, s = 10 + rnd() * 18, a = rnd() * Math.PI;
+      ctx.save(); ctx.translate(x, y); ctx.rotate(a); ctx.beginPath(); ctx.ellipse(0, 0, s, s * 0.42, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+    }
+  });
+}
+
+/* ── Controls ── */
+function setPressed(group, btn) { group.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b === btn)); }
+$('#ctl-theme').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; setPressed($('#ctl-theme'), b); const v = b.dataset.v; if (v === 'system') document.documentElement.removeAttribute('data-theme'); else document.documentElement.setAttribute('data-theme', v); requestAnimationFrame(drawAmbient); });
+$('#ctl-glass').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; setPressed($('#ctl-glass'), b); screen.classList.toggle('tier-solid', b.dataset.v === 'solid'); });
+$('#ctl-motion').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; setPressed($('#ctl-motion'), b); screen.classList.toggle('reduce-motion', b.dataset.v === 'reduced'); });
+$('#ctl-jump').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; const v = b.dataset.v; if (v === 'active') { if (!walk || walk.status === 'ended') startWalk(); else go('active'); } else if (v === 'report') { reportWalk = lastDone || SAMPLE; go('report'); } else go(v); });
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => requestAnimationFrame(drawAmbient));
+window.addEventListener('resize', () => requestAnimationFrame(drawAmbient));
+setInterval(() => { $('#sb-time').textContent = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }).replace(/\s?[AP]M/i, ''); }, 10000);
+$('#sb-time').textContent = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }).replace(/\s?[AP]M/i, '');
+
+drawAmbient();
+go('home');
+})();
+</script>
