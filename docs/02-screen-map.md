@@ -129,7 +129,7 @@ Customization (Settings > Quick Log): reorder categories and events, hide defaul
 5. Weather strip: start and end conditions, high/low, wind, UV, any alert. "Weather unavailable" or "Entered manually" when relevant.
 6. Timeline: chronological events; tapping one focuses the map on it.
 7. Photos, walker notes, classification and business fields (professional mode only).
-8. Actions: Share, Export image, Export PDF (optional event appendix), Copy link (if signed in). Nothing is saved to the device automatically.
+8. Actions: Share link (expiring, revocable web link; default expiry 30 days, choices 24 h / 7 d / 30 d), Export image, Export PDF (optional event appendix). Exports are kept in the walk's cloud history (backed up) and can be re-shared later; nothing is saved to the device's photos or files unless the user taps Save.
 
 ### Calendar
 - Month / Week / Day segmented control. Dog filter chip (All dogs or one dog).
@@ -141,11 +141,41 @@ Customization (Settings > Quick Log): reorder categories and events, hide defaul
 ### Dogs Directory
 - Contacts-style list: alphabetical section headers, index scrubber, search field, segmented filter (All / My dogs / Client dogs). Row: photo, name, breed, owner name for client dogs. "+" adds a dog.
 
-### Dog Profile
-1. Large photo header with glass name plate: name, breed, age, sex, size; owner name and a call button for client dogs.
-2. Walking overview: total walks, distance, time, most recent walk, average duration.
-3. **Walk Behavior** (before notes): auto-populated list of event types with counts and a sparkline. Tap opens behavior history (date, trigger, outcome, walk, location, note); tapping an incident opens that walk's map focused on the event.
-4. Notes: walking preferences, habits, temperament, practical instructions.
+### Dog Profile (structure from the supplied Wag screenshot, original Walkwise visuals)
+
+```
+┌──────────────────────────────┐
+│ (←)                   (✎)    │  glass icon domes floating over the photo
+│ [● Bubba] [○ Luke]           │  household switcher: dogs sharing an owner/client
+│                              │
+│        full-bleed photo      │  ~45% of screen height, tap or (⤢) for full screen
+│                         (⤢)  │
+╞══════════════════════════════╡  level-1 glass sheet overlapping the photo
+│ Bubba                        │  name (large title)
+│ 🐕 Labrador Retriever        │  breed with icon
+│ ┌───────┐┌───────┐┌───────┐  │  three tinted attribute tiles
+│ │  SEX  ││ SIZE  ││  AGE  │  │  sky / aqua / silver tints
+│ │ Male ♂││ Large ││ 4 yrs │  │
+│ │       ││51-99lb││ Adult │  │
+│ └───────┘└───────┘└───────┘  │
+│ Owner: Dana R.        (📞)   │  client dogs only: owner name + call dome
+├──────────────────────────────┤
+│ Walking overview             │  total walks, distance, time, last walk, average
+│ Walk Behavior          (›)   │  auto-populated from logged events, BEFORE notes
+│ Notes                        │  free-form
+└──────────────────────────────┘
+```
+
+1. **Household switcher** (adopted from the screenshot's "Bubba / Luke" chips): avatar chips for dogs that share an owner (a client's dogs, or "My dogs"), so a walker can flip between siblings walked together without going back to the directory. Selected chip is a lavender-tinted control pill.
+2. **Full-bleed photo** with floating back, edit, and expand controls; the glass content sheet overlaps the bottom of the photo with a 34 pt radius.
+3. **Name and breed** as the sheet's header.
+4. **Attribute tiles**: Sex (with symbol), Size (bucket plus weight range: Small up to 25 lb, Medium 26 to 50, Large 51 to 99, Giant 100+, shown in the user's units), Age (years computed from birth date, or "about 4 yrs" when estimated, plus life stage: Puppy under 1, Adult 1 to 7, Senior 8+ as a default that varies by size later if wanted).
+5. **Owner row** for client dogs: owner name and a call button (opens the dialer).
+6. **Walking overview**: total walks, distance, time, most recent walk, average duration.
+7. **Walk Behavior** (before notes): auto-populated list of event types with counts and a sparkline. Tap opens behavior history (date, trigger, outcome, walk, location, note); tapping an incident opens that walk's map focused on the event.
+8. **Notes**: walking preferences, habits, temperament, practical instructions.
+
+Deliberately not adopted from the screenshot: the neutered/medical flag (the brief excludes medical sections) and the plain white sheet styling.
 
 ### Behavior Analytics (Insights)
 - Time filter: Week, Month, Year, All time, Custom.
@@ -162,6 +192,8 @@ Customization (Settings > Quick Log): reorder categories and events, hide defaul
 Profile and mode (Owner / Professional / Both), Units, Temperature, Theme, Glass intensity, Reduce motion, Reduce transparency, Lightweight mode, Quick Log layout, Custom events and triggers, Notifications, Location permission status and explanation, Location retention, Weather preferences, Widgets help, Data export, Delete location history, Delete account, Privacy policy.
 
 ## 2.3 Core flows
+
+**First launch:** Welcome (glass illustration) > Sign in with Apple / Google / email (account required, needs a connection once) > choose mode (Owner, Professional, Both) > optional "Add your first dog" (skippable) > Dashboard. Location permission is requested at the first Start Walk, not at onboarding.
 
 **Start a walk (1 tap):** Dashboard > Start Walk > (first time only: location permission explainer, then OS prompt; Android 13+: notification permission for the tracking notification) > Active Walk recording.
 

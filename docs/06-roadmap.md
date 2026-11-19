@@ -17,7 +17,7 @@ Acceptance:
 
 ## Phase 2: Core walking
 
-Scope: location service and background task; walk state machine; start/pause/resume/end; running totals; point filtering; map with live route; dog assignment before, during, after; unassigned walk flow; interruption detection and recovery; walk history list; sync engine v1 (push/pull for dogs, walks, intervals, participants, points); auth (Apple, Google, email) with local-first pre-sign-in mode.
+Scope: location service and background task; walk state machine; start/pause/resume/end; running totals; point filtering; map with live route; dog assignment before, during, after; unassigned walk flow; interruption detection and recovery; walk history list; sync engine v1 (push/pull for dogs, walks, intervals, participants, points); required sign-in (Apple, Google, email) with offline use after the first sign-in; media backup queue.
 
 Acceptance:
 - [ ] One tap on Start Walk begins recording with no dog selected; time to first accepted point < 10 s outdoors.

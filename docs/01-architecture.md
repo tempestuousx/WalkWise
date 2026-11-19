@@ -1,6 +1,6 @@
 # 1. Architecture Proposal
 
-Status: **Proposed, awaiting approval**
+Status: **Proposed, revision 2 (decisions from review applied)**
 Date: 2026-11-19
 
 ## 1.1 Summary
@@ -33,7 +33,7 @@ Walkwise is a local-first React Native app. Everything a user does during a walk
 
 | Concern | Choice | Version | Notes |
 |---|---|---|---|
-| Runtime | Expo SDK 58, React Native 0.88, React 19.3 | `expo@58` | Development builds only (`expo-dev-client`). Expo Go cannot run the background task, Mapbox, widgets, or glass. |
+| Runtime | Expo SDK 58, React Native 0.88, React 19.3 | `expo@58` | Development builds only (`expo-dev-client`). Expo Go cannot run the background task, Google Maps with custom keys, widgets, or glass. |
 | Language | TypeScript, `strict: true`, `noUncheckedIndexedAccess` | | |
 | Navigation | Expo Router | `~58.0` | File-based routes, typed routes, deep links for widgets and shared reports. |
 | Animation | Reanimated 4 + Worklets | `4.7.x`, `worklets 0.13` | Pinned to the SDK's bundled versions. |
@@ -43,8 +43,8 @@ Walkwise is a local-first React Native app. Everything a user does during a walk
 | Server state | TanStack Query 5 | `5.x` | Remote-only reads (auth session, shared-report status, weather on demand) and sync status. Local data is read from SQLite, not from Query caches. |
 | Ephemeral UI state | Zustand | | Live walk HUD, radial menu interaction state, sheet state. |
 | Backend | Supabase (Auth, Postgres 17 + PostGIS, Storage, Edge Functions, pg_cron) | `supabase-js 2.x` | |
-| Maps | **Recommended: Mapbox (`@rnmapbox/maps` 10.x)** | `10.3` | Custom pastel map style that matches the glass language, native GeoJSON clustering, offline tile packs, `takeSnap` for exports, TextureView mode on Android so glass can sit over it. Alternative: MapLibre with a commercial tile host. See open question Q2. |
-| Weather | **Recommended: Apple WeatherKit REST via a Supabase Edge Function** | | Current conditions, hourly history back to 2021, UV, gusts, apparent temperature, and alerts where Apple has coverage. Works on Android because it is a REST call from our server. Fallback adapter: Open-Meteo (commercial plan required for a paid app). See Q3. |
+| Maps | **Decided: Google Maps on both platforms** via `react-native-maps` with `PROVIDER_GOOGLE` | `1.29.11` (SDK 58 bundled) | Maps SDK for Android/iOS map loads are free and unlimited **when no Map ID is used**, so the pastel style is applied as a JSON `customMapStyle` (cloud styling with a Map ID is billed per load). Clustering with `supercluster` in JS, route as `Polyline`, markers as custom views with `tracksViewChanges` off after first render, export snapshots with `MapView.takeSnapshot`. Separate API keys per platform, restricted to the bundle id / SHA-1. |
+| Weather | **Recommended: Apple WeatherKit REST via a Supabase Edge Function** (the free option, see 7.5) | | 500,000 calls/month included with the Apple Developer Program membership the App Store already requires. Current conditions, hourly history back to 2021, UV, gusts, apparent temperature, alerts where Apple has coverage. Works for Android users because the call is made by our server. Requires Apple Weather attribution in the UI. |
 | Glass | `expo-glass-effect` (iOS 26+ native Liquid Glass), `expo-blur` (iOS < 26, Android 12+), `@shopify/react-native-skia` 2.x (highlights, rims, ambient light, lens effect on our own backgrounds) | | Three rendering tiers, see `05-liquid-glass.md`. |
 | Charts | `victory-native` 43 (Skia based) | | Interactive line/bar charts with press-to-inspect, renders on the UI thread. |
 | Audio | `expo-audio` | `~58.0` | Voice notes (AAC m4a). |
@@ -61,7 +61,8 @@ Rejected or deferred:
 
 - **`react-native-background-geolocation` (Transistor)**: the most battle-tested tracker (motion detection, survives app termination on Android), but it is a paid license and the brief prefers Expo Location. We isolate tracking behind a `LocationSource` interface so it can be swapped in if Phase 7 field testing shows unacceptable gaps on aggressive Android OEMs.
 - **PowerSync**: a credible managed alternative to a hand-written sync engine. Our data is mostly append-only and single-writer, so a custom outbox is simpler and avoids another vendor. Revisit only if multi-device editing becomes a core requirement.
-- **`react-native-maps` / `expo-maps`**: fewer styling controls and no first-class offline packs. Viable if the Mapbox cost is unacceptable.
+- **Mapbox / MapLibre**: stronger styling and offline packs, but you chose Google Maps. Trade-off accepted: Google's mobile SDK has no downloadable offline areas (see risk R10).
+- **`expo-maps`**: uses Apple Maps on iOS, which conflicts with the Google Maps decision.
 
 ## 1.3 Project structure
 
@@ -135,6 +136,7 @@ Dependency rule (enforced with `eslint-plugin-boundaries`): `domain` imports not
 
 ## 1.5 Authentication model
 
-- Supabase Auth with Sign in with Apple, Google, and email magic link.
-- Recommended (Q4): the app is fully usable before sign-in. Data lives locally under a provisional local user id; on first sign-in it is re-keyed to the auth user and uploaded. Sharing reports, backup, and multi-device require an account.
+- **Decided: an account is required.** Supabase Auth with Sign in with Apple, Google, and email (magic link or code). Apple requires Sign in with Apple whenever another social login is offered.
+- First launch needs a connection to sign in. After that, the session is cached and the app works fully offline: walks, logging, history. An expired access token never blocks local work; it only pauses sync until a refresh succeeds.
+- All photos (dog photos, walk photos), voice notes, and exported report images and PDFs are backed up automatically to private Supabase Storage, so they survive a lost or replaced phone. Backup can be limited to Wi-Fi in Settings.
 - Session tokens stored in `expo-secure-store`. Refresh handled by supabase-js with an AppState listener.

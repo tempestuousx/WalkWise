@@ -117,4 +117,8 @@ Every repository mutation runs in one SQLite transaction: write the row with `sy
 
 ### Auth and sync
 
-Before sign-in, data is written under a local provisional user id and nothing is pushed. On first sign-in, a single migration transaction rewrites `user_id` on local rows to the auth user id and enqueues everything. Signing out offers to keep or wipe local data.
+An account is required, so every local row is written with the signed-in user's id from the start; there is no anonymous mode to migrate. Sign-in happens once with a connection; afterwards the cached session lets the app work offline indefinitely, and sync resumes once the token refreshes. Signing out first pushes pending changes (or warns how many are unsynced), then wipes local data and cached media for privacy.
+
+### Media backup
+
+Dog photos, walk photos, voice notes, and exported report images/PDFs are uploaded to private buckets (`dog-photos`, `walk-media`, `report-exports`) through the resumable upload queue. The local file is kept as a cache; if it is missing (new phone, cleared cache) it is re-downloaded through a short-lived signed URL. Upload over cellular is allowed by default and can be limited to Wi-Fi.

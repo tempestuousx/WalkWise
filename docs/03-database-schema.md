@@ -28,12 +28,13 @@ erDiagram
   WALKS ||--o{ WEATHER_OBSERVATIONS : conditions
   WALKS ||--o| REPORT_METADATA : report
   WALKS ||--o{ REPORT_SHARES : "shared via"
+  WALKS ||--o{ REPORT_EXPORTS : "exported as"
   USERS ||--o{ SCHEDULED_WALKS : plans
   SCHEDULED_WALKS ||--o{ SCHEDULED_WALK_DOGS : dogs
   SCHEDULED_WALKS |o--o| WALKS : "completed by"
 ```
 
-Mapping to the brief's suggested entities: Users (`auth.users`, `profiles`), Dogs, Clients, Walks, WalkParticipants, GPSPoints, EventCategories, EventTypes, WalkEvents, EventDogs, EventTriggers, EventOutcomes, WeatherObservations, WalkPhotos (`walk_media`, which also stores voice notes), ScheduledWalks (+ `scheduled_walk_dogs`), ReportMetadata (+ `report_shares` for revocable links), UserPreferences, SyncOperations. Added: `walk_intervals` (pauses and recording gaps, needed for accurate moving time and honest reports).
+Mapping to the brief's suggested entities: Users (`auth.users`, `profiles`), Dogs, Clients, Walks, WalkParticipants, GPSPoints, EventCategories, EventTypes, WalkEvents, EventDogs, EventTriggers, EventOutcomes, WeatherObservations, WalkPhotos (`walk_media`, which also stores voice notes), ScheduledWalks (+ `scheduled_walk_dogs`), ReportMetadata (+ `report_shares` for expiring, revocable links and `report_exports` for backed-up image/PDF exports), UserPreferences, SyncOperations. Added: `walk_intervals` (pauses and recording gaps, needed for accurate moving time and honest reports).
 
 ## 3.2 Design notes
 

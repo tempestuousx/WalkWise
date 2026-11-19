@@ -6,7 +6,7 @@ GPS dog-walk tracking, one-handed behavioral logging, weather context, analytics
 
 ## Status
 
-**Architecture proposal, awaiting approval.** No application code yet. Implementation starts with Phase 1 (design system) and Phase 2 (core walking) once the proposal is approved.
+**Architecture proposal, revision 2** (maps, accounts, sharing decided; weather provider pending). No application code yet. Implementation starts with Phase 1 (design system) and Phase 2 (core walking) once the proposal is approved.
 
 ## Proposal documents
 

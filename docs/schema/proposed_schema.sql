@@ -381,6 +381,23 @@ create table public.report_metadata (
   server_version     bigint not null default 0
 );
 
+-- Exported report files, backed up to the private 'report-exports' bucket.
+-- Created only when the user explicitly exports; never written to device storage automatically.
+create table public.report_exports (
+  id                 uuid primary key,
+  user_id            uuid not null references auth.users(id) on delete cascade,
+  walk_id            uuid not null references public.walks(id) on delete cascade,
+  format             text not null check (format in ('image', 'pdf')),
+  include_appendix   boolean not null default false,
+  storage_path       text,          -- null until the upload completes
+  byte_size          bigint,
+  report_version     integer not null,
+  created_at         timestamptz not null default now(),
+  client_updated_at  timestamptz not null, server_updated_at timestamptz not null default now(),
+  server_version     bigint not null default 0, deleted_at timestamptz
+);
+create index report_exports_walk_idx on public.report_exports (walk_id);
+
 -- Revocable, expiring links for owners. Only a SHA-256 hash of the token is stored.
 create table public.report_shares (
   id                 uuid primary key,
@@ -421,7 +438,7 @@ begin
   foreach t in array array[
     'profiles','user_preferences','clients','dogs','event_categories','event_types','event_triggers',
     'event_outcomes','walks','walk_intervals','walk_participants','walk_events','event_dogs','walk_media',
-    'weather_observations','scheduled_walks','scheduled_walk_dogs','report_metadata'
+    'weather_observations','scheduled_walks','scheduled_walk_dogs','report_metadata','report_exports'
   ] loop
     execute format('create trigger %I_touch before insert or update on public.%I
                     for each row execute function public.touch_row()', t, t);
@@ -436,7 +453,7 @@ begin
   foreach t in array array[
     'clients','dogs','walks','walk_intervals','walk_participants','gps_points','walk_events','event_dogs',
     'walk_media','weather_observations','scheduled_walks','scheduled_walk_dogs','report_metadata',
-    'report_shares','sync_operations'
+    'report_exports','report_shares','sync_operations'
   ] loop
     execute format('alter table public.%I enable row level security', t);
     execute format('create policy %I_owner on public.%I for all to authenticated
