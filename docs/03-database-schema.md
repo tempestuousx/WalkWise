@@ -21,6 +21,8 @@ erDiagram
   EVENT_TYPES ||--o{ WALK_EVENTS : typed
   EVENT_TRIGGERS ||--o{ WALK_EVENTS : "optional trigger"
   EVENT_OUTCOMES ||--o{ WALK_EVENTS : "optional outcome"
+  EVENT_TYPES ||--o{ EVENT_TYPE_DETAILS : "detail ring"
+  EVENT_TYPE_DETAILS ||--o{ WALK_EVENTS : "optional detail"
   WALK_EVENTS ||--o{ EVENT_DOGS : "applies to"
   DOGS ||--o{ EVENT_DOGS : attributed
   WALKS ||--o{ WALK_MEDIA : photos_voice
@@ -42,6 +44,7 @@ Mapping to the brief's suggested entities: Users (`auth.users`, `profiles`), Dog
 - **Sync cursor**: every mutable table carries `server_version` from a single sequence, set by trigger. Pull returns rows with `server_version > cursor`. Clock skew between devices cannot hide changes.
 - **Soft deletes**: `deleted_at` tombstones replicate deletions; pg_cron hard-purges tombstones after 30 days.
 - **Event attribution**: `event_dogs` rows are explicit. When a dog is added mid-walk, only events logged after that moment get the new dog automatically; earlier unattributed events (logged while no dog was assigned) are attributed when the first dog is assigned. The assign sheet shows "Also apply to 3 earlier observations?" when a second dog is added mid-walk (default yes for a shared walk, can be unticked). Nothing is attributed silently after the walk ends.
+- **Event details**: `event_type_details` holds nested ring options for a specific event type (seeded: Poop → Consistency: Normal, Soft, Runny). `walk_events.detail_id` is optional, like trigger and outcome.
 - **Count wording**: `event_types.count_noun` drives "4 incidents" vs "6 observations" so reports do not imply that loose-leash walking is an "incident".
 - **Multi-dog without double counting**: walker totals (distance, time, steps, walk count) aggregate over `walks`. Dog totals aggregate over `walk_participants`. A combined "all dogs" view uses walker totals; a separate "dog-miles" figure is shown only where it is labeled as such.
 - **Location retention**: a nightly pg_cron job deletes `gps_points`, clears `walks.route`, `walks.start_point`, and event coordinates for walks older than the user's retention setting, and stamps `location_purged_at`. Totals and observations remain. The same routine backs "Delete location history" in Settings.

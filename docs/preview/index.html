@@ -487,7 +487,7 @@ const icon = (n, extra = '') => `<svg class="icon" viewBox="0 0 24 24" aria-hidd
 
 /* ── Taxonomy ── */
 const CATS = [
-  { key: 'nature', name: 'Nature', c: '--c-nature', shape: 'circle', trig: false, items: [['pee','Pee','Pee'],['poop','Poop','Poop'],['marking','Marking','Mark'],['sniffing','Sniffing','Sniff'],['drinking','Drinking water','Drink'],['resting','Resting','Rest'],['n-other','Other','Other']] },
+  { key: 'nature', name: 'Nature', c: '--c-nature', shape: 'circle', trig: false, items: [['pee','Pee','Pee'],['poop','Poop','Poop'],['marking','Marking','Mark'],['drinking','Drinking water','Drink'],['resting','Resting','Rest'],['n-other','Other','Other']] },
   { key: 'behavior', name: 'Behavior', c: '--c-behavior', shape: 'tri', trig: true, items: [['pulling','Pulling','Pull'],['barking','Barking','Bark'],['lunging','Lunging','Lunge'],['jumping','Jumping','Jump'],['freezing','Freezing','Freeze'],['reactivity','Reactivity','React'],['distraction','Distraction','Distract'],['loose','Loose-leash walking','Loose'],['calm','Calm behavior','Calm'],['b-other','Other','Other']] },
   { key: 'training', name: 'Training', c: '--c-training', shape: 'square', trig: true, items: [['recall','Successful recall','Recall'],['heel','Heel','Heel'],['sit','Sit','Sit'],['leaveit','Leave it','Leave'],['redirect','Successful redirection','Redirect'],['cue','Responded to cue','Cue'],['t-other','Other','Other']] },
   { key: 'custom', name: 'Additional', c: '--c-custom', shape: 'diamond', trig: false, items: [['voice','Voice note','Voice'],['photo','Photo','Photo'],['custom','Custom event','Custom']] },
@@ -497,6 +497,10 @@ const NOUN = k => { const c = TYPE[k].cat.key; if (c === 'behavior') return (k =
 const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
 const TRIGGERS = [['Another dog','Dog'],['Person','Person'],['Bicycle','Bike'],['Vehicle','Vehicle'],['Wildlife','Wildlife'],['Loud noise','Noise'],['Unfamiliar environment','New place'],['Food','Food'],['Unknown','Unknown']];
 const OUTCOMES = ['Successfully redirected', 'Continued behavior', 'Settled independently', 'Required assistance'];
+// Nested detail rings for specific event types (optional, like triggers).
+const DETAILS = { poop: { label: 'Consistency', opts: [['Normal', 'Normal'], ['Soft', 'Soft'], ['Runny', 'Runny']] } };
+const deepFor = k => DETAILS[k] ? { kind: 'detail', label: DETAILS[k].label, opts: DETAILS[k].opts, c: TYPE[k].cat.c }
+  : (TYPE[k].cat.trig && k.indexOf('other') === -1 ? { kind: 'trigger', label: 'Trigger', opts: TRIGGERS, c: '--lav' } : null);
 
 /* ── Sample dogs ── */
 const DOGS = [
@@ -588,10 +592,10 @@ function jitter([x, y], seed) { const a = (seed * 137.5) % 360 * Math.PI / 180; 
 function sampleWalk() {
   const start = new Date(); start.setHours(17, 12, 0, 0);
   const evs = [
-    ['sniffing', 60, 140], ['pee', 140, 260, ], ['pulling', 250, 420, { trigger: 'Another dog', outcome: 'Successfully redirected' }],
+    ['marking', 60, 140], ['pee', 140, 260, ], ['pulling', 250, 420, { trigger: 'Another dog', outcome: 'Successfully redirected' }],
     ['loose', 420, 700], ['barking', 520, 830, { trigger: 'Bicycle', outcome: 'Settled independently' }], ['recall', 600, 980],
-    ['poop', 760, 1240], ['pulling', 900, 1480, { trigger: 'Wildlife', outcome: 'Continued behavior', note: 'Squirrel on the fence line.' }],
-    ['loose', 1040, 1700], ['sit', 1180, 1900], ['pulling', 1300, 2080, { trigger: 'Another dog' }], ['drinking', 1400, 2300], ['calm', 1500, 2480],
+    ['poop', 760, 1240, { detail: 'Normal' }], ['pulling', 900, 1480, { trigger: 'Wildlife', outcome: 'Continued behavior', note: 'Squirrel on the fence line.' }],
+    ['loose', 1040, 1700], ['sit', 1180, 1900], ['pulling', 1300, 2080, { trigger: 'Another dog' }], ['poop', 1360, 2200, { detail: 'Soft' }], ['drinking', 1400, 2300], ['calm', 1500, 2480],
   ];
   return { id: 'sample', sample: true, start, sim: 2580, distM: ROUTE_M, u: TOTAL, dogs: ['juno', 'maple'], cls: 'Private client',
     events: evs.map(([k, u, t, x]) => mkEvent(k, Math.min(u, TOTAL), t, Object.assign({ dogs: ['juno', 'maple'] }, x || {}))) };
@@ -682,7 +686,7 @@ function renderHome() {
   const unassigned = lastDone && !lastDone.dogs.length;
   const counts = {}; recent.events.forEach(e => counts[e.key] = (counts[e.key] || 0) + 1);
   const chips = Object.entries(counts).slice(0, 5).map(([k, n]) => `<span class="ev-chip" style="--c:var(${TYPE[k].cat.c})">${esc(TYPE[k].short)} ${n}</span>`).join('');
-  const obs = [...recent.events].reverse().slice(0, 4).map(e => { const t = TYPE[e.key]; return `<button class="li" data-open-ev="${e.id}"><svg class="shape" viewBox="-10 -10 20 20">${shapeSvg(t.cat.shape, 0, 0, t.cat.c, '', 'stroke="none"')}</svg><span class="grow"><span class="t1">${esc(t.name)}</span><br><span class="t2">${e.trigger ? 'Trigger: ' + esc(e.trigger) + ' · ' : ''}${clock(new Date(recent.start.getTime() + e.t * 1000))}${e.dogs && e.dogs.length ? ' · ' + dogNames(e.dogs) : ''}</span></span></button>`; }).join('') || '<p class="muted small" style="margin:6px 0">Nothing logged on this walk.</p>';
+  const obs = [...recent.events].reverse().slice(0, 4).map(e => { const t = TYPE[e.key]; return `<button class="li" data-open-ev="${e.id}"><svg class="shape" viewBox="-10 -10 20 20">${shapeSvg(t.cat.shape, 0, 0, t.cat.c, '', 'stroke="none"')}</svg><span class="grow"><span class="t1">${esc(t.name)}</span><br><span class="t2">${e.detail ? esc(e.detail) + ' · ' : ''}${e.trigger ? 'Trigger: ' + esc(e.trigger) + ' · ' : ''}${clock(new Date(recent.start.getTime() + e.t * 1000))}${e.dogs && e.dogs.length ? ' · ' + dogNames(e.dogs) : ''}</span></span></button>`; }).join('') || '<p class="muted small" style="margin:6px 0">Nothing logged on this walk.</p>';
   $('#v-home').innerHTML = `
     <div class="stack">
       <div class="greet"><div><p class="h-sec" style="margin-bottom:2px">${dateLong(new Date())}</p><h1 class="h-title">${hello}</h1></div>
@@ -826,7 +830,7 @@ function drawRadial(fresh = false, ring2Fresh = false) {
     return `<path class="sec ${on ? 'on' : ''}" style="${fill}" data-ring="${ring}" data-idx="${i}" d="${arcPath(cx, cy, ri, ro, a0, a1)}"><title>${esc(label)}</title></path>` +
       `<text class="lbl ${ring !== 1 ? 's' : ''}" x="${(cx + rm * Math.cos(mid)).toFixed(1)}" y="${(cy + rm * Math.sin(mid)).toFixed(1)}">${esc(short)}</text>`;
   };
-  if (R.level !== 'trigger') {
+  if (R.level !== 'deep') {
     let r1 = '';
     CATS.forEach((c, i) => { r1 += sector(1, i, 4, G.R1i, G.R1o, c.name, c.name, c.c, R.hover && R.hover.ring === 1 && R.hover.idx === i); });
     h += `<g class="${fresh ? 'ring' : ''}">${r1}</g>`;
@@ -836,15 +840,15 @@ function drawRadial(fresh = false, ring2Fresh = false) {
       h += `<g class="${ring2Fresh ? 'ring' : ''}">${r2}</g>`;
     }
   } else {
-    const c = TYPE[R.locked].cat; let rt = '';
-    TRIGGERS.forEach(([n, s], i) => { rt += sector('t', i, TRIGGERS.length, G.R2i - 30, G.R2o - 4, n, s, '--lav', R.hover && R.hover.ring === 't' && R.hover.idx === i); });
+    const d = deepFor(R.locked); let rt = '';
+    d.opts.forEach(([n, s], i) => { rt += sector('t', i, d.opts.length, G.R2i - 30, G.R2o - 4, n, s, d.c, R.hover && R.hover.ring === 't' && R.hover.idx === i); });
     h += `<g class="ring">${rt}</g>`;
-    h += `<text class="ctr-s" x="${cx}" y="${cy - G.R2i + 14}">Optional trigger</text>`;
+    h += `<text class="ctr-s" x="${cx}" y="${cy - G.R2i + 14}">Optional ${d.label.toLowerCase()}</text>`;
   }
   let t1 = 'Quick Log', t2 = R.mode === 'tap' ? 'Tap a category' : 'Slide to a category';
   if (R.cancel) { t1 = 'Cancel'; t2 = 'Release: nothing saved'; }
-  else if (R.level === 'trigger') { t1 = TYPE[R.locked].short; t2 = R.hover ? TRIGGERS[R.hover.idx][0] : 'Release here: no trigger'; }
-  else if (R.hover && R.hover.ring === 2) { const it = CATS[R.cat].items[R.hover.idx]; t1 = it[2]; t2 = CATS[R.cat].trig && R.mode === 'gesture' ? 'Release to log · hold for trigger' : 'Release to log'; if (R.mode === 'tap') t2 = 'Tap to log'; }
+  else if (R.level === 'deep') { const d = deepFor(R.locked); t1 = TYPE[R.locked].short; t2 = R.hover ? d.opts[R.hover.idx][0] : (R.mode === 'tap' ? 'Tap here: log without' : 'Release here: no ' + d.label.toLowerCase()); }
+  else if (R.hover && R.hover.ring === 2) { const it = CATS[R.cat].items[R.hover.idx]; t1 = it[2]; const dp = deepFor(it[0]); t2 = dp && R.mode === 'gesture' ? 'Release · hold for ' + dp.label.toLowerCase() : 'Release to log'; if (R.mode === 'tap') t2 = 'Tap to log'; }
   else if (R.hover && R.hover.ring === 1) { t1 = CATS[R.hover.idx].name; t2 = R.mode === 'tap' ? 'Tap to open' : 'Keep sliding out'; }
   else if (R.mode === 'tap' && R.level === 2) { t1 = CATS[R.cat].name; t2 = 'Tap center to close'; }
   h += `<circle class="ctr" data-ring="c" cx="${cx}" cy="${cy}" r="${G.R0}" ${R.cancel ? 'style="stroke:var(--danger);stroke-width:2.5"' : ''}/>`;
@@ -858,8 +862,8 @@ function onGestureMove(x, y) {
   R.cancel = dy > 34 && r > 40;
   let ring2Fresh = false;
   if (R.cancel) R.hover = null;
-  else if (R.level === 'trigger') {
-    R.hover = (r >= G.R2i - 34 && r <= G.R2o + 60) ? { ring: 't', idx: sectorIdx(ang, TRIGGERS.length) } : null;
+  else if (R.level === 'deep') {
+    R.hover = (r >= G.R2i - 34 && r <= G.R2o + 60) ? { ring: 't', idx: sectorIdx(ang, deepFor(R.locked).opts.length) } : null;
   } else if (r < G.R0) R.hover = null;
   else if (r < G.R1o) { const ci = sectorIdx(ang, 4); R.hover = { ring: 1, idx: ci }; if (R.level === 2 && R.cat !== ci) { R.cat = ci; ring2Fresh = true; } }
   else {
@@ -868,20 +872,20 @@ function onGestureMove(x, y) {
   }
   const key = JSON.stringify(R.hover) + R.cancel;
   if (key !== prevKey || R.level !== prevLevel || R.cat !== prevCat) { drawRadial(false, ring2Fresh); if (R.hover) buzz(); }
-  // Dwell to deepen into triggers
-  const eligible = R.level === 2 && R.hover && R.hover.ring === 2 && CATS[R.cat].trig && CATS[R.cat].items[R.hover.idx][0].indexOf('other') === -1;
+  // Dwell to deepen into the event's nested ring (trigger, or a detail such as poop consistency)
+  const eligible = R.level === 2 && R.hover && R.hover.ring === 2 && !!deepFor(CATS[R.cat].items[R.hover.idx][0]);
   if (!eligible) { clearTimeout(dwellT); dwellKey = ''; return; }
   const k = R.cat + ':' + R.hover.idx;
   if (k !== dwellKey || Math.hypot(x - dwellAnchor[0], y - dwellAnchor[1]) > 9) {
     dwellKey = k; dwellAnchor = [x, y]; clearTimeout(dwellT);
-    dwellT = setTimeout(() => { if (!R.open || R.level !== 2) return; R.locked = CATS[R.cat].items[R.hover.idx][0]; R.level = 'trigger'; R.hover = null; dwellKey = ''; buzz(); drawRadial(); }, 350);
+    dwellT = setTimeout(() => { if (!R.open || R.level !== 2) return; R.locked = CATS[R.cat].items[R.hover.idx][0]; R.level = 'deep'; R.hover = null; dwellKey = ''; buzz(); drawRadial(); }, 350);
   }
 }
 function buzz() { try { navigator.vibrate && navigator.vibrate(8); } catch (e) {} }
 function commitGesture() {
   clearTimeout(dwellT);
   if (R.cancel) { closeRadial(); toast('Cancelled. Nothing logged.'); return; }
-  if (R.level === 'trigger') { const trig = R.hover ? TRIGGERS[R.hover.idx][0] : null; const k = R.locked; closeRadial(); logEvent(k, trig); return; }
+  if (R.level === 'deep') { const k = R.locked, d = deepFor(k), pick = R.hover ? d.opts[R.hover.idx][0] : null; closeRadial(); d.kind === 'detail' ? logEvent(k, null, pick) : logEvent(k, pick); return; }
   if (R.hover && R.hover.ring === 2) { const k = CATS[R.cat].items[R.hover.idx][0]; closeRadial(); logEvent(k, null); return; }
   if (R.hover && R.hover.ring === 1) { const ci = R.hover.idx; closeRadial(); openRadial('tap'); R.cat = ci; R.level = 2; drawRadial(false, true); return; }
   closeRadial(); toast('Cancelled. Nothing logged.');
@@ -889,9 +893,20 @@ function commitGesture() {
 function onTapRadial(e) {
   const t = e.target.closest('[data-ring]'); if (!t) { closeRadial(); return; }
   const ring = t.dataset.ring, i = +t.dataset.idx;
+  if (R.level === 'deep') {
+    const k = R.locked, d = deepFor(k);
+    if (ring === 'c') { closeRadial(); logEvent(k, null, null); return; }
+    if (ring === 't') { closeRadial(); d.kind === 'detail' ? logEvent(k, null, d.opts[i][0]) : logEvent(k, d.opts[i][0]); }
+    return;
+  }
   if (ring === 'c') { closeRadial(); return; }
   if (ring === '1') { R.cat = i; R.level = 2; R.hover = null; drawRadial(false, true); return; }
-  if (ring === '2') { const k = CATS[R.cat].items[i][0]; closeRadial(); logEvent(k, null); }
+  if (ring === '2') {
+    const k = CATS[R.cat].items[i][0];
+    // Tap mode opens detail rings (consistency) as the next level; triggers stay a post-log chip to keep taps low.
+    if (DETAILS[k]) { R.locked = k; R.level = 'deep'; R.hover = null; drawRadial(); return; }
+    closeRadial(); logEvent(k, null);
+  }
 }
 function bindQuickLog(btn) {
   btn.addEventListener('pointerdown', e => {
@@ -910,21 +925,23 @@ function bindQuickLog(btn) {
   btn.addEventListener('pointercancel', () => { clearTimeout(holdT); btn.style.transform = ''; gs = null; closeRadial(); });
   btn.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openRadial('tap'); } });
 }
-function logEvent(key, trigger) {
+function logEvent(key, trigger, detail = null) {
   const t = TYPE[key];
-  const ev = mkEvent(key, walk.u, walk.sim, { trigger, dogs: [...walk.dogs] });
+  const ev = mkEvent(key, walk.u, walk.sim, { trigger, detail, dogs: [...walk.dogs] });
   walk.events.push(ev); refreshLiveMap();
   const acts = [];
+  if (DETAILS[key] && !detail) acts.push({ label: 'Add ' + DETAILS[key].label.toLowerCase(), run: () => pickFor(ev, 'detail') });
   if (t.cat.trig && !trigger) acts.push({ label: 'Add trigger', run: () => pickFor(ev, 'trigger') });
   if (t.cat.trig) acts.push({ label: 'Outcome', run: () => pickFor(ev, 'outcome') });
   acts.push({ label: 'Undo', run: () => { walk.events = walk.events.filter(x => x !== ev); refreshLiveMap(); toast('Removed.'); } });
-  toast(`<b>${esc(t.name)}</b> logged${trigger ? ' · ' + esc(trigger) : ''}`, acts);
+  toast(`<b>${esc(t.name)}</b> logged${detail ? ' · ' + esc(detail) : ''}${trigger ? ' · ' + esc(trigger) : ''}`, acts);
 }
 function pickFor(ev, field) {
-  const opts = field === 'trigger' ? TRIGGERS.map(t => t[0]) : OUTCOMES;
-  sheet(`<h3>${field === 'trigger' ? 'Trigger' : 'Outcome'} <span class="muted small" style="font-weight:600">(optional)</span></h3><p class="muted small" style="margin:0 0 12px">For ${esc(TYPE[ev.key].name)}. You can also edit this later from the report.</p>
+  const opts = field === 'trigger' ? TRIGGERS.map(t => t[0]) : field === 'detail' ? DETAILS[ev.key].opts.map(o => o[0]) : OUTCOMES;
+  const title = field === 'trigger' ? 'Trigger' : field === 'detail' ? DETAILS[ev.key].label : 'Outcome';
+  sheet(`<h3>${title} <span class="muted small" style="font-weight:600">(optional)</span></h3><p class="muted small" style="margin:0 0 12px">For ${esc(TYPE[ev.key].name)}. You can also edit this later from the report.</p>
     <div style="display:flex;flex-wrap:wrap;gap:8px">${opts.map((o, i) => `<button class="chip g lv-control press" data-o="${i}">${esc(o)}</button>`).join('')}</div>`, p => {
-    p.querySelectorAll('[data-o]').forEach(b => b.onclick = () => { ev[field] = opts[+b.dataset.o]; closeSheet(); toast(`${field === 'trigger' ? 'Trigger' : 'Outcome'} saved: ${esc(ev[field])}`); });
+    p.querySelectorAll('[data-o]').forEach(b => b.onclick = () => { ev[field] = opts[+b.dataset.o]; closeSheet(); toast(`${title} saved: ${esc(ev[field])}`); });
   });
 }
 
@@ -934,7 +951,7 @@ function renderReport(opts = {}) {
   const end = new Date(w.start.getTime() + w.sim * 1000);
   const byCat = CATS.map(c => ({ c, rows: Object.entries(w.events.filter(e => TYPE[e.key].cat === c).reduce((a, e) => (a[e.key] = (a[e.key] || 0) + 1, a), {})) })).filter(x => x.rows.length);
   const steps = Math.round(miles(w.distM) * 2100);
-  const timeline = [...w.events].sort((a, b) => a.t - b.t).map(e => { const t = TYPE[e.key]; return `<button class="li" data-tl="${e.id}"><svg class="shape" viewBox="-10 -10 20 20">${shapeSvg(t.cat.shape, 0, 0, t.cat.c, '', 'stroke="none"')}</svg><span class="grow"><span class="t1">${esc(t.name)}</span><br><span class="t2">${clock(new Date(w.start.getTime() + e.t * 1000))}${e.trigger ? ' · ' + esc(e.trigger) : ''}${e.outcome ? ' · ' + esc(e.outcome) : ''}</span></span>${icon('chev')}</button>`; }).join('');
+  const timeline = [...w.events].sort((a, b) => a.t - b.t).map(e => { const t = TYPE[e.key]; return `<button class="li" data-tl="${e.id}"><svg class="shape" viewBox="-10 -10 20 20">${shapeSvg(t.cat.shape, 0, 0, t.cat.c, '', 'stroke="none"')}</svg><span class="grow"><span class="t1">${esc(t.name)}</span><br><span class="t2">${clock(new Date(w.start.getTime() + e.t * 1000))}${e.detail ? ' · ' + esc(e.detail) : ''}${e.trigger ? ' · ' + esc(e.trigger) : ''}${e.outcome ? ' · ' + esc(e.outcome) : ''}</span></span>${icon('chev')}</button>`; }).join('');
   $('#v-report').innerHTML = `
     <div class="stack">
       <div class="topbar"><button class="icon-btn g lv-orb press" id="r-back" aria-label="Back">${icon('back')}</button><span class="h-sec" style="flex:1">Walk report</span>${w.sample ? '<span class="sample">Sample</span>' : ''}</div>
@@ -952,7 +969,7 @@ function renderReport(opts = {}) {
       <section class="g lv-card map-card" aria-label="Route and events"><div id="r-map" style="position:relative">${mapSvg(w, { viewBox: '10 200 380 480', interactive: true, slice: false, focus })}</div>
         <div class="legend">${CATS.map(c => `<span>${legendShape(c)}${c.name}</span>`).join('')}<span class="muted" style="font-weight:600">Tap a marker for details</span></div></section>
       <section class="g lv-card"><h2 class="h-sec">Behavior breakdown</h2>
-        ${byCat.length ? byCat.map(({ c, rows }) => `<div class="bd-cat">${legendShape(c)}${c.name}</div>` + rows.map(([k, n]) => `<div class="bd-row"><span>${esc(TYPE[k].name)}</span><span><span class="num n">${n}</span> <span class="muted small">${NOUN(k)}${n === 1 ? '' : 's'}</span></span></div>`).join('')).join('') : '<p class="muted" style="margin:8px 0 0">Nothing was logged on this walk.</p>'}
+        ${byCat.length ? byCat.map(({ c, rows }) => `<div class="bd-cat">${legendShape(c)}${c.name}</div>` + rows.map(([k, n]) => `<div class="bd-row"><span>${esc(TYPE[k].name)}</span><span><span class="num n">${n}</span> <span class="muted small">${NOUN(k)}${n === 1 ? '' : 's'}</span></span></div>${detailLine(w, k)}`).join('')).join('') : '<p class="muted" style="margin:8px 0 0">Nothing was logged on this walk.</p>'}
       </section>
       <section class="g lv-card"><div class="row between"><h2 class="h-sec">Weather</h2><span class="sample">Sample values</span></div>
         <div class="wx" style="margin-top:10px">
@@ -983,13 +1000,20 @@ function renderReport(opts = {}) {
   v.onscroll = closePop;
   if (focus) setTimeout(() => { $('#v-report').scrollTop = $('#r-map').offsetTop - 70; const el = $(`#r-map [data-ev="${focus}"]`); if (el) showPop(w, [w.events.find(x => x.id === focus)], el); else { const ci = clusters(w.events).findIndex(c => c.items.some(i => i.id === focus)); const cel = $(`#r-map [data-cl="${ci}"]`); cel && showPop(w, clusters(w.events)[ci].items, cel); } }, 180);
 }
+function detailLine(w, k) {
+  if (!DETAILS[k]) return '';
+  const evs = w.events.filter(e => e.key === k), counts = DETAILS[k].opts.map(([o]) => [o, evs.filter(e => e.detail === o).length]).filter(x => x[1]);
+  const none = evs.filter(e => !e.detail).length;
+  if (!counts.length) return '';
+  return `<div class="muted small" style="margin:-4px 0 4px">${counts.map(([o, n]) => `${esc(o)} ${n}`).join(' · ')}${none ? ` · not recorded ${none}` : ''}</div>`;
+}
 function showPop(w, items, anchor) {
   closePop();
   const sr = screen.getBoundingClientRect(), ar = anchor.getBoundingClientRect();
   const p = document.createElement('div'); p.className = 'pop g lv-card'; p.setAttribute('role', 'dialog');
   p.innerHTML = items.map((e, i) => { const t = TYPE[e.key]; return `${i ? '<hr style="border:0;border-top:1px solid var(--glass-border);margin:10px 0">' : ''}<div class="row" style="gap:8px"><svg class="shape" viewBox="-10 -10 20 20">${shapeSvg(t.cat.shape, 0, 0, t.cat.c, '', 'stroke="none"')}</svg><b>${esc(t.name)}</b></div>
     <dl><dt>Time</dt><dd>${clock(new Date(w.start.getTime() + e.t * 1000))}</dd><dt>Dog</dt><dd>${e.dogs && e.dogs.length ? dogNames(e.dogs) : 'Not assigned'}</dd>
-    ${e.trigger ? `<dt>Trigger</dt><dd>${esc(e.trigger)}</dd>` : ''}${e.outcome ? `<dt>Outcome</dt><dd>${esc(e.outcome)}</dd>` : ''}${e.note ? `<dt>Note</dt><dd>${esc(e.note)}</dd>` : ''}</dl>`; }).join('');
+    ${e.detail ? `<dt>${esc(DETAILS[e.key].label)}</dt><dd>${esc(e.detail)}</dd>` : ''}${e.trigger ? `<dt>Trigger</dt><dd>${esc(e.trigger)}</dd>` : ''}${e.outcome ? `<dt>Outcome</dt><dd>${esc(e.outcome)}</dd>` : ''}${e.note ? `<dt>Note</dt><dd>${esc(e.note)}</dd>` : ''}</dl>`; }).join('');
   screen.appendChild(p);
   const pw = p.offsetWidth, ph = p.offsetHeight;
   let left = ar.left + ar.width / 2 - sr.left - pw / 2; left = Math.max(10, Math.min(sr.width - pw - 10, left));
@@ -1079,11 +1103,11 @@ function renderDogs() {
 let profileId = 'juno'; let openBeh = null;
 const BEH = {
   juno: [['pulling', 12, [3, 2, 2, 1, 2, 1, 1, 0]], ['barking', 7, [1, 2, 1, 1, 0, 1, 1, 0]], ['loose', 18, [1, 2, 2, 3, 2, 3, 2, 3]], ['recall', 9, [0, 1, 1, 1, 2, 1, 2, 1]]],
-  maple: [['loose', 22, [2, 3, 3, 3, 2, 3, 3, 3]], ['sniffing', 31, [4, 3, 4, 5, 3, 4, 4, 4]], ['freezing', 4, [1, 0, 1, 0, 1, 0, 1, 0]]],
+  maple: [['loose', 22, [2, 3, 3, 3, 2, 3, 3, 3]], ['marking', 31, [4, 3, 4, 5, 3, 4, 4, 4]], ['freezing', 4, [1, 0, 1, 0, 1, 0, 1, 0]]],
   biscuit: [['jumping', 6, [2, 1, 1, 1, 0, 1, 0, 0]], ['pulling', 9, [2, 2, 1, 1, 1, 1, 1, 0]], ['calm', 14, [1, 1, 2, 2, 2, 2, 2, 2]]],
   olive: [['freezing', 5, [1, 1, 0, 1, 0, 1, 1, 0]], ['loose', 16, [2, 2, 2, 2, 2, 2, 2, 2]]],
   pepper: [['barking', 11, [2, 2, 1, 2, 1, 1, 1, 1]], ['reactivity', 6, [1, 1, 1, 1, 0, 1, 1, 0]], ['leaveit', 8, [0, 1, 1, 1, 1, 2, 1, 1]]],
-  ziggy: [['sniffing', 40, [5, 5, 4, 6, 5, 5, 5, 5]], ['distraction', 13, [3, 2, 2, 2, 1, 1, 1, 1]], ['recall', 5, [0, 0, 1, 0, 1, 1, 1, 1]]],
+  ziggy: [['marking', 40, [5, 5, 4, 6, 5, 5, 5, 5]], ['distraction', 13, [3, 2, 2, 2, 1, 1, 1, 1]], ['recall', 5, [0, 0, 1, 0, 1, 1, 1, 1]]],
 };
 const OVER = { juno: [58, 71.4, 39.8], maple: [52, 60.2, 37.1], biscuit: [96, 118.0, 62.5], olive: [21, 31.6, 13.2], pepper: [30, 22.4, 15.9], ziggy: [44, 49.7, 30.3] };
 function renderProfile() {

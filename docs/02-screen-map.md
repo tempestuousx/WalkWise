@@ -108,6 +108,7 @@ Gesture model (single continuous press-and-drag):
 3. Crossing ring 1's outer radius opens **ring 2** as an outer arc with that category's events (up to 11 items; Behavior has 10 plus Other).
 4. **Release on an event**: event saved immediately with timestamp, last GPS fix, walk id, current dogs. Success haptic and a small glass toast: "Pulling logged · Add trigger".
 5. **Optional trigger, still in the same gesture**: hold still on an event for 350ms. The event "locks" into the center label and ring 2 is replaced by the trigger ring (Another dog, Person, Bicycle, Vehicle, Wildlife, Loud noise, Unfamiliar environment, Food, Unknown, custom). Release on a trigger saves event + trigger. Release in the center dead zone saves the event without a trigger.
+5b. **Detail rings for specific events**: some events have their own nested ring instead of the trigger ring, reached the same way (hold still for 350ms). **Poop** opens a **Consistency** ring: Normal, Soft, Runny. Release on an option saves Poop with that consistency; release in the center saves Poop without one. Consistency is optional, can be added later from the toast chip or the report, and appears in the report breakdown (for example "Poop: 3 events, Normal 2 · Soft 1"). In tap mode, tapping Poop opens the Consistency ring as the next level and tapping the center logs it without one. The mechanism is data driven (`event_type_details`), so other events can get detail rings later without new code.
 6. **Cancel**: drag back into the center dead zone and release, or drag off-screen. A "Cancelled" toast confirms nothing was saved.
 7. Releasing on a category (without reaching ring 2) switches to **tap mode** with that category open.
 
@@ -118,6 +119,8 @@ Tap mode (accessibility and preference): a single tap on Quick Log opens the men
 Post-log details (never blocking): the toast's "Add trigger" / "Add outcome" / "Note" chips stay for 6 seconds. Anything can also be edited from the event marker or the walk report later.
 
 Additional category: Voice note (hold to record, release to save; transcribed later if needed), Photo (opens camera, returns to walk; GPS tagged), Custom event (opens the user's custom types).
+
+Default Nature events: Pee, Poop, Marking, Drinking water, Resting, Other. Sniffing was removed from the default Quick Log at your request; anyone who wants it can add it back as a custom event.
 
 Customization (Settings > Quick Log): reorder categories and events, hide defaults, add custom events and triggers, choose icons, set handedness, and choose gesture vs tap as default.
 

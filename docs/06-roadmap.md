@@ -33,13 +33,14 @@ Acceptance:
 
 ## Phase 3: Behavioral logging
 
-Scope: radial menu (gesture and tap modes), haptics, cancel gesture, dwell-to-trigger, post-log chips, event persistence with location, map markers and clustering, event editing, custom categories/events/triggers, Quick Log customization, voice notes with deferred transcription and keyword-based suggestions, photos.
+Scope: radial menu (gesture and tap modes), haptics, cancel gesture, dwell-to-trigger, detail rings (Poop consistency), post-log chips, event persistence with location, map markers and clustering, event editing, custom categories/events/triggers, Quick Log customization, voice notes with deferred transcription and keyword-based suggestions, photos.
 
 Acceptance:
 - [ ] Logging an event with one press-drag-release takes < 1.5 s for a practiced user and requires no dialogs.
 - [ ] Gesture runs at 60 fps (120 on ProMotion) with no JS-thread dependency during the drag (verified with the performance monitor).
 - [ ] Event saved on release even when offline and with no dog assigned; timestamp and nearest fix (with fix age) recorded.
 - [ ] Triggers and outcomes are never required; release in the dead zone after dwell saves the event without trigger.
+- [ ] Poop can be logged as Normal, Soft, or Runny in one gesture (hold on Poop) or in tap mode, and without a consistency; the report shows the consistency counts.
 - [ ] VoiceOver and TalkBack users can log every event type through the list alternative.
 - [ ] Markers appear on the active map immediately and on the report without any toggle; overlapping markers cluster and expand.
 - [ ] Voice note recorded offline is saved immediately and transcribed later; no network AI service is called.

@@ -163,6 +163,20 @@ create table public.event_triggers (
   unique nulls not distinct (user_id, key)
 );
 
+-- Optional nested detail values for a specific event type, shown as a ring in Quick Log.
+-- Seeded: poop -> Consistency: normal, soft, runny. Users can add their own later.
+create table public.event_type_details (
+  id uuid primary key, user_id uuid references auth.users(id) on delete cascade,
+  event_type_id uuid not null references public.event_types(id),
+  detail_label text not null,          -- ring title, e.g. 'Consistency'
+  key text not null, name text not null, sort_order integer not null default 0,
+  archived boolean not null default false,
+  client_updated_at timestamptz not null default now(), server_updated_at timestamptz not null default now(),
+  server_version bigint not null default 0, deleted_at timestamptz,
+  unique nulls not distinct (user_id, event_type_id, key)
+);
+create index event_type_details_type_idx on public.event_type_details (event_type_id);
+
 create table public.event_outcomes (
   id uuid primary key, user_id uuid references auth.users(id) on delete cascade,
   key text not null, name text not null, icon text not null, sort_order integer not null default 0,
@@ -268,6 +282,7 @@ create table public.walk_events (
   event_type_id      uuid not null references public.event_types(id),
   trigger_id         uuid references public.event_triggers(id),
   outcome_id         uuid references public.event_outcomes(id),
+  detail_id          uuid references public.event_type_details(id),  -- e.g. poop consistency; optional
   occurred_at        timestamptz not null,
   lat                double precision check (lat between -90 and 90),   -- null if no fix was available
   lng                double precision check (lng between -180 and 180),
@@ -437,7 +452,7 @@ declare t text;
 begin
   foreach t in array array[
     'profiles','user_preferences','clients','dogs','event_categories','event_types','event_triggers',
-    'event_outcomes','walks','walk_intervals','walk_participants','walk_events','event_dogs','walk_media',
+    'event_outcomes','event_type_details','walks','walk_intervals','walk_participants','walk_events','event_dogs','walk_media',
     'weather_observations','scheduled_walks','scheduled_walk_dogs','report_metadata','report_exports'
   ] loop
     execute format('create trigger %I_touch before insert or update on public.%I
@@ -473,7 +488,7 @@ create policy prefs_owner on public.user_preferences for all to authenticated
 do $$
 declare t text;
 begin
-  foreach t in array array['event_categories','event_types','event_triggers','event_outcomes'] loop
+  foreach t in array array['event_categories','event_types','event_triggers','event_outcomes','event_type_details'] loop
     execute format('alter table public.%I enable row level security', t);
     execute format('create policy %I_read on public.%I for select to authenticated
                     using (user_id is null or user_id = (select auth.uid()))', t, t);
