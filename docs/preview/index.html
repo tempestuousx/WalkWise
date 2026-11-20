@@ -316,6 +316,10 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
 .btn { min-height: 50px; padding: 0 20px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 800; border-radius: 999px; }
 .btn.primary { --t: var(--sky); }
 .btn.full { width: 100%; }
+.res { font-size: 11.5px; font-weight: 800; padding: 2px 8px; border-radius: 999px; background: color-mix(in srgb, var(--t) 70%, transparent); vertical-align: 1px; }
+.tr-input { width: 100%; margin-top: 10px; padding: 12px 16px; border-radius: 18px; font: inherit; color: var(--text); outline: none; resize: vertical; }
+.tr-input::placeholder { color: var(--text3); }
+textarea.tr-input { border-radius: 18px; }
 .pop { position: absolute; z-index: 65; width: 240px; padding: 12px 14px; border-radius: 20px; font-size: 13.5px; animation: toastin 0.28s cubic-bezier(0.34, 1.56, 0.64, 1); }
 .pop dl { margin: 6px 0 0; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 3px 10px; }
 .pop dt { color: var(--text2); font-weight: 600; }
@@ -491,7 +495,6 @@ const icon = (n, extra = '') => `<svg class="icon" viewBox="0 0 24 24" aria-hidd
 const CATS = [
   { key: 'nature', name: 'Nature', c: '--c-nature', shape: 'circle', trig: false, items: [['pee','Pee','Pee'],['poop','Poop','Poop'],['marking','Marking','Mark'],['drinking','Drinking water','Drink'],['resting','Resting','Rest'],['n-other','Other','Other']] },
   { key: 'behavior', name: 'Behavior', c: '--c-behavior', shape: 'tri', trig: true, items: [['pulling','Pulling','Pull'],['barking','Barking','Bark'],['lunging','Lunging','Lunge'],['jumping','Jumping','Jump'],['freezing','Freezing','Freeze'],['reactivity','Reactivity','React'],['distraction','Distraction','Distract'],['loose','Loose-leash walking','Loose'],['calm','Calm behavior','Calm'],['b-other','Other','Other']] },
-  { key: 'training', name: 'Training', c: '--c-training', shape: 'square', trig: true, items: [['recall','Successful recall','Recall'],['heel','Heel','Heel'],['sit','Sit','Sit'],['leaveit','Leave it','Leave'],['redirect','Successful redirection','Redirect'],['cue','Responded to cue','Cue'],['t-other','Other','Other']] },
   { key: 'custom', name: 'Additional', c: '--c-custom', shape: 'diamond', trig: false, items: [['voice','Voice note','Voice'],['photo','Photo','Photo'],['custom','Custom event','Custom']] },
 ];
 const TYPE = {}; CATS.forEach((c, ci) => c.items.forEach(([k, n, s]) => TYPE[k] = { key: k, name: n, short: s, cat: c, ci }));
@@ -499,6 +502,21 @@ const NOUN = k => { const c = TYPE[k].cat.key; if (c === 'behavior') return (k =
 const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
 const TRIGGERS = [['Another dog','Dog'],['Person','Person'],['Bicycle','Bike'],['Vehicle','Vehicle'],['Wildlife','Wildlife'],['Loud noise','Noise'],['Unfamiliar environment','New place'],['Food','Food'],['Unknown','Unknown']];
 const OUTCOMES = ['Successfully redirected', 'Continued behavior', 'Settled independently', 'Required assistance'];
+// Training is recorded on the report card after the walk, not in Quick Log.
+const TRAINING = [['heel', 'Heel'], ['loose-practice', 'Loose-leash practice'], ['leaveit', 'Leave it'], ['redirect', 'Redirection'], ['recall', 'Recall'], ['sit', 'Sit'], ['cue', 'Responded to cue'], ['t-other', 'Other']];
+const TR = Object.fromEntries(TRAINING);
+const RESULTS = [['well', 'Went well', '--mint'], ['mixed', 'Mixed', '--peach'], ['work', 'Needs work', '--blush']];
+const RES = Object.fromEntries(RESULTS.map(r => [r[0], r]));
+// Which practice ideas to show for which logged behaviors. Simple, editable rules; not advice.
+const TRAIN_RULES = { pulling: ['heel', 'loose-practice'], lunging: ['leaveit', 'redirect'], barking: ['redirect', 'leaveit'], reactivity: ['redirect', 'leaveit'], jumping: ['sit'], distraction: ['cue', 'recall'] };
+function suggestTraining(w) {
+  const from = {};
+  w.events.forEach(e => (TRAIN_RULES[e.key] || []).forEach(t => { from[t] = from[t] || {}; from[t][e.key] = (from[t][e.key] || 0) + 1; }));
+  const done = new Set(w.training.map(x => x.key));
+  return Object.entries(from).filter(([t]) => !done.has(t))
+    .map(([t, src]) => ({ key: t, total: Object.values(src).reduce((a, b) => a + b, 0), reason: 'Logged: ' + Object.entries(src).map(([k, n]) => `${TYPE[k].name} ${n}`).join(', ') }))
+    .sort((a, b) => b.total - a.total).slice(0, 4);
+}
 // Nested detail rings for specific event types (optional, like triggers).
 const DETAILS = { poop: { label: 'Consistency', opts: [['Normal', 'Normal'], ['Soft', 'Soft'], ['Runny', 'Runny']] } };
 const deepFor = k => DETAILS[k] ? { kind: 'detail', label: DETAILS[k].label, opts: DETAILS[k].opts, c: TYPE[k].cat.c }
@@ -595,11 +613,12 @@ function sampleWalk() {
   const start = new Date(); start.setHours(17, 12, 0, 0);
   const evs = [
     ['marking', 60, 140], ['pee', 140, 260, ], ['pulling', 250, 420, { trigger: 'Another dog', outcome: 'Successfully redirected' }],
-    ['loose', 420, 700], ['barking', 520, 830, { trigger: 'Bicycle', outcome: 'Settled independently' }], ['recall', 600, 980],
+    ['loose', 420, 700], ['barking', 520, 830, { trigger: 'Bicycle', outcome: 'Settled independently' }], ['lunging', 600, 980, { trigger: 'Another dog', outcome: 'Successfully redirected' }],
     ['poop', 760, 1240, { detail: 'Normal' }], ['pulling', 900, 1480, { trigger: 'Wildlife', outcome: 'Continued behavior', note: 'Squirrel on the fence line.' }],
-    ['loose', 1040, 1700], ['sit', 1180, 1900], ['pulling', 1300, 2080, { trigger: 'Another dog' }], ['poop', 1360, 2200, { detail: 'Soft' }], ['drinking', 1400, 2300], ['calm', 1500, 2480],
+    ['loose', 1040, 1700], ['jumping', 1180, 1900, { trigger: 'Person' }], ['pulling', 1300, 2080, { trigger: 'Another dog' }], ['poop', 1360, 2200, { detail: 'Soft' }], ['drinking', 1400, 2300], ['calm', 1500, 2480],
   ];
   return { id: 'sample', sample: true, start, sim: 2580, distM: ROUTE_M, u: TOTAL, dogs: ['juno', 'maple'], cls: 'Private client',
+    training: [{ id: 'tr1', key: 'heel', name: 'Heel', result: 'mixed', note: 'Better after the park loop.', source: 'suggested', dogs: ['juno', 'maple'] }],
     events: evs.map(([k, u, t, x]) => mkEvent(k, Math.min(u, TOTAL), t, Object.assign({ dogs: ['juno', 'maple'] }, x || {}))) };
 }
 const SAMPLE = sampleWalk();
@@ -657,7 +676,7 @@ function renderOrb() {
 /* ── Walk engine (simulated) ── */
 function startWalk(preDogs = []) {
   if (walk && (walk.status === 'recording' || walk.status === 'paused')) { go('active'); return; }
-  walk = { id: 'w' + Date.now(), start: new Date(), sim: 0, distM: 0, u: 0, dogs: Array.isArray(preDogs) ? preDogs : [], events: [], status: 'recording', cls: 'Personal' };
+  walk = { id: 'w' + Date.now(), start: new Date(), sim: 0, distM: 0, u: 0, dogs: Array.isArray(preDogs) ? preDogs : [], events: [], training: [], status: 'recording', cls: 'Personal' };
   go('active');
   toast('Recording started. No dog needed to begin.', [], false);
 }
@@ -743,7 +762,7 @@ function dogPicker(selected, title, cta, done, laterLabel = null, later = null) 
 
 /* ── Active walk ── */
 function renderActive() {
-  if (!walk) { walk = { id: 'w' + Date.now(), start: new Date(), sim: 0, distM: 0, u: 0, dogs: [], events: [], status: 'recording', cls: 'Personal' }; }
+  if (!walk) { walk = { id: 'w' + Date.now(), start: new Date(), sim: 0, distM: 0, u: 0, dogs: [], events: [], training: [], status: 'recording', cls: 'Personal' }; }
   const paused = walk.status === 'paused';
   $('#v-active').innerHTML = `
     <div class="mapwrap" id="live-map">${mapSvg(walk, { live: true })}</div>
@@ -838,7 +857,7 @@ function drawRadial(fresh = false, ring2Fresh = false) {
   };
   if (R.level !== 'deep') {
     let r1 = '';
-    CATS.forEach((c, i) => { r1 += sector(1, i, 4, G.R1i, G.R1o, c.name, c.name, c.c, R.hover && R.hover.ring === 1 && R.hover.idx === i); });
+    CATS.forEach((c, i) => { r1 += sector(1, i, CATS.length, G.R1i, G.R1o, c.name, c.name, c.c, R.hover && R.hover.ring === 1 && R.hover.idx === i); });
     h += `<g class="${fresh ? 'ring' : ''}">${r1}</g>`;
     if (R.cat !== null && R.level === 2) {
       const c = CATS[R.cat]; let r2 = '';
@@ -896,10 +915,10 @@ function onGestureMove(x, y) {
     R.hover = R.armed && r >= G.R2i - 34 ? { ring: 't', idx: stickyIdx(ang, deepFor(R.locked).opts.length, same('t')) } : null;
   } else if (r < G.R0) R.hover = null;
   else if (r < G.R1o && !(R.level === 2 && prevHover && prevHover.ring === 2 && r >= G.R1o - RING_BACK)) {
-    const ci = stickyIdx(ang, 4, same(1) ?? (R.level === 2 ? R.cat : null));
+    const ci = stickyIdx(ang, CATS.length, same(1) ?? (R.level === 2 ? R.cat : null));
     R.hover = { ring: 1, idx: ci }; if (R.level === 2 && R.cat !== ci) { R.cat = ci; ring2Fresh = true; }
   } else {
-    if (R.level !== 2) { R.cat = stickyIdx(ang, 4, same(1)); R.level = 2; ring2Fresh = true; }
+    if (R.level !== 2) { R.cat = stickyIdx(ang, CATS.length, same(1)); R.level = 2; ring2Fresh = true; }
     R.hover = { ring: 2, idx: stickyIdx(ang, CATS[R.cat].items.length, ring2Fresh ? null : same(2)) };
   }
   const key = JSON.stringify(R.hover) + R.cancel;
@@ -1005,6 +1024,7 @@ function renderReport(opts = {}) {
       <section class="g lv-card"><h2 class="h-sec">Behavior breakdown</h2>
         ${byCat.length ? byCat.map(({ c, rows }) => `<div class="bd-cat">${legendShape(c)}${c.name}</div>` + rows.map(([k, n]) => `<div class="bd-row"><span>${esc(TYPE[k].name)}</span><span><span class="num n">${n}</span> <span class="muted small">${NOUN(k)}${n === 1 ? '' : 's'}</span></span></div>${detailLine(w, k)}`).join('')).join('') : '<p class="muted" style="margin:8px 0 0">Nothing was logged on this walk.</p>'}
       </section>
+      ${trainingSection(w)}
       <section class="g lv-card"><div class="row between"><h2 class="h-sec">Weather</h2><span class="sample">Sample values</span></div>
         <div class="wx" style="margin-top:10px">
           <div><div class="v num">64°</div><div class="l">Start · partly cloudy</div></div><div><div class="v num">61°</div><div class="l">End · feels 60°</div></div><div><div class="v num">58%</div><div class="l">Humidity</div></div>
@@ -1020,7 +1040,10 @@ function renderReport(opts = {}) {
     </div>`;
   const v = $('#v-report');
   $('#r-back', v).onclick = () => go('home');
-  $('#r-assign', v) && ($('#r-assign', v).onclick = () => dogPicker([], 'Who did you walk?', 'Assign', ids => { if (!ids.length) return; w.events.forEach(e => { if (!e.dogs || !e.dogs.length) e.dogs = [...ids]; }); w.dogs = ids; renderReport(); toast(`Assigned to ${dogNames(ids)}.`); }));
+  $('#tr-add', v).onclick = () => trainingSheet(w);
+  v.querySelectorAll('[data-sug]').forEach(b => b.onclick = () => trainingSheet(w, b.dataset.sug));
+  v.querySelectorAll('[data-tr]').forEach(b => b.onclick = () => trainingSheet(w, null, w.training.find(x => x.id === b.dataset.tr)));
+  $('#r-assign', v) && ($('#r-assign', v).onclick = () => dogPicker([], 'Who did you walk?', 'Assign', ids => { if (!ids.length) return; w.events.forEach(e => { if (!e.dogs || !e.dogs.length) e.dogs = [...ids]; }); (w.training || []).forEach(t => { if (!t.dogs.length) t.dogs = [...ids]; }); w.dogs = ids; renderReport(); toast(`Assigned to ${dogNames(ids)}.`); }));
   v.querySelectorAll('[data-share]').forEach(b => b.onclick = () => toast({ link: 'Preview only. Links expire after 30 days and can be revoked.', image: 'Preview only. The image includes the route and every marker.', pdf: 'Preview only. The PDF can include a detailed event appendix.' }[b.dataset.share]));
   const mapBox = $('#r-map', v);
   mapBox.addEventListener('click', e => {
@@ -1033,6 +1056,50 @@ function renderReport(opts = {}) {
   v.querySelectorAll('[data-tl]').forEach(b => b.onclick = () => { renderReport({ focus: b.dataset.tl }); $('#v-report').scrollTop = $('#r-map').offsetTop - 70; setTimeout(() => { const el = $(`#r-map [data-ev="${b.dataset.tl}"]`); if (el) showPop(w, [w.events.find(x => x.id === b.dataset.tl)], el); else { const c = clusters(w.events).findIndex(c => c.items.some(i => i.id === b.dataset.tl)); const cel = $(`#r-map [data-cl="${c}"]`); cel && showPop(w, clusters(w.events)[c].items, cel); } }, 180); });
   v.onscroll = closePop;
   if (focus) setTimeout(() => { $('#v-report').scrollTop = $('#r-map').offsetTop - 70; const el = $(`#r-map [data-ev="${focus}"]`); if (el) showPop(w, [w.events.find(x => x.id === focus)], el); else { const ci = clusters(w.events).findIndex(c => c.items.some(i => i.id === focus)); const cel = $(`#r-map [data-cl="${ci}"]`); cel && showPop(w, clusters(w.events)[ci].items, cel); } }, 180);
+}
+function trainingSection(w) {
+  const sug = suggestTraining(w);
+  const rec = w.training.map(t => { const r = t.result && RES[t.result]; return `<button class="li" data-tr="${t.id}"><span class="grow"><span class="t1">${esc(t.name)}</span>${r ? ` <span class="res" style="--t:var(${r[2]})">${r[1]}</span>` : ''}<br><span class="t2">${t.dogs.length ? dogNames(t.dogs) : 'No dog assigned'}${t.note ? ' · ' + esc(t.note) : ''}</span></span>${icon('edit', 'style="width:16px;height:16px;opacity:.6"')}</button>`; }).join('');
+  return `<section class="g lv-card" aria-label="Training">
+    <div class="row between"><h2 class="h-sec">Training</h2><button class="chip g lv-control tint press" style="--t:var(--sky)" id="tr-add">${icon('plus', 'style="width:16px;height:16px"')}Add</button></div>
+    <div class="list">${rec || '<p class="muted small" style="margin:8px 0 4px">No training recorded for this walk yet.</p>'}</div>
+    ${sug.length ? `<div class="sugg"><p class="small" style="margin:12px 0 2px"><b>Ideas from this walk</b> <span class="muted">· based on what you logged. Tap one to record it.</span></p>
+      <div class="list">${sug.map(x => `<button class="li" data-sug="${x.key}">${icon('plus', 'style="width:18px;height:18px;color:var(--accent)"')}<span class="grow"><span class="t1">${esc(TR[x.key])}</span><br><span class="t2">${esc(x.reason)}</span></span></button>`).join('')}</div>
+      <p class="muted small" style="margin:6px 0 0">Ideas are suggestions, not a training plan, and are not included in shared reports.</p></div>` : ''}
+  </section>`;
+}
+function trainingSheet(w, preset = null, existing = null) {
+  let key = existing ? existing.key : preset, result = existing ? existing.result : null;
+  const otherName = existing && existing.key === 't-other' ? existing.name : '';
+  sheet(`<h3>${existing ? 'Edit training' : 'Add training'}</h3>
+    <p class="muted small" style="margin:0 0 12px">What you worked on during this walk. It shows on the report card you share.</p>
+    <p class="h-sec" style="margin:0 0 8px">What did you work on?</p>
+    <div style="display:flex;flex-wrap:wrap;gap:8px" id="tr-types">${TRAINING.map(([k, n]) => `<button class="chip g lv-control press" data-k="${k}" aria-pressed="false">${esc(n)}</button>`).join('')}</div>
+    <input class="tr-input g lv-control" id="tr-other" placeholder="Name it, for example Wait at curb" value="${esc(otherName)}" hidden>
+    <p class="h-sec" style="margin:16px 0 8px">How did it go? <span style="text-transform:none;letter-spacing:0;font-weight:600">(optional)</span></p>
+    <div style="display:flex;flex-wrap:wrap;gap:8px" id="tr-res">${RESULTS.map(([k, n]) => `<button class="chip g lv-control press" data-r="${k}" aria-pressed="false">${n}</button>`).join('')}</div>
+    <label class="h-sec" for="tr-note" style="display:block;margin:16px 0 8px">Note <span style="text-transform:none;letter-spacing:0;font-weight:600">(optional)</span></label>
+    <textarea class="tr-input g" id="tr-note" rows="2" placeholder="For example: better once we reached the park">${esc(existing ? existing.note : '')}</textarea>
+    <p class="small" id="tr-err" style="color:var(--danger);margin:8px 0 0" hidden>Pick what you worked on.</p>
+    <div style="display:grid;gap:8px;margin-top:14px"><button class="btn primary full g tint press" id="tr-save">Save training</button>${existing ? '<button class="btn full press" id="tr-del" style="color:var(--danger)">Remove</button>' : ''}</div>`, p => {
+    const paint = () => {
+      p.querySelectorAll('[data-k]').forEach(b => { const on = b.dataset.k === key; b.setAttribute('aria-pressed', on); b.classList.toggle('tint', on); b.style.setProperty('--t', 'var(--lav)'); });
+      p.querySelectorAll('[data-r]').forEach(b => { const on = b.dataset.r === result; b.setAttribute('aria-pressed', on); b.classList.toggle('tint', on); b.style.setProperty('--t', `var(${RES[b.dataset.r][2]})`); });
+      $('#tr-other', p).hidden = key !== 't-other';
+    };
+    paint();
+    p.querySelectorAll('[data-k]').forEach(b => b.onclick = () => { key = b.dataset.k; $('#tr-err', p).hidden = true; paint(); });
+    p.querySelectorAll('[data-r]').forEach(b => b.onclick = () => { result = result === b.dataset.r ? null : b.dataset.r; paint(); });
+    $('#tr-save', p).onclick = () => {
+      if (!key) { $('#tr-err', p).hidden = false; return; }
+      const name = key === 't-other' ? ($('#tr-other', p).value.trim() || 'Other') : TR[key];
+      const note = $('#tr-note', p).value.trim();
+      if (existing) Object.assign(existing, { key, name, result, note });
+      else w.training.push({ id: 't' + (uid++), key, name, result, note, source: preset ? 'suggested' : 'manual', dogs: [...w.dogs] });
+      closeSheet(); const st = $('#v-report').scrollTop; renderReport(); $('#v-report').scrollTop = st; toast(`${esc(name)} saved to this report.`);
+    };
+    if (existing) $('#tr-del', p).onclick = () => { w.training = w.training.filter(x => x !== existing); closeSheet(); const st = $('#v-report').scrollTop; renderReport(); $('#v-report').scrollTop = st; toast('Training removed.'); };
+  });
 }
 function detailLine(w, k) {
   if (!DETAILS[k]) return '';
@@ -1136,12 +1203,12 @@ function renderDogs() {
 /* ── Dog profile ── */
 let profileId = 'juno'; let openBeh = null;
 const BEH = {
-  juno: [['pulling', 12, [3, 2, 2, 1, 2, 1, 1, 0]], ['barking', 7, [1, 2, 1, 1, 0, 1, 1, 0]], ['loose', 18, [1, 2, 2, 3, 2, 3, 2, 3]], ['recall', 9, [0, 1, 1, 1, 2, 1, 2, 1]]],
+  juno: [['pulling', 12, [3, 2, 2, 1, 2, 1, 1, 0]], ['barking', 7, [1, 2, 1, 1, 0, 1, 1, 0]], ['loose', 18, [1, 2, 2, 3, 2, 3, 2, 3]], ['lunging', 5, [1, 1, 0, 1, 1, 0, 1, 0]]],
   maple: [['loose', 22, [2, 3, 3, 3, 2, 3, 3, 3]], ['marking', 31, [4, 3, 4, 5, 3, 4, 4, 4]], ['freezing', 4, [1, 0, 1, 0, 1, 0, 1, 0]]],
   biscuit: [['jumping', 6, [2, 1, 1, 1, 0, 1, 0, 0]], ['pulling', 9, [2, 2, 1, 1, 1, 1, 1, 0]], ['calm', 14, [1, 1, 2, 2, 2, 2, 2, 2]]],
   olive: [['freezing', 5, [1, 1, 0, 1, 0, 1, 1, 0]], ['loose', 16, [2, 2, 2, 2, 2, 2, 2, 2]]],
-  pepper: [['barking', 11, [2, 2, 1, 2, 1, 1, 1, 1]], ['reactivity', 6, [1, 1, 1, 1, 0, 1, 1, 0]], ['leaveit', 8, [0, 1, 1, 1, 1, 2, 1, 1]]],
-  ziggy: [['marking', 40, [5, 5, 4, 6, 5, 5, 5, 5]], ['distraction', 13, [3, 2, 2, 2, 1, 1, 1, 1]], ['recall', 5, [0, 0, 1, 0, 1, 1, 1, 1]]],
+  pepper: [['barking', 11, [2, 2, 1, 2, 1, 1, 1, 1]], ['reactivity', 6, [1, 1, 1, 1, 0, 1, 1, 0]], ['jumping', 8, [2, 1, 1, 1, 1, 1, 1, 0]]],
+  ziggy: [['marking', 40, [5, 5, 4, 6, 5, 5, 5, 5]], ['distraction', 13, [3, 2, 2, 2, 1, 1, 1, 1]], ['pulling', 9, [2, 1, 2, 1, 1, 1, 1, 0]]],
 };
 const OVER = { juno: [58, 71.4, 39.8], maple: [52, 60.2, 37.1], biscuit: [96, 118.0, 62.5], olive: [21, 31.6, 13.2], pepper: [30, 22.4, 15.9], ziggy: [44, 49.7, 30.3] };
 function renderProfile() {

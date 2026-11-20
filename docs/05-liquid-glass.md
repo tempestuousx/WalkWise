@@ -113,7 +113,7 @@ elevation = { 1: card, 2: floating control, 3: radial menu / sheets }
 
 Purple is limited to the Custom category accent and a faint ambient lavender, never used for primary UI.
 
-Category markers use **shape plus color** so they work for color-blind users and in sunlight glare: Nature = circle, Behavior = rounded triangle, Training = rounded square, Custom = diamond. Each marker has a white 2 px halo for contrast on any map tile. Measured contrast of light-theme category colors against that halo: Nature 4.25, Behavior 3.52, Training 4.88, Custom 4.94 (WCAG non-text minimum is 3:1). Category colors are never used for body text.
+Category markers use **shape plus color** so they work for color-blind users and in sunlight glare: Nature = circle, Behavior = rounded triangle, Custom = diamond (Training is no longer a map marker; its blue is used for the report's Training section). Each marker has a white 2 px halo for contrast on any map tile. Measured contrast of light-theme category colors against that halo: Nature 4.25, Behavior 3.52, Training 4.88, Custom 4.94 (WCAG non-text minimum is 3:1). Category colors are never used for body text.
 
 Typography: platform system fonts (SF Pro / Roboto) to honor Dynamic Type and font scaling; SF Pro Rounded / Roboto Flex rounded axis for display numerals. All live metrics use tabular numerals. Text scales to 200%; layouts reflow rather than truncate metrics.
 

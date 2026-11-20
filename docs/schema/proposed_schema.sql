@@ -43,6 +43,8 @@ create type public.weather_source       as enum ('weatherkit', 'open_meteo', 'ma
 create type public.measure_source       as enum ('healthkit', 'health_connect', 'pedometer', 'estimated');
 create type public.elevation_source     as enum ('gps', 'barometer', 'dem');
 create type public.schedule_status      as enum ('scheduled', 'completed', 'cancelled');
+create type public.training_result      as enum ('went_well', 'mixed', 'needs_work');
+create type public.training_source      as enum ('suggested', 'manual');
 
 -- ───────────────────────── Accounts ─────────────────────────
 create table public.profiles (
@@ -334,6 +336,42 @@ create table public.walk_media (
 );
 create index walk_media_walk_idx on public.walk_media (walk_id);
 
+-- ───────────────────────── Training (recorded after the walk) ─────────────────────────
+-- Training is not logged in Quick Log; it is recorded on the report card.
+create table public.training_types (
+  id uuid primary key, user_id uuid references auth.users(id) on delete cascade,   -- null = system
+  key text not null, name text not null, sort_order integer not null default 0,
+  archived boolean not null default false,
+  client_updated_at timestamptz not null default now(), server_updated_at timestamptz not null default now(),
+  server_version bigint not null default 0, deleted_at timestamptz,
+  unique nulls not distinct (user_id, key)
+);
+
+create table public.walk_training (
+  id                 uuid primary key,
+  user_id            uuid not null references auth.users(id) on delete cascade,
+  walk_id            uuid not null references public.walks(id) on delete cascade,
+  training_type_id   uuid not null references public.training_types(id),
+  custom_name        text,             -- for 'other' entries named by the user
+  result             public.training_result,   -- optional
+  note               text,
+  source             public.training_source not null,
+  created_at         timestamptz not null default now(),
+  client_updated_at  timestamptz not null, server_updated_at timestamptz not null default now(),
+  server_version     bigint not null default 0, deleted_at timestamptz
+);
+create index walk_training_walk_idx on public.walk_training (walk_id);
+
+create table public.walk_training_dogs (
+  walk_training_id uuid not null references public.walk_training(id) on delete cascade,
+  dog_id           uuid not null references public.dogs(id) on delete cascade,
+  user_id          uuid not null references auth.users(id) on delete cascade,
+  client_updated_at timestamptz not null, server_updated_at timestamptz not null default now(),
+  server_version bigint not null default 0, deleted_at timestamptz,
+  primary key (walk_training_id, dog_id)
+);
+create index walk_training_dogs_dog_idx on public.walk_training_dogs (dog_id) where deleted_at is null;
+
 -- ───────────────────────── Weather ─────────────────────────
 create table public.weather_observations (
   id                 uuid primary key,
@@ -452,7 +490,7 @@ declare t text;
 begin
   foreach t in array array[
     'profiles','user_preferences','clients','dogs','event_categories','event_types','event_triggers',
-    'event_outcomes','event_type_details','walks','walk_intervals','walk_participants','walk_events','event_dogs','walk_media',
+    'event_outcomes','event_type_details','training_types','walk_training','walk_training_dogs','walks','walk_intervals','walk_participants','walk_events','event_dogs','walk_media',
     'weather_observations','scheduled_walks','scheduled_walk_dogs','report_metadata','report_exports'
   ] loop
     execute format('create trigger %I_touch before insert or update on public.%I
@@ -468,7 +506,7 @@ begin
   foreach t in array array[
     'clients','dogs','walks','walk_intervals','walk_participants','gps_points','walk_events','event_dogs',
     'walk_media','weather_observations','scheduled_walks','scheduled_walk_dogs','report_metadata',
-    'report_exports','report_shares','sync_operations'
+    'report_exports','report_shares','sync_operations','walk_training','walk_training_dogs'
   ] loop
     execute format('alter table public.%I enable row level security', t);
     execute format('create policy %I_owner on public.%I for all to authenticated
@@ -488,7 +526,7 @@ create policy prefs_owner on public.user_preferences for all to authenticated
 do $$
 declare t text;
 begin
-  foreach t in array array['event_categories','event_types','event_triggers','event_outcomes','event_type_details'] loop
+  foreach t in array array['event_categories','event_types','event_triggers','event_outcomes','event_type_details','training_types'] loop
     execute format('alter table public.%I enable row level security', t);
     execute format('create policy %I_read on public.%I for select to authenticated
                     using (user_id is null or user_id = (select auth.uid()))', t, t);
@@ -501,7 +539,7 @@ end $$;
 create or replace function public.assert_same_owner() returns trigger
 language plpgsql security definer set search_path = public as $$
 begin
-  if tg_table_name in ('walk_participants', 'event_dogs', 'scheduled_walk_dogs') then
+  if tg_table_name in ('walk_participants', 'event_dogs', 'scheduled_walk_dogs', 'walk_training_dogs') then
     if not exists (select 1 from dogs d where d.id = new.dog_id and d.user_id = new.user_id) then
       raise exception 'dog % not owned by user', new.dog_id using errcode = '42501';
     end if;
@@ -513,6 +551,8 @@ create trigger walk_participants_owner before insert or update on public.walk_pa
 create trigger event_dogs_owner before insert or update on public.event_dogs
   for each row execute function public.assert_same_owner();
 create trigger scheduled_walk_dogs_owner before insert or update on public.scheduled_walk_dogs
+  for each row execute function public.assert_same_owner();
+create trigger walk_training_dogs_owner before insert or update on public.walk_training_dogs
   for each row execute function public.assert_same_owner();
 
 -- Storage buckets (all private): dog-photos, walk-media, report-exports.

@@ -103,7 +103,7 @@ Geometry: the menu opens as an arc fan above the Quick Log button (about 200° o
 
 Gesture model (single continuous press-and-drag):
 
-1. **Press and hold** Quick Log for 180ms. Haptic tick. Ring 1 (categories: Nature, Behavior, Training, Additional) springs open.
+1. **Press and hold** Quick Log for 180ms. Haptic tick. Ring 1 (categories: Nature, Behavior, Additional) springs open.
 2. **Drag** toward a category. The sector under the thumb highlights (glass brightens, icon scales). Selection haptic on each sector change.
 3. Crossing ring 1's outer radius opens **ring 2** as an outer arc with that category's events (up to 11 items; Behavior has 10 plus Other).
 4. **Release on an event**: event saved immediately with timestamp, last GPS fix, walk id, current dogs. Success haptic and a small glass toast: "Pulling logged · Add trigger".
@@ -122,7 +122,7 @@ Post-log details (never blocking): the toast's "Add trigger" / "Add outcome" / "
 
 Additional category: Voice note (hold to record, release to save; transcribed later if needed), Photo (opens camera, returns to walk; GPS tagged), Custom event (opens the user's custom types).
 
-Default Nature events: Pee, Poop, Marking, Drinking water, Resting, Other. Sniffing was removed from the default Quick Log at your request; anyone who wants it can add it back as a custom event.
+Quick Log categories: Nature, Behavior, Additional. Training was moved out of Quick Log to the report card (too much to log during a walk). Default Nature events: Pee, Poop, Marking, Drinking water, Resting, Other. Sniffing was removed from the default Quick Log at your request; anyone who wants it can add it back as a custom event.
 
 Customization (Settings > Quick Log): reorder categories and events, hide defaults, add custom events and triggers, choose icons, set handedness, and choose gesture vs tap as default.
 
@@ -130,6 +130,10 @@ Customization (Settings > Quick Log): reorder categories and events, hide defaul
 1. Header: dog photo(s) and names (or "Unassigned walk" with an Assign button), date, start to end time.
 2. Hero stats: duration, distance, pace, walker steps (measured or labeled estimate).
 3. **Interactive route map**: route plus every event marker visible immediately, category legend, clusters for overlapping events that expand to a stacked list.
+4a. **Training** (recorded after the walk, not in Quick Log): a list of what the walker worked on, each with an optional result (Went well, Mixed, Needs work), an optional note, and the dogs it applies to. Two ways to add:
+   - **Ideas from this walk**: up to four practice ideas picked from what was logged, each showing why (for example "Heel · Logged: Pulling 3"). Tap one to record it; recorded ideas disappear from the list. Ideas come from simple, editable rules (Pulling → Heel, Loose-leash practice; Lunging, Barking, Reactivity → Leave it, Redirection; Jumping → Sit; Distraction → Responded to cue, Recall). They are labeled as suggestions, not a training plan, and are never included in shared reports.
+   - **Add**: pick from Heel, Loose-leash practice, Leave it, Redirection, Recall, Sit, Responded to cue, or Other with your own name.
+   Recorded training is part of the shared report. Training recorded before a dog is assigned is attributed when the dog is assigned.
 4. Behavior breakdown: totals by category, then per event type ("Pulling: 4 incidents", "Loose-leash walking: 6 observations").
 5. Weather strip: start and end conditions, high/low, wind, UV, any alert. "Weather unavailable" or "Entered manually" when relevant.
 6. Timeline: chronological events; tapping one focuses the map on it.

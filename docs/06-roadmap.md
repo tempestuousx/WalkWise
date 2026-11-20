@@ -49,9 +49,11 @@ Acceptance:
 
 ## Phase 4: Profiles and reports
 
-Scope: Dogs directory (contacts-style), dog form, clients, profile with walking overview and Walk Behavior section, behavior drill-down to focused walk map, report card, timeline, exports (image, PDF with optional appendix), share sheet, revocable share links with expiry and route trimming, web report viewer (Edge Function rendered), professional fields (classification, price, payment status, booking source).
+Scope: report card Training section (ideas from logged behavior plus manual entry), Dogs directory (contacts-style), dog form, clients, profile with walking overview and Walk Behavior section, behavior drill-down to focused walk map, report card, timeline, exports (image, PDF with optional appendix), share sheet, revocable share links with expiry and route trimming, web report viewer (Edge Function rendered), professional fields (classification, price, payment status, booking source).
 
 Acceptance:
+- [ ] Training cannot be logged from Quick Log; it is recorded on the report card, with ideas shown only when a matching behavior was logged, each idea showing which logged behavior produced it.
+- [ ] Shared reports include recorded training and never include unrecorded ideas.
 - [ ] Report contains every recorded event: automated test compares event counts in the DB to the rendered breakdown and marker count.
 - [ ] Exported image and PDF include the route and all colored markers; nothing is written to device storage until the user taps Save or Share.
 - [ ] Revoking a share link makes it return 404 within 60 s; expired links return 404; tokens are never stored in plaintext.
