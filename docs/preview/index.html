@@ -292,6 +292,8 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
 .radial .ctr { fill: var(--radial-fill); stroke: var(--glass-border); stroke-width: 1.5; }
 .radial .ctr-t { font: 800 13px var(--font-ui); fill: var(--text); text-anchor: middle; pointer-events: none; }
 .radial .ctr-s { font: 600 9.5px var(--font-ui); fill: var(--text2); text-anchor: middle; pointer-events: none; }
+.radial .dwell { fill: none; stroke: var(--accent); stroke-width: 4; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; animation: dwellfill linear forwards; }
+@keyframes dwellfill { to { stroke-dashoffset: 0; } }
 .radial .ring { transform-origin: var(--cx) var(--cy); animation: ringin 0.32s cubic-bezier(0.34, 1.56, 0.64, 1); }
 @keyframes ringin { from { transform: scale(0.72); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 .radial.tapmode .sec { cursor: pointer; }
@@ -800,6 +802,10 @@ const R = { open: false, mode: 'gesture', level: 1, cat: null, hover: null, lock
 const G = { R0: 44, R1i: 52, R1o: 128, R2i: 134, R2o: 190 };
 let gs = null, holdT = null, dwellT = null, dwellAnchor = null, dwellKey = '';
 function sectorIdx(ang, n) { if (ang > 0) ang = ang < 90 ? 0 : -180; return Math.max(0, Math.min(n - 1, Math.floor((ang + 180) / (180 / n)))); }
+function arcLine(cx, cy, r, a0, a1) {
+  const rad = d => d * Math.PI / 180;
+  return `M${(cx + r * Math.cos(rad(a0))).toFixed(1)},${(cy + r * Math.sin(rad(a0))).toFixed(1)} A${r},${r} 0 0 1 ${(cx + r * Math.cos(rad(a1))).toFixed(1)},${(cy + r * Math.sin(rad(a1))).toFixed(1)}`;
+}
 function arcPath(cx, cy, ri, ro, a0, a1) {
   const rad = d => d * Math.PI / 180, p = (r, a) => [cx + r * Math.cos(rad(a)), cy + r * Math.sin(rad(a))];
   const [x0, y0] = p(ro, a0), [x1, y1] = p(ro, a1), [x2, y2] = p(ri, a1), [x3, y3] = p(ri, a0);
@@ -838,6 +844,10 @@ function drawRadial(fresh = false, ring2Fresh = false) {
       const c = CATS[R.cat]; let r2 = '';
       c.items.forEach(([k, n, s], i) => { r2 += sector(2, i, c.items.length, G.R2i, G.R2o, n, s, c.c, R.hover && R.hover.ring === 2 && R.hover.idx === i); });
       h += `<g class="${ring2Fresh ? 'ring' : ''}">${r2}</g>`;
+      if (R.mode === 'gesture' && R.hover && R.hover.ring === 2 && deepFor(c.items[R.hover.idx][0])) {
+        const n = c.items.length, a0 = -180 + R.hover.idx * 180 / n + 3, a1 = -180 + (R.hover.idx + 1) * 180 / n - 3;
+        h += `<path class="dwell" style="animation-duration:${DWELL_MS}ms" pathLength="1" d="${arcLine(cx, cy, G.R2o + 7, a0, a1)}"/>`;
+      }
     }
   } else {
     const d = deepFor(R.locked); let rt = '';
@@ -848,7 +858,7 @@ function drawRadial(fresh = false, ring2Fresh = false) {
   let t1 = 'Quick Log', t2 = R.mode === 'tap' ? 'Tap a category' : 'Slide to a category';
   if (R.cancel) { t1 = 'Cancel'; t2 = 'Release: nothing saved'; }
   else if (R.level === 'deep') { const d = deepFor(R.locked); t1 = TYPE[R.locked].short; t2 = R.hover ? d.opts[R.hover.idx][0] : (R.mode === 'tap' ? 'Tap here: log without' : 'Release here: no ' + d.label.toLowerCase()); }
-  else if (R.hover && R.hover.ring === 2) { const it = CATS[R.cat].items[R.hover.idx]; t1 = it[2]; const dp = deepFor(it[0]); t2 = dp && R.mode === 'gesture' ? 'Release · hold for ' + dp.label.toLowerCase() : 'Release to log'; if (R.mode === 'tap') t2 = 'Tap to log'; }
+  else if (R.hover && R.hover.ring === 2) { const it = CATS[R.cat].items[R.hover.idx]; t1 = it[2]; const dp = deepFor(it[0]); t2 = dp && R.mode === 'gesture' ? 'Push out for ' + dp.label.toLowerCase() : 'Release to log'; if (R.mode === 'tap') t2 = 'Tap to log'; }
   else if (R.hover && R.hover.ring === 1) { t1 = CATS[R.hover.idx].name; t2 = R.mode === 'tap' ? 'Tap to open' : 'Keep sliding out'; }
   else if (R.mode === 'tap' && R.level === 2) { t1 = CATS[R.cat].name; t2 = 'Tap center to close'; }
   h += `<circle class="ctr" data-ring="c" cx="${cx}" cy="${cy}" r="${G.R0}" ${R.cancel ? 'style="stroke:var(--danger);stroke-width:2.5"' : ''}/>`;
@@ -856,29 +866,53 @@ function drawRadial(fresh = false, ring2Fresh = false) {
   if (R.mode === 'gesture' && !R.cancel) h += `<text class="ctr-s" x="${cx}" y="${cy + G.R0 + 22}">Drag down to cancel</text>`;
   svg.innerHTML = h;
 }
+// Tuning: deliberate deepening and steady selection (less sensitive than v1).
+const DWELL_MS = 900;   // hold still this long on an event to open its nested ring
+const PUSH_OUT = 26;    // or push this far past the event ring to open it right away
+const H_DEG = 7;        // angular hysteresis: stay on the current option until clearly past its edge
+const RING_BACK = 14;   // radial hysteresis between ring 1 and ring 2
+const ARM_PX = 22;      // after a nested ring opens, move this far before any option is selected
+function stickyIdx(ang, n, prev) {
+  if (ang > 0) ang = ang < 90 ? 0 : -180;
+  const w = 180 / n, raw = Math.max(0, Math.min(n - 1, Math.floor((ang + 180) / w)));
+  if (prev == null || raw === prev) return raw;
+  const pad = Math.min(H_DEG, w * 0.35), lo = -180 + prev * w - pad, hi = -180 + (prev + 1) * w + pad;
+  return ang >= lo && ang <= hi ? prev : raw;
+}
+function enterDeep(x, y) {
+  R.locked = CATS[R.cat].items[R.hover.idx][0]; R.level = 'deep'; R.hover = null;
+  R.deepOrigin = [x, y]; R.armed = false; clearTimeout(dwellT); dwellKey = ''; buzz(); drawRadial();
+}
 function onGestureMove(x, y) {
+  R.last = [x, y];
   const dx = x - R.ccx, dy = y - R.ccy, r = Math.hypot(dx, dy), ang = Math.atan2(dy, dx) * 180 / Math.PI;
-  const prevLevel = R.level, prevCat = R.cat, prevKey = JSON.stringify(R.hover) + R.cancel;
+  const prevLevel = R.level, prevCat = R.cat, prevHover = R.hover, prevKey = JSON.stringify(R.hover) + R.cancel;
+  const same = ring => prevHover && prevHover.ring === ring ? prevHover.idx : null;
   R.cancel = dy > 34 && r > 40;
   let ring2Fresh = false;
   if (R.cancel) R.hover = null;
   else if (R.level === 'deep') {
-    R.hover = (r >= G.R2i - 34 && r <= G.R2o + 60) ? { ring: 't', idx: sectorIdx(ang, deepFor(R.locked).opts.length) } : null;
+    if (!R.armed && Math.hypot(x - R.deepOrigin[0], y - R.deepOrigin[1]) > ARM_PX) R.armed = true;
+    R.hover = R.armed && r >= G.R2i - 34 ? { ring: 't', idx: stickyIdx(ang, deepFor(R.locked).opts.length, same('t')) } : null;
   } else if (r < G.R0) R.hover = null;
-  else if (r < G.R1o) { const ci = sectorIdx(ang, 4); R.hover = { ring: 1, idx: ci }; if (R.level === 2 && R.cat !== ci) { R.cat = ci; ring2Fresh = true; } }
-  else {
-    if (R.level !== 2) { R.cat = sectorIdx(ang, 4); R.level = 2; ring2Fresh = true; }
-    R.hover = { ring: 2, idx: sectorIdx(ang, CATS[R.cat].items.length) };
+  else if (r < G.R1o && !(R.level === 2 && prevHover && prevHover.ring === 2 && r >= G.R1o - RING_BACK)) {
+    const ci = stickyIdx(ang, 4, same(1) ?? (R.level === 2 ? R.cat : null));
+    R.hover = { ring: 1, idx: ci }; if (R.level === 2 && R.cat !== ci) { R.cat = ci; ring2Fresh = true; }
+  } else {
+    if (R.level !== 2) { R.cat = stickyIdx(ang, 4, same(1)); R.level = 2; ring2Fresh = true; }
+    R.hover = { ring: 2, idx: stickyIdx(ang, CATS[R.cat].items.length, ring2Fresh ? null : same(2)) };
   }
   const key = JSON.stringify(R.hover) + R.cancel;
   if (key !== prevKey || R.level !== prevLevel || R.cat !== prevCat) { drawRadial(false, ring2Fresh); if (R.hover) buzz(); }
-  // Dwell to deepen into the event's nested ring (trigger, or a detail such as poop consistency)
+  // Open the event's nested ring (trigger, or a detail such as poop consistency): push out, or hold still.
   const eligible = R.level === 2 && R.hover && R.hover.ring === 2 && !!deepFor(CATS[R.cat].items[R.hover.idx][0]);
   if (!eligible) { clearTimeout(dwellT); dwellKey = ''; return; }
+  const sr = screen.getBoundingClientRect();
+  if (r > G.R2o + PUSH_OUT || x < sr.left + 6 || x > sr.right - 6 || y < sr.top + 6) { enterDeep(x, y); return; }
   const k = R.cat + ':' + R.hover.idx;
-  if (k !== dwellKey || Math.hypot(x - dwellAnchor[0], y - dwellAnchor[1]) > 9) {
-    dwellKey = k; dwellAnchor = [x, y]; clearTimeout(dwellT);
-    dwellT = setTimeout(() => { if (!R.open || R.level !== 2) return; R.locked = CATS[R.cat].items[R.hover.idx][0]; R.level = 'deep'; R.hover = null; dwellKey = ''; buzz(); drawRadial(); }, 350);
+  if (k !== dwellKey) {
+    dwellKey = k; clearTimeout(dwellT);
+    dwellT = setTimeout(() => { if (R.open && R.level === 2 && R.hover && R.hover.ring === 2) enterDeep(R.last[0], R.last[1]); }, DWELL_MS);
   }
 }
 function buzz() { try { navigator.vibrate && navigator.vibrate(8); } catch (e) {} }
