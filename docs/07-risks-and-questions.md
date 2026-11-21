@@ -37,6 +37,7 @@ The brief describes a cascading menu where the user can continue from event into
 | Q4 | Accounts | **Account required**; offline use after first sign-in |
 | Q5 | Owner sharing | **Image, PDF, and expiring web links**; all photos, voice notes, and exports backed up to cloud storage |
 | Q6 | Minimum OS | Default assumed: iOS 17+, Android 10+ (API 29) |
+| Q9 | Behavior logging and assessment update | Beginner / Professional modes (existing users stay Professional), always-visible Timed Log, behavior episodes with suggested grouping, optional post-walk "Understand My Dog" review with education, and episode-aware analytics. See doc 08 |
 | Q8 | Behavior logging update | Behaviors are exactly Pulling, Reactivity, Resource Guarding, Fear / Anxiety, Aggression, Barking. Slide-out Dog / Human / Other on all but Pulling, always optional. Other prompts "What triggered this behavior?" after logging (optional). "Human" replaces Person/People everywhere |
 | Q7 | Quick Log changes from preview review | Poop gets a Consistency ring (Normal, Soft, Runny); Sniffing removed; nested rings open by pushing out or a 0.9 s hold; **Training removed from Quick Log and moved to the report card** with ideas based on logged behavior plus manual entry |
 

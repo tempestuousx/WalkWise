@@ -42,6 +42,7 @@
 
   --land: #EAF0F4; --block: #DFE6ED; --street: #FFFFFF; --street-case: #CDD7E1; --park: #CBE8D6; --park-path: #E9F5EE; --water: #BCDFEA;
   --route: #2867B8; --route-glow: rgba(40, 103, 184, 0.25); --halo: #FFFFFF;
+  --on-danger: #FFFFFF;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -114,7 +115,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
 /* ───────── Phone ───────── */
 .phone { width: 410px; max-width: 100%; padding: 10px; border-radius: 58px; background: var(--bezel); box-shadow: 0 30px 80px -30px rgba(0, 0, 0, 0.55); }
 .screen {
-  position: relative; height: 840px; border-radius: 48px; overflow: hidden; isolation: isolate;
+  position: relative; height: 840px; border-radius: 48px; overflow: hidden; overflow: clip; isolation: isolate;
   background: var(--base); color: var(--text); font-size: 15px; user-select: none; -webkit-user-select: none;
 }
 @media (max-width: 900px) {
@@ -322,6 +323,34 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
 textarea.tr-input { border-radius: 18px; }
 .why { position: absolute; left: 12px; right: 12px; top: 100px; z-index: 62; padding: 14px 16px; border-radius: 26px; display: grid; gap: 4px; animation: toastin 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
 .why.low { top: auto; bottom: 104px; }
+.tz-right { display: flex; align-items: center; justify-content: space-evenly; gap: 6px; }
+.timed-btn { width: 60px; height: 60px; display: grid; place-items: center; align-content: center; gap: 0; --t: var(--lav); touch-action: none; font-size: 10.5px; font-weight: 800; position: relative; flex: none; }
+.timed-btn .icon { width: 22px; height: 22px; stroke-width: 2.1; }
+.badge { position: absolute; top: -4px; right: -4px; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 10px; background: var(--danger); color: var(--on-danger); font-size: 11px; font-weight: 800; display: grid; place-items: center; }
+.timers { position: absolute; left: 14px; right: 14px; bottom: 272px; z-index: 11; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; pointer-events: none; }
+.timer { pointer-events: auto; display: flex; align-items: center; gap: 10px; height: 46px; padding: 0 6px 0 14px; font-weight: 800; font-size: 14px; }
+.timer .chip { min-height: 34px; }
+.umd-sug { padding: 12px 14px; border-radius: 20px; margin-top: 12px; }
+.opt-list { display: grid; gap: 8px; }
+.opt { display: block; width: 100%; text-align: left; padding: 12px 16px; border-radius: 18px; font-weight: 600; min-height: 48px; }
+.ind-list { display: grid; gap: 8px; margin-top: 8px; }
+.ind { padding: 12px 14px; border-radius: 18px; display: grid; gap: 2px; }
+.ind .t1 { font-weight: 800; } .ind .t2 { font-size: 13px; color: var(--text2); }
+.ind img { width: 100%; max-height: 140px; object-fit: contain; border-radius: 12px; margin-bottom: 6px; }
+.seg3 { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+.edu { margin: 0 0 12px; } .edu ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-size: 14px; }
+.edu.thin ul { color: var(--text2); }
+.edu.safety { padding: 12px 14px; border-radius: 18px; font-size: 13.5px; --glass-top: color-mix(in srgb, var(--peach) 40%, var(--out-top)); }
+.dur { display: flex; align-items: center; gap: 6px; padding: 0 14px; height: 48px; font-weight: 700; }
+.dur input { width: 52px; border: 0; background: transparent; font: inherit; color: var(--text); outline: none; font-size: 18px; text-align: right; }
+.flts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.flt { display: grid; gap: 4px; min-width: 0; }
+.flt select { width: 100%; min-width: 0; height: 42px; padding: 0 10px; font: inherit; font-size: 13px; font-weight: 700; color: var(--text); border-radius: 14px; appearance: none; -webkit-appearance: none; }
+.hbar { display: grid; grid-template-columns: minmax(0, 9fr) minmax(0, 8fr) auto; gap: 8px; align-items: center; padding: 5px 0; font-size: 13.5px; }
+.hbar .hl { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hbar .hb { height: 8px; border-radius: 4px; background: color-mix(in srgb, var(--text) 8%, transparent); overflow: hidden; }
+.hbar .hb i { display: block; height: 100%; border-radius: 4px; background: color-mix(in srgb, var(--c-behavior) 75%, transparent); }
+.hbar .hv { font-size: 14px; text-align: right; white-space: nowrap; }
 .pop { position: absolute; z-index: 65; width: 240px; padding: 12px 14px; border-radius: 20px; font-size: 13.5px; animation: toastin 0.28s cubic-bezier(0.34, 1.56, 0.64, 1); }
 .pop dl { margin: 6px 0 0; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 3px 10px; }
 .pop dt { color: var(--text2); font-weight: 600; }
@@ -402,10 +431,10 @@ textarea.tr-input { border-radius: 18px; }
     <p class="lede">A clickable mockup of the planned app, built from the liquid-glass references you shared. It runs in the browser with sample dogs and a simulated walk. It is not the app: GPS, maps, weather, and saving all come in the real build.</p>
     <ol class="try">
       <li>Tap <b>Start</b>. The walk is simulated and runs 6 times faster than real time.</li>
-      <li><b>Press and hold Quick Log</b>, slide up into a category, keep sliding outward onto an event, and let go to log it.</li>
-      <li>On a <b>Behavior</b> (all except Pulling), push your thumb further out or hold still to pick <b>Dog, Human, or Other</b>. Pick Other and you can type what triggered it. Drag down to cancel.</li>
-      <li><b>Tap</b> Quick Log instead to use the tap-only menu.</li>
-      <li><b>Hold End</b> to finish. With no dog assigned you get the "Who did you walk?" step, then the report card.</li>
+      <li><b>Quick Log</b>: press and hold, slide into Nature or Behavior, keep sliding onto an event, let go. Push further out (or hold still) on a behavior for Dog, Human, or Other.</li>
+      <li><b>Timed Log</b> (beside it): same gesture, but letting go starts a timer. Tap <b>End</b> on the timer when the behavior stops. Quick Log keeps working meanwhile.</li>
+      <li>Switch <b>Beginner / Professional</b> logging below, or from the avatar on Home.</li>
+      <li><b>Hold End</b> to finish. On the report, <b>Understand My Dog</b> suggests grouping related behaviors and offers a short, optional review. The sample report has an encounter ready to group.</li>
     </ol>
     <div class="ctl">
       <div class="ctl-row"><span class="ctl-label" id="lbl-theme">Theme</span>
@@ -424,6 +453,12 @@ textarea.tr-input { border-radius: 18px; }
           <button id="mo-full" aria-pressed="true" data-v="full">Full</button>
           <button id="mo-reduced" aria-pressed="false" data-v="reduced">Reduced</button>
         </div></div>
+      <div class="ctl-row"><span class="ctl-label" id="lbl-mode">Logging mode</span>
+        <div class="seg" role="group" aria-labelledby="lbl-mode" id="ctl-mode">
+          <button id="md-pro" aria-pressed="true" data-v="professional">Professional</button>
+          <button id="md-beg" aria-pressed="false" data-v="beginner">Beginner</button>
+        </div>
+        <p class="note">The preview acts as an existing user, so it starts in Professional. New users are recommended Beginner. Also in the app: tap the avatar on Home.</p></div>
       <div class="ctl-row"><span class="ctl-label" id="lbl-jump">Jump to</span>
         <div class="seg" role="group" aria-labelledby="lbl-jump" id="ctl-jump">
           <button id="jp-home" data-v="home">Home</button>
@@ -462,11 +497,15 @@ textarea.tr-input { border-radius: 18px; }
   </div>
 </div>
 
+<script src="behavior-core.js"></script>
 <script>
 (() => {
 const $ = (s, r = document) => r.querySelector(s);
 const screen = $('#screen');
 const SPEED = 6;
+const C = window.WWCore;
+// The preview behaves like an existing user, so it starts in Professional mode (new users are recommended Beginner).
+const prefs = { loggingMode: C.DEFAULT_MODE_EXISTING_USER };
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 /* ── Icons ── */
@@ -489,22 +528,27 @@ const I = {
   log: '<circle cx="12" cy="12" r="3.2" fill="currentColor" stroke="none"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/>',
   dog: '<circle cx="7" cy="9" r="2"/><circle cx="12" cy="6" r="2"/><circle cx="17" cy="9" r="2"/><path d="M8 17c0-3 2-5 4-5s4 2 4 5c0 2-2 2-4 2s-4 0-4-2z"/>',
   sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4"/>',
+  timer: '<circle cx="12" cy="13.5" r="7"/><path d="M12 13.5V10M9.5 3h5M18 7l1.5-1.5"/>',
   leaf: '<path d="M5 19c0-8 6-13 14-14-1 8-6 14-14 14zM5 19l7-7"/>',
 };
 const icon = (n, extra = '') => `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" ${extra}>${I[n]}</svg>`;
 
 /* ── Taxonomy ── */
-const CATS = [
-  { key: 'nature', name: 'Nature', c: '--c-nature', shape: 'circle', trig: false, items: [['pee','Pee','Pee'],['poop','Poop','Poop'],['marking','Marking','Mark'],['drinking','Drinking water','Drink'],['resting','Resting','Rest'],['n-other','Other','Other']] },
-  { key: 'behavior', name: 'Behavior', c: '--c-behavior', shape: 'tri', trig: true, items: [['pulling','Pulling','Pulling'],['reactivity','Reactivity','Reactivity'],['guarding','Resource Guarding','Guarding'],['fear','Fear / Anxiety','Fear'],['aggression','Aggression','Aggression'],['barking','Barking','Barking']] },
-  { key: 'custom', name: 'Additional', c: '--c-custom', shape: 'diamond', trig: false, items: [['voice','Voice note','Voice'],['photo','Photo','Photo'],['custom','Custom event','Custom']] },
-];
+const CAT_NATURE = { key: 'nature', name: 'Nature', c: '--c-nature', shape: 'circle', trig: false, items: [['pee','Pee','Pee'],['poop','Poop','Poop'],['marking','Marking','Mark'],['drinking','Drinking water','Drink'],['resting','Resting','Rest'],['n-other','Other','Other']] };
+// Behavior holds every behavior type from both modes, so history from either mode always displays.
+const CAT_BEHAVIOR = { key: 'behavior', name: 'Behavior', c: '--c-behavior', shape: 'tri', trig: true, items: Object.entries(C.BEHAVIORS).map(([k, b]) => [k, b.name, b.short]) };
+const CAT_CUSTOM = { key: 'custom', name: 'Additional', c: '--c-custom', shape: 'diamond', trig: false, items: [['voice','Voice note','Voice'],['photo','Photo','Photo'],['custom','Custom event','Custom']] };
+const CATS = [CAT_NATURE, CAT_BEHAVIOR, CAT_CUSTOM];
 const TYPE = {}; CATS.forEach((c, ci) => c.items.forEach(([k, n, s]) => TYPE[k] = { key: k, name: n, short: s, cat: c, ci }));
-const NOUN = k => { const c = TYPE[k].cat.key; if (c === 'behavior') return 'incident'; if (c === 'training') return 'observation'; return 'event'; };
+// What the radial menus show depends on the logging mode. Nature is identical in both modes.
+function behaviorCat() { return Object.assign({}, CAT_BEHAVIOR, { items: C.behaviorsForMode(C.resolveMode(prefs)).map(k => [k, C.BEHAVIORS[k].name, C.BEHAVIORS[k].short]) }); }
+function radialCats(purpose) { return purpose === 'timed' ? [behaviorCat()] : [CAT_NATURE, behaviorCat(), CAT_CUSTOM]; }
+const NOUN = k => { const c = TYPE[k].cat.key; if (c === 'behavior') return C.isSuccess(k) ? 'time' : 'incident'; if (c === 'training') return 'observation'; return 'event'; };
 const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
 // Behavior slide-out: who or what it was directed at. 'Human' is used everywhere (never Person/People).
 const TRIGGERS = [['Dog', 'Dog'], ['Human', 'Human'], ['Other', 'Other']];
-const NO_TRIGGER = new Set(['pulling']);
+const evName = e => TYPE[e.key].name + (e.behaviorText ? `: \u201c${e.behaviorText}\u201d` : '');
+const durText = e => !e.timed ? '' : C.durationKnown(e) ? fmtTime(e.duration) + (e.durationSource === 'corrected' ? ' (added later)' : '') : e.timerStatus === 'running' ? 'timer running' : 'duration unknown';
 const trigText = e => !e.trigger ? '' : e.trigger === 'Other' && e.triggerText ? `Other: “${e.triggerText}”` : e.trigger;
 const OUTCOMES = ['Successfully redirected', 'Continued behavior', 'Settled independently', 'Required assistance'];
 // Training is recorded on the report card after the walk, not in Quick Log.
@@ -514,7 +558,7 @@ const RESULTS = [['well', 'Went well', '--mint'], ['mixed', 'Mixed', '--peach'],
 const RES = Object.fromEntries(RESULTS.map(r => [r[0], r]));
 // Which practice ideas to show for which logged behaviors. Simple, editable rules; not advice.
 // No ideas are generated for Resource Guarding, Fear / Anxiety or Aggression: those warrant a professional, not an app suggestion.
-const TRAIN_RULES = { pulling: ['heel', 'loose-practice'], reactivity: ['redirect', 'leaveit'], barking: ['redirect', 'leaveit'] };
+const TRAIN_RULES = C.TRAIN_RULES;
 function suggestTraining(w) {
   const from = {};
   w.events.forEach(e => (TRAIN_RULES[e.key] || []).forEach(t => { from[t] = from[t] || {}; from[t][e.key] = (from[t][e.key] || 0) + 1; }));
@@ -526,7 +570,7 @@ function suggestTraining(w) {
 // Nested detail rings for specific event types (optional, like triggers).
 const DETAILS = { poop: { label: 'Consistency', opts: [['Normal', 'Normal'], ['Soft', 'Soft'], ['Runny', 'Runny']] } };
 const deepFor = k => DETAILS[k] ? { kind: 'detail', label: DETAILS[k].label, opts: DETAILS[k].opts, c: TYPE[k].cat.c }
-  : (TYPE[k].cat.trig && !NO_TRIGGER.has(k) ? { kind: 'trigger', label: 'Trigger', opts: TRIGGERS, c: '--lav' } : null);
+  : (TYPE[k].cat.trig && C.BEHAVIORS[k] && C.BEHAVIORS[k].trigger ? { kind: 'trigger', label: 'Trigger', opts: TRIGGERS, c: '--lav' } : null);
 
 /* ── Sample dogs ── */
 const DOGS = [
@@ -621,17 +665,27 @@ function sampleWalk() {
     ['marking', 60, 140], ['pee', 140, 260], ['pulling', 250, 420, { outcome: 'Successfully redirected' }],
     ['barking', 520, 830, { trigger: 'Other', triggerText: 'Bicycle passing close on the sidewalk', outcome: 'Settled independently' }],
     ['reactivity', 600, 980, { trigger: 'Dog', outcome: 'Successfully redirected' }], ['poop', 760, 1240, { detail: 'Normal' }],
-    ['pulling', 900, 1480, { note: 'Squirrel on the fence line.' }], ['fear', 1040, 1700, { trigger: 'Other', triggerText: 'Garbage truck brakes hissing' }],
-    ['barking', 1180, 1900, { trigger: 'Human' }], ['pulling', 1300, 2080], ['poop', 1360, 2200, { detail: 'Soft' }], ['drinking', 1400, 2300],
+    ['pulling', 900, 1480, { note: 'Squirrel on the fence line.' }],
+    ['growling', 1040, 1700, { dogs: ['juno'], trigger: 'Dog', timedFor: 28 }], ['barking', 1043, 1706, { dogs: ['juno'], trigger: 'Dog' }],
+    ['barking', 1046, 1712, { dogs: ['juno'], trigger: 'Dog' }], ['lunging', 1048, 1718, { dogs: ['juno'], trigger: 'Dog' }],
+    ['fear', 1100, 1820, { dogs: ['maple'], trigger: 'Other', triggerText: 'Garbage truck brakes hissing' }],
+    ['barking', 1180, 1900, { trigger: 'Human', timedFor: null }], ['pulling', 1300, 2080], ['poop', 1360, 2200, { detail: 'Soft' }], ['drinking', 1400, 2300],
     ['guarding', 1500, 2480, { trigger: 'Dog', note: 'Stick at the park entrance.' }],
   ];
   return { id: 'sample', sample: true, start, sim: 2580, distM: ROUTE_M, u: TOTAL, dogs: ['juno', 'maple'], cls: 'Private client',
     training: [{ id: 'tr1', key: 'heel', name: 'Heel', result: 'mixed', note: 'Better after the park loop.', source: 'suggested', dogs: ['juno', 'maple'] }],
-    events: evs.map(([k, u, t, x]) => mkEvent(k, Math.min(u, TOTAL), t, Object.assign({ dogs: ['juno', 'maple'] }, x || {}))) };
+    clock: 2580, episodes: [], reviews: {}, dismissed: new Set(), interpretations: {},
+    events: evs.map(([k, u, t, x]) => {
+      const { timedFor, ...rest } = x || {};
+      const e = mkEvent(k, Math.min(u, TOTAL), t, Object.assign({ dogs: ['juno', 'maple'] }, rest));
+      if (timedFor !== undefined) { C.startTimed(e, t, e.xy); if (timedFor) C.endTimed(e, t + timedFor, e.xy); else C.finalizeTimers([e]); }
+      return e;
+    }) };
 }
 const SAMPLE = sampleWalk();
 let walk = null;        // active or last session walk
 let lastDone = null;    // completed walk from this session
+const doneWalks = [];   // all walks completed in this session (for Insights)
 let reportWalk = SAMPLE;
 let reportFocus = null;
 let current = 'home';
@@ -684,12 +738,14 @@ function renderOrb() {
 /* ── Walk engine (simulated) ── */
 function startWalk(preDogs = []) {
   if (walk && (walk.status === 'recording' || walk.status === 'paused')) { go('active'); return; }
-  walk = { id: 'w' + Date.now(), start: new Date(), sim: 0, distM: 0, u: 0, dogs: Array.isArray(preDogs) ? preDogs : [], events: [], training: [], status: 'recording', cls: 'Personal' };
+  walk = { id: 'w' + Date.now(), start: new Date(), sim: 0, distM: 0, u: 0, dogs: Array.isArray(preDogs) ? preDogs : [], events: [], training: [], clock: 0, episodes: [], reviews: {}, dismissed: new Set(), interpretations: {}, status: 'recording', cls: 'Personal' };
   go('active');
   toast('Recording started. No dog needed to begin.', [], false);
 }
 setInterval(() => {
-  if (!walk || walk.status !== 'recording') return;
+  if (!walk || (walk.status !== 'recording' && walk.status !== 'paused')) return;
+  walk.clock += 0.25 * SPEED;
+  if (walk.status === 'paused') { updateTimers(); return; }
   walk.sim += 0.25 * SPEED;
   walk.distM = Math.min(ROUTE_M, walk.distM + 1.35 * 0.25 * SPEED);
   walk.u = walk.distM / M_PER_U;
@@ -703,6 +759,7 @@ function updateHud() {
   $('#hud-dist').textContent = fmtMi(walk.distM);
   $('#hud-pace').textContent = fmtPace(walk.sim, walk.distM);
   const r = $('#live-route'); if (r) { const p = pathUpTo(walk.u); r.setAttribute('points', p); r.previousElementSibling.setAttribute('points', p); }
+  updateTimers();
   const pos = $('#live-pos'); if (pos) { const [x, y] = pointAt(walk.u); pos.querySelectorAll('circle').forEach(c => { c.setAttribute('cx', x); c.setAttribute('cy', y); }); }
 }
 
@@ -719,7 +776,7 @@ function renderHome() {
   $('#v-home').innerHTML = `
     <div class="stack">
       <div class="greet"><div><p class="h-sec" style="margin-bottom:2px">${dateLong(new Date())}</p><h1 class="h-title">${hello}</h1></div>
-        <button class="avatar press" style="--t:var(--lav)" aria-label="Settings">W</button></div>
+        <button class="avatar press" style="--t:var(--lav)" aria-label="Settings" id="h-settings">W</button></div>
       ${unassigned ? `<button class="banner g tint press" id="hb-assign">${icon('dog')}<span style="flex:1">1 walk needs a dog</span>${icon('chev')}</button>` : ''}
       <section class="g lv-panel hero" aria-label="Start a walk">
         ${active ? `<button class="hero-orb g lv-orb tint press" id="h-resume" style="--t:var(--blush)"><span class="rec"></span><span class="big num">${fmtTime(walk.sim)}</span><span class="sub">Walk in progress</span></button>
@@ -749,6 +806,7 @@ function renderHome() {
   $('#h-resume', v) && ($('#h-resume', v).onclick = () => go('active'));
   $('#h-choose', v) && ($('#h-choose', v).onclick = () => dogPicker([], 'Choose dogs, then start', 'Start walk', ids => startWalk(ids)));
   $('#h-recent', v).onclick = () => { reportWalk = recent; go('report'); };
+  $('#h-settings', v).onclick = settingsSheet;
   $('#hb-assign', v) && ($('#hb-assign', v).onclick = () => { reportWalk = lastDone; go('report'); });
   v.querySelectorAll('[data-go]').forEach(b => b.onclick = () => go(b.dataset.go));
   v.querySelectorAll('[data-dog]').forEach(b => b.onclick = () => { profileId = b.dataset.dog; go('profile'); });
@@ -770,7 +828,7 @@ function dogPicker(selected, title, cta, done, laterLabel = null, later = null) 
 
 /* ── Active walk ── */
 function renderActive() {
-  if (!walk) { walk = { id: 'w' + Date.now(), start: new Date(), sim: 0, distM: 0, u: 0, dogs: [], events: [], training: [], status: 'recording', cls: 'Personal' }; }
+  if (!walk) { walk = { id: 'w' + Date.now(), start: new Date(), sim: 0, distM: 0, u: 0, dogs: [], events: [], training: [], clock: 0, episodes: [], reviews: {}, dismissed: new Set(), interpretations: {}, status: 'recording', cls: 'Personal' }; }
   const paused = walk.status === 'paused';
   $('#v-active').innerHTML = `
     <div class="mapwrap" id="live-map">${mapSvg(walk, { live: true })}</div>
@@ -792,14 +850,41 @@ function renderActive() {
     <div class="thumbzone">
       <button class="side-btn g lv-orb outdoor press" id="a-pause" aria-label="${paused ? 'Resume' : 'Pause'}">${icon(paused ? 'play' : 'pause')}</button>
       <button class="ql g lv-orb tint" id="ql" aria-label="Quick Log. Press and hold, then slide to log an observation. Tap for menu.">${icon('log')}<span>Quick Log</span></button>
-      <button class="side-btn g lv-orb outdoor" id="a-end" aria-label="End walk. Press and hold.">${icon('stop')}<span>Hold</span><span class="hold-ring" id="hold-ring"></span></button>
-    </div>`;
+      <div class="tz-right">
+        <button class="timed-btn g lv-orb tint" id="tl" aria-label="Timed Log. Press and hold, then slide to a behavior to start timing it. Tap for menu.">${icon('timer')}<span>Timed</span><span class="badge" id="tl-badge" hidden></span></button>
+        <button class="side-btn g lv-orb outdoor" id="a-end" aria-label="End walk. Press and hold.">${icon('stop')}<span>Hold</span><span class="hold-ring" id="hold-ring"></span></button>
+      </div>
+    </div>
+    <div class="timers" id="timers" aria-live="polite"></div>`;
   const mapEl = $('#live-map');
   $('#a-min').onclick = () => go('home');
   $('#a-pause').onclick = () => { walk.status = walk.status === 'paused' ? 'recording' : 'paused'; renderActive(); renderOrb(); toast(walk.status === 'paused' ? 'Paused. Distance stops counting until you resume.' : 'Resumed.'); };
   $('#a-dog').onclick = () => dogPicker(walk.dogs, 'Dogs on this walk', 'Done', ids => { reattribute(ids); walk.dogs = ids; renderActive(); toast(ids.length ? `${dogNames(ids)} added. Route and timer unchanged.` : 'No dogs assigned.'); });
   bindHold($('#a-end'), endWalk);
-  bindQuickLog($('#ql'));
+  bindRadialButton($('#ql'), 'quick');
+  bindRadialButton($('#tl'), 'timed');
+  renderTimers();
+}
+function runningTimers() { return walk ? walk.events.filter(e => e.timed && e.timerStatus === 'running') : []; }
+function renderTimers() {
+  const box = $('#timers'); if (!box) return;
+  const list = runningTimers();
+  box.innerHTML = list.map(e => `<div class="timer g lv-control outdoor" data-tm="${e.id}"><span class="rec"></span><span>${esc(TYPE[e.key].name)}</span><span class="num" data-tmv>${fmtTime(walk.clock - e.t)}</span><button class="chip g lv-control tint press" style="--t:var(--blush)" data-tmend="${e.id}" aria-label="End ${esc(TYPE[e.key].name)} timer">End</button></div>`).join('');
+  box.querySelectorAll('[data-tmend]').forEach(b => b.onclick = () => endTimer(b.dataset.tmend));
+  const badge = $('#tl-badge'); if (badge) { badge.hidden = !list.length; badge.textContent = list.length; }
+}
+function updateTimers() { if (current !== 'active') return; runningTimers().forEach(e => { const el = $(`[data-tm="${e.id}"] [data-tmv]`); if (el) el.textContent = fmtTime(walk.clock - e.t); }); }
+function startTimer(key, trigger) {
+  const ev = mkEvent(key, walk.u, walk.clock, { trigger, dogs: [...walk.dogs] });
+  C.startTimed(ev, walk.clock, ev.xy);
+  walk.events.push(ev); refreshLiveMap(); renderTimers();
+  if (trigger === 'Other' || (C.BEHAVIORS[key] || {}).describe) { askWhy(ev, 'timer started'); return; }
+  toast(`<b>${esc(TYPE[key].name)}</b> timer started${trigger ? ' · ' + esc(trigger) : ''}. Tap End when it stops.`, [{ label: 'Undo', run: () => { walk.events = walk.events.filter(x => x !== ev); refreshLiveMap(); renderTimers(); toast('Removed.'); } }]);
+}
+function endTimer(id) {
+  const ev = walk.events.find(e => e.id === id); if (!ev || ev.timerStatus !== 'running') return;
+  C.endTimed(ev, walk.clock, pointAt(walk.u));
+  renderTimers(); toast(`<b>${esc(TYPE[ev.key].name)}</b> lasted ${fmtTime(ev.duration)}.`);
 }
 function reattribute(ids) {
   // Events logged before any dog was assigned get the first dogs assigned.
@@ -818,7 +903,7 @@ function bindHold(btn, done) {
 }
 function endWalk() {
   walk.status = 'ended';
-  const finish = () => { lastDone = walk; reportWalk = walk; walk = null; go('report'); };
+  const finish = () => { const unended = C.finalizeTimers(walk.events); lastDone = walk; doneWalks.push(walk); reportWalk = walk; walk = null; go('report'); if (unended.length) toast(`${unended.length === 1 ? 'A timer was' : unended.length + ' timers were'} still running, so ${unended.length === 1 ? 'its duration is' : 'their durations are'} saved as unknown. You can add ${unended.length === 1 ? 'it' : 'them'} on the report.`); };
   if (!walk.dogs.length) {
     dogPicker([], 'Who did you walk?', 'Save report', ids => { reattribute(ids); walk.dogs = ids; finish(); }, 'Later: save as unassigned', () => { finish(); toast('Saved as an unassigned walk. Assign a dog any time.'); });
   } else finish();
@@ -838,9 +923,9 @@ function arcPath(cx, cy, ri, ro, a0, a1) {
   const [x0, y0] = p(ro, a0), [x1, y1] = p(ro, a1), [x2, y2] = p(ri, a1), [x3, y3] = p(ri, a0);
   return `M${x0.toFixed(1)},${y0.toFixed(1)} A${ro},${ro} 0 0 1 ${x1.toFixed(1)},${y1.toFixed(1)} L${x2.toFixed(1)},${y2.toFixed(1)} A${ri},${ri} 0 0 0 ${x3.toFixed(1)},${y3.toFixed(1)} Z`;
 }
-function openRadial(mode) {
+function openRadial(mode, purpose = 'quick') {
   const sr = screen.getBoundingClientRect(), br = $('#ql').getBoundingClientRect();
-  Object.assign(R, { open: true, mode, level: 1, cat: null, hover: null, locked: null, cancel: false,
+  Object.assign(R, { open: true, mode, purpose, cats: radialCats(purpose), level: 1, cat: null, hover: null, locked: null, cancel: false,
     ccx: br.left + br.width / 2, ccy: br.top + br.height / 2, cx: br.left + br.width / 2 - sr.left, cy: br.top + br.height / 2 - sr.top });
   const scrim = document.createElement('div'); scrim.className = 'radial-scrim'; scrim.id = 'r-scrim';
   scrim.style.setProperty('--cx', R.cx + 'px'); scrim.style.setProperty('--cy', R.cy + 'px');
@@ -865,10 +950,10 @@ function drawRadial(fresh = false, ring2Fresh = false) {
   };
   if (R.level !== 'deep') {
     let r1 = '';
-    CATS.forEach((c, i) => { r1 += sector(1, i, CATS.length, G.R1i, G.R1o, c.name, c.name, c.c, R.hover && R.hover.ring === 1 && R.hover.idx === i); });
+    R.cats.forEach((c, i) => { r1 += sector(1, i, R.cats.length, G.R1i, G.R1o, c.name, c.name, c.c, R.hover && R.hover.ring === 1 && R.hover.idx === i); });
     h += `<g class="${fresh ? 'ring' : ''}">${r1}</g>`;
     if (R.cat !== null && R.level === 2) {
-      const c = CATS[R.cat]; let r2 = '';
+      const c = R.cats[R.cat]; let r2 = '';
       c.items.forEach(([k, n, s], i) => { r2 += sector(2, i, c.items.length, G.R2i, G.R2o, n, s, c.c, R.hover && R.hover.ring === 2 && R.hover.idx === i); });
       h += `<g class="${ring2Fresh ? 'ring' : ''}">${r2}</g>`;
       if (R.mode === 'gesture' && R.hover && R.hover.ring === 2 && deepFor(c.items[R.hover.idx][0])) {
@@ -882,12 +967,12 @@ function drawRadial(fresh = false, ring2Fresh = false) {
     h += `<g class="ring">${rt}</g>`;
     h += `<text class="ctr-s" x="${cx}" y="${cy - G.R2i + 14}">Optional ${d.label.toLowerCase()}</text>`;
   }
-  let t1 = 'Quick Log', t2 = R.mode === 'tap' ? 'Tap a category' : 'Slide to a category';
+  let t1 = R.purpose === 'timed' ? 'Timed Log' : 'Quick Log', t2 = R.mode === 'tap' ? 'Tap a category' : 'Slide to a category';
   if (R.cancel) { t1 = 'Cancel'; t2 = 'Release: nothing saved'; }
   else if (R.level === 'deep') { const d = deepFor(R.locked); t1 = TYPE[R.locked].short; t2 = R.hover ? d.opts[R.hover.idx][0] : (R.mode === 'tap' ? 'Tap here: log without' : 'Release here: no ' + d.label.toLowerCase()); }
-  else if (R.hover && R.hover.ring === 2) { const it = CATS[R.cat].items[R.hover.idx]; t1 = it[2]; const dp = deepFor(it[0]); t2 = dp && R.mode === 'gesture' ? 'Push out for ' + dp.label.toLowerCase() : 'Release to log'; if (R.mode === 'tap') t2 = 'Tap to log'; }
-  else if (R.hover && R.hover.ring === 1) { t1 = CATS[R.hover.idx].name; t2 = R.mode === 'tap' ? 'Tap to open' : 'Keep sliding out'; }
-  else if (R.mode === 'tap' && R.level === 2) { t1 = CATS[R.cat].name; t2 = 'Tap center to close'; }
+  else if (R.hover && R.hover.ring === 2) { const it = R.cats[R.cat].items[R.hover.idx]; t1 = it[2]; const dp = deepFor(it[0]); t2 = dp && R.mode === 'gesture' ? 'Push out for ' + dp.label.toLowerCase() : (R.purpose === 'timed' ? 'Release to start' : 'Release to log'); if (R.mode === 'tap') t2 = R.purpose === 'timed' ? 'Tap to start' : 'Tap to log'; }
+  else if (R.hover && R.hover.ring === 1) { t1 = R.cats[R.hover.idx].name; t2 = R.mode === 'tap' ? 'Tap to open' : 'Keep sliding out'; }
+  else if (R.mode === 'tap' && R.level === 2) { t1 = R.cats[R.cat].name; t2 = 'Tap center to close'; }
   h += `<circle class="ctr" data-ring="c" cx="${cx}" cy="${cy}" r="${G.R0}" ${R.cancel ? 'style="stroke:var(--danger);stroke-width:2.5"' : ''}/>`;
   h += `<text class="ctr-t" x="${cx}" y="${cy - 2}" ${R.cancel ? 'style="fill:var(--danger)"' : ''}>${esc(t1)}</text><text class="ctr-s" x="${cx}" y="${cy + 13}">${esc(t2.length > 24 ? t2.slice(0, 23) + '…' : t2)}</text>`;
   if (R.mode === 'gesture' && !R.cancel) h += `<text class="ctr-s" x="${cx}" y="${cy + G.R0 + 22}">Drag down to cancel</text>`;
@@ -907,7 +992,7 @@ function stickyIdx(ang, n, prev) {
   return ang >= lo && ang <= hi ? prev : raw;
 }
 function enterDeep(x, y) {
-  R.locked = CATS[R.cat].items[R.hover.idx][0]; R.level = 'deep'; R.hover = null;
+  R.locked = R.cats[R.cat].items[R.hover.idx][0]; R.level = 'deep'; R.hover = null;
   R.deepOrigin = [x, y]; R.armed = false; clearTimeout(dwellT); dwellKey = ''; buzz(); drawRadial();
 }
 function onGestureMove(x, y) {
@@ -923,16 +1008,16 @@ function onGestureMove(x, y) {
     R.hover = R.armed && r >= G.R2i - 34 ? { ring: 't', idx: stickyIdx(ang, deepFor(R.locked).opts.length, same('t')) } : null;
   } else if (r < G.R0) R.hover = null;
   else if (r < G.R1o && !(R.level === 2 && prevHover && prevHover.ring === 2 && r >= G.R1o - RING_BACK)) {
-    const ci = stickyIdx(ang, CATS.length, same(1) ?? (R.level === 2 ? R.cat : null));
+    const ci = stickyIdx(ang, R.cats.length, same(1) ?? (R.level === 2 ? R.cat : null));
     R.hover = { ring: 1, idx: ci }; if (R.level === 2 && R.cat !== ci) { R.cat = ci; ring2Fresh = true; }
   } else {
-    if (R.level !== 2) { R.cat = stickyIdx(ang, CATS.length, same(1)); R.level = 2; ring2Fresh = true; }
-    R.hover = { ring: 2, idx: stickyIdx(ang, CATS[R.cat].items.length, ring2Fresh ? null : same(2)) };
+    if (R.level !== 2) { R.cat = stickyIdx(ang, R.cats.length, same(1)); R.level = 2; ring2Fresh = true; }
+    R.hover = { ring: 2, idx: stickyIdx(ang, R.cats[R.cat].items.length, ring2Fresh ? null : same(2)) };
   }
   const key = JSON.stringify(R.hover) + R.cancel;
   if (key !== prevKey || R.level !== prevLevel || R.cat !== prevCat) { drawRadial(false, ring2Fresh); if (R.hover) buzz(); }
   // Open the event's nested ring (trigger, or a detail such as poop consistency): push out, or hold still.
-  const eligible = R.level === 2 && R.hover && R.hover.ring === 2 && !!deepFor(CATS[R.cat].items[R.hover.idx][0]);
+  const eligible = R.level === 2 && R.hover && R.hover.ring === 2 && !!deepFor(R.cats[R.cat].items[R.hover.idx][0]);
   if (!eligible) { clearTimeout(dwellT); dwellKey = ''; return; }
   const sr = screen.getBoundingClientRect();
   if (r > G.R2o + PUSH_OUT || x < sr.left + 6 || x > sr.right - 6 || y < sr.top + 6) { enterDeep(x, y); return; }
@@ -946,9 +1031,9 @@ function buzz() { try { navigator.vibrate && navigator.vibrate(8); } catch (e) {
 function commitGesture() {
   clearTimeout(dwellT);
   if (R.cancel) { closeRadial(); toast('Cancelled. Nothing logged.'); return; }
-  if (R.level === 'deep') { const k = R.locked, d = deepFor(k), pick = R.hover ? d.opts[R.hover.idx][0] : null; closeRadial(); d.kind === 'detail' ? logEvent(k, null, pick) : logEvent(k, pick); return; }
-  if (R.hover && R.hover.ring === 2) { const k = CATS[R.cat].items[R.hover.idx][0]; closeRadial(); logEvent(k, null); return; }
-  if (R.hover && R.hover.ring === 1) { const ci = R.hover.idx; closeRadial(); openRadial('tap'); R.cat = ci; R.level = 2; drawRadial(false, true); return; }
+  if (R.level === 'deep') { const k = R.locked, d = deepFor(k), pick = R.hover ? d.opts[R.hover.idx][0] : null; closeRadial(); d.kind === 'detail' ? record(k, null, pick) : record(k, pick); return; }
+  if (R.hover && R.hover.ring === 2) { const k = R.cats[R.cat].items[R.hover.idx][0]; closeRadial(); record(k, null); return; }
+  if (R.hover && R.hover.ring === 1) { const ci = R.hover.idx, pp = R.purpose; closeRadial(); openRadial('tap', pp); R.cat = ci; R.level = 2; drawRadial(false, true); return; }
   closeRadial(); toast('Cancelled. Nothing logged.');
 }
 function onTapRadial(e) {
@@ -956,65 +1041,74 @@ function onTapRadial(e) {
   const ring = t.dataset.ring, i = +t.dataset.idx;
   if (R.level === 'deep') {
     const k = R.locked, d = deepFor(k);
-    if (ring === 'c') { closeRadial(); logEvent(k, null, null); return; }
-    if (ring === 't') { closeRadial(); d.kind === 'detail' ? logEvent(k, null, d.opts[i][0]) : logEvent(k, d.opts[i][0]); }
+    if (ring === 'c') { closeRadial(); record(k, null, null); return; }
+    if (ring === 't') { closeRadial(); d.kind === 'detail' ? record(k, null, d.opts[i][0]) : record(k, d.opts[i][0]); }
     return;
   }
   if (ring === 'c') { closeRadial(); return; }
   if (ring === '1') { R.cat = i; R.level = 2; R.hover = null; drawRadial(false, true); return; }
   if (ring === '2') {
-    const k = CATS[R.cat].items[i][0];
+    const k = R.cats[R.cat].items[i][0];
     // Tap mode: tapping an event with a slide-out (behavior target, poop consistency) reveals it; tap the center to log without.
     if (deepFor(k)) { R.locked = k; R.level = 'deep'; R.hover = null; drawRadial(); return; }
-    closeRadial(); logEvent(k, null);
+    closeRadial(); record(k, null);
   }
 }
-function bindQuickLog(btn) {
+// Quick Log records an instant event; Timed Log starts timing a behavior. Same gesture, same menu position.
+function record(k, trigger, detail) { if (R.purpose === 'timed') startTimer(k, trigger); else logEvent(k, trigger, detail); }
+function bindRadialButton(btn, purpose) {
   btn.addEventListener('pointerdown', e => {
     e.preventDefault(); try { btn.setPointerCapture(e.pointerId); } catch (_) {}
     closeWhy(); gs = { x0: e.clientX, y0: e.clientY, opened: false };
     btn.style.transform = 'scale(0.94)';
-    holdT = setTimeout(() => { if (gs) { gs.opened = true; openRadial('gesture'); buzz(); } }, 180);
+    holdT = setTimeout(() => { if (gs) { gs.opened = true; openRadial('gesture', purpose); buzz(); } }, 180);
   });
   btn.addEventListener('pointermove', e => {
     if (!gs) return;
-    if (!gs.opened && Math.hypot(e.clientX - gs.x0, e.clientY - gs.y0) > 12) { clearTimeout(holdT); gs.opened = true; openRadial('gesture'); }
+    if (!gs.opened && Math.hypot(e.clientX - gs.x0, e.clientY - gs.y0) > 12) { clearTimeout(holdT); gs.opened = true; openRadial('gesture', purpose); }
     if (gs.opened) onGestureMove(e.clientX, e.clientY);
   });
-  const up = () => { if (!gs) return; clearTimeout(holdT); btn.style.transform = ''; const opened = gs.opened; gs = null; if (opened) commitGesture(); else openRadial('tap'); };
+  const up = () => { if (!gs) return; clearTimeout(holdT); btn.style.transform = ''; const opened = gs.opened; gs = null; if (opened) commitGesture(); else openRadial('tap', purpose); };
   btn.addEventListener('pointerup', up);
   btn.addEventListener('pointercancel', () => { clearTimeout(holdT); btn.style.transform = ''; gs = null; closeRadial(); });
-  btn.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openRadial('tap'); } });
+  btn.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openRadial('tap', purpose); } });
 }
 function logEvent(key, trigger, detail = null) {
   const t = TYPE[key];
-  const ev = mkEvent(key, walk.u, walk.sim, { trigger, detail, dogs: [...walk.dogs] });
+  const ev = mkEvent(key, walk.u, walk.clock, { trigger, detail, dogs: [...walk.dogs] });
   walk.events.push(ev); refreshLiveMap();
   const acts = [];
   if (DETAILS[key] && !detail) acts.push({ label: 'Add ' + DETAILS[key].label.toLowerCase(), run: () => pickFor(ev, 'detail') });
   if (t.cat.trig && !trigger) acts.push({ label: 'Add trigger', run: () => pickFor(ev, 'trigger') });
   if (t.cat.trig) acts.push({ label: 'Outcome', run: () => pickFor(ev, 'outcome') });
   acts.push({ label: 'Undo', run: () => { walk.events = walk.events.filter(x => x !== ev); refreshLiveMap(); toast('Removed.'); } });
-  if (trigger === 'Other') { askWhy(ev); return; }
+  if (trigger === 'Other' || (C.BEHAVIORS[key] || {}).describe) { askWhy(ev); return; }
   toast(`<b>${esc(t.name)}</b> logged${detail ? ' · ' + esc(detail) : ''}${trigger ? ' · ' + esc(trigger) : ''}`, acts);
 }
 // After an 'Other' behavior is logged (already saved with time and GPS), ask what triggered it. Optional; never blocks the walk.
-function askWhy(ev) {
+function askWhy(ev, verb = 'logged') {
+  const describe = (C.BEHAVIORS[ev.key] || {}).describe, trig = ev.trigger === 'Other';
+  if (!describe && !trig) return;
   closeWhy(); $('.toast', screen)?.remove(); clearTimeout(toastTimer);
   const inWalk = current === 'active';
   const card = document.createElement('div');
   card.className = 'why g lv-panel ' + (inWalk ? 'outdoor' : 'low');
-  card.setAttribute('role', 'dialog'); card.setAttribute('aria-labelledby', 'why-q');
-  card.innerHTML = `<p class="small" style="margin:0 0 2px"><b>${esc(TYPE[ev.key].name)}</b> logged · Other</p>
-    <label id="why-q" for="why-text" style="font-weight:800;font-size:16px">What triggered this behavior?</label>
-    <textarea class="tr-input g" id="why-text" rows="3" placeholder="Optional. For example: skateboard rolling past">${esc(ev.triggerText || '')}</textarea>
+  card.setAttribute('role', 'dialog'); card.setAttribute('aria-labelledby', describe ? 'why-dq' : 'why-q');
+  card.innerHTML = `<p class="small" style="margin:0 0 2px"><b>${esc(TYPE[ev.key].name)}</b> ${verb}${trig ? ' · Other' : ''}</p>
+    ${describe ? `<label id="why-dq" for="why-desc" style="font-weight:800;font-size:16px">${esc(describe)}</label>
+    <textarea class="tr-input g" id="why-desc" rows="2" placeholder="Optional. For example: spun in circles">${esc(ev.behaviorText || '')}</textarea>` : ''}
+    ${trig ? `<label id="why-q" for="why-text" style="font-weight:800;font-size:16px;${describe ? 'margin-top:8px' : ''}">What triggered this behavior?</label>
+    <textarea class="tr-input g" id="why-text" rows="${describe ? 2 : 3}" placeholder="Optional. For example: skateboard rolling past">${esc(ev.triggerText || '')}</textarea>` : ''}
     <div class="row" style="justify-content:flex-end;gap:8px;margin-top:10px"><button class="btn press" id="why-skip">Skip</button><button class="btn primary g tint press" id="why-save">Save</button></div>`;
   screen.appendChild(card);
-  $('#why-skip', card).onclick = () => { closeWhy(); toast(`<b>${esc(TYPE[ev.key].name)}</b> saved · Other`); };
+  $('#why-skip', card).onclick = () => { closeWhy(); toast(`<b>${esc(TYPE[ev.key].name)}</b> saved${trig ? ' · Other' : ''}`); };
   $('#why-save', card).onclick = () => {
-    const v = $('#why-text', card).value.trim(); ev.triggerText = v || null; closeWhy();
-    toast(v ? 'Trigger description saved.' : `<b>${esc(TYPE[ev.key].name)}</b> saved · Other`);
-    if (current === 'report') { const st = $('#v-report').scrollTop; renderReport(); $('#v-report').scrollTop = st; }
+    const d = describe ? $('#why-desc', card).value.trim() : '', v = trig ? $('#why-text', card).value.trim() : '';
+    if (describe) ev.behaviorText = d || null;
+    if (trig) ev.triggerText = v || null;
+    closeWhy();
+    toast(v && !d ? 'Trigger description saved.' : d || v ? 'Description saved.' : `<b>${esc(TYPE[ev.key].name)}</b> saved${trig ? ' · Other' : ''}`);
+    if (current === 'report') rerenderReport();
   };
 }
 function closeWhy() { $('.why', screen)?.remove(); }
@@ -1030,10 +1124,10 @@ function pickFor(ev, field) {
 /* ── Report ── */
 function renderReport(opts = {}) {
   const w = reportWalk; const focus = opts.focus || null;
-  const end = new Date(w.start.getTime() + w.sim * 1000);
+  const end = new Date(w.start.getTime() + (w.clock ?? w.sim) * 1000);
   const byCat = CATS.map(c => ({ c, rows: Object.entries(w.events.filter(e => TYPE[e.key].cat === c).reduce((a, e) => (a[e.key] = (a[e.key] || 0) + 1, a), {})) })).filter(x => x.rows.length);
   const steps = Math.round(miles(w.distM) * 2100);
-  const timeline = [...w.events].sort((a, b) => a.t - b.t).map(e => { const t = TYPE[e.key]; return `<button class="li" data-tl="${e.id}"><svg class="shape" viewBox="-10 -10 20 20">${shapeSvg(t.cat.shape, 0, 0, t.cat.c, '', 'stroke="none"')}</svg><span class="grow"><span class="t1">${esc(t.name)}</span><br><span class="t2">${clock(new Date(w.start.getTime() + e.t * 1000))}${e.detail ? ' · ' + esc(e.detail) : ''}${e.trigger ? ' · ' + esc(trigText(e)) : ''}${e.outcome ? ' · ' + esc(e.outcome) : ''}</span></span>${icon('chev')}</button>`; }).join('');
+  const timeline = [...w.events].sort((a, b) => a.t - b.t).map(e => { const t = TYPE[e.key]; return `<button class="li" data-tl="${e.id}"><svg class="shape" viewBox="-10 -10 20 20">${shapeSvg(t.cat.shape, 0, 0, t.cat.c, '', 'stroke="none"')}</svg><span class="grow"><span class="t1">${esc(evName(e))}</span><br><span class="t2">${clock(new Date(w.start.getTime() + e.t * 1000))}${e.timed ? ' · ' + durText(e) : ''}${e.detail ? ' · ' + esc(e.detail) : ''}${e.trigger ? ' · ' + esc(trigText(e)) : ''}${e.outcome ? ' · ' + esc(e.outcome) : ''}</span></span>${icon('chev')}</button>`; }).join('');
   $('#v-report').innerHTML = `
     <div class="stack">
       <div class="topbar"><button class="icon-btn g lv-orb press" id="r-back" aria-label="Back">${icon('back')}</button><span class="h-sec" style="flex:1">Walk report</span>${w.sample ? '<span class="sample">Sample</span>' : ''}</div>
@@ -1050,9 +1144,10 @@ function renderReport(opts = {}) {
       </div>
       <section class="g lv-card map-card" aria-label="Route and events"><div id="r-map" style="position:relative">${mapSvg(w, { viewBox: '10 200 380 480', interactive: true, slice: false, focus })}</div>
         <div class="legend">${CATS.map(c => `<span>${legendShape(c)}${c.name}</span>`).join('')}<span class="muted" style="font-weight:600">Tap a marker for details</span></div></section>
-      <section class="g lv-card"><h2 class="h-sec">Behavior breakdown</h2>
+      <section class="g lv-card"><h2 class="h-sec">Behavior breakdown</h2>${breakdownSummary(w)}
         ${byCat.length ? byCat.map(({ c, rows }) => `<div class="bd-cat">${legendShape(c)}${c.name}</div>` + rows.map(([k, n]) => `<div class="bd-row"><span>${esc(TYPE[k].name)}</span><span><span class="num n">${n}</span> <span class="muted small">${NOUN(k)}${n === 1 ? '' : 's'}</span></span></div>${detailLine(w, k)}`).join('')).join('') : '<p class="muted" style="margin:8px 0 0">Nothing was logged on this walk.</p>'}
       </section>
+      ${umdSection(w)}
       ${trainingSection(w)}
       <section class="g lv-card"><div class="row between"><h2 class="h-sec">Weather</h2><span class="sample">Sample values</span></div>
         <div class="wx" style="margin-top:10px">
@@ -1070,6 +1165,7 @@ function renderReport(opts = {}) {
   const v = $('#v-report');
   $('#r-back', v).onclick = () => go('home');
   $('#tr-add', v).onclick = () => trainingSheet(w);
+  bindUmd(v, w);
   v.querySelectorAll('[data-sug]').forEach(b => b.onclick = () => trainingSheet(w, b.dataset.sug));
   v.querySelectorAll('[data-tr]').forEach(b => b.onclick = () => trainingSheet(w, null, w.training.find(x => x.id === b.dataset.tr)));
   $('#r-assign', v) && ($('#r-assign', v).onclick = () => dogPicker([], 'Who did you walk?', 'Assign', ids => { if (!ids.length) return; w.events.forEach(e => { if (!e.dogs || !e.dogs.length) e.dogs = [...ids]; }); (w.training || []).forEach(t => { if (!t.dogs.length) t.dogs = [...ids]; }); w.dogs = ids; renderReport(); toast(`Assigned to ${dogNames(ids)}.`); }));
@@ -1130,7 +1226,13 @@ function trainingSheet(w, preset = null, existing = null) {
     if (existing) $('#tr-del', p).onclick = () => { w.training = w.training.filter(x => x !== existing); closeSheet(); const st = $('#v-report').scrollTop; renderReport(); $('#v-report').scrollTop = st; toast('Training removed.'); };
   });
 }
-function detailLine(w, k) {
+function detailLine(w, k) { return detailLineBase(w, k) + durLine(w, k); }
+function durLine(w, k) {
+  const evs = w.events.filter(e => e.key === k && e.timed && e.timerStatus !== 'running'); if (!evs.length) return '';
+  const known = evs.filter(C.durationKnown), unknown = evs.length - known.length, total = known.reduce((a, e) => a + e.duration, 0);
+  return `<div class="muted small" style="margin:-2px 0 4px">${known.length ? `Timed: ${fmtTime(total)} total across ${known.length}` : 'Timed'}${unknown ? ` · ${unknown} timer${unknown === 1 ? '' : 's'} not ended (duration unknown) <button class="textlink" style="padding:0 4px" data-dur="${evs.find(e => !C.durationKnown(e)).id}">Add duration</button>` : ''}</div>`;
+}
+function detailLineBase(w, k) {
   if (deepFor(k) && deepFor(k).kind === 'trigger') {
     const evs = w.events.filter(e => e.key === k), parts = TRIGGERS.map(([o]) => [o, evs.filter(e => e.trigger === o).length]).filter(x => x[1]);
     const none = evs.filter(e => !e.trigger).length;
@@ -1148,12 +1250,187 @@ function showPop(w, items, anchor) {
   const p = document.createElement('div'); p.className = 'pop g lv-card'; p.setAttribute('role', 'dialog');
   p.innerHTML = items.map((e, i) => { const t = TYPE[e.key]; return `${i ? '<hr style="border:0;border-top:1px solid var(--glass-border);margin:10px 0">' : ''}<div class="row" style="gap:8px"><svg class="shape" viewBox="-10 -10 20 20">${shapeSvg(t.cat.shape, 0, 0, t.cat.c, '', 'stroke="none"')}</svg><b>${esc(t.name)}</b></div>
     <dl><dt>Time</dt><dd>${clock(new Date(w.start.getTime() + e.t * 1000))}</dd><dt>Dog</dt><dd>${e.dogs && e.dogs.length ? dogNames(e.dogs) : 'Not assigned'}</dd>
-    ${e.detail ? `<dt>${esc(DETAILS[e.key].label)}</dt><dd>${esc(e.detail)}</dd>` : ''}${e.trigger ? `<dt>Trigger</dt><dd>${esc(e.trigger)}</dd>` : ''}${e.triggerText ? `<dt>What triggered it</dt><dd>${esc(e.triggerText)}</dd>` : ''}${e.outcome ? `<dt>Outcome</dt><dd>${esc(e.outcome)}</dd>` : ''}${e.note ? `<dt>Note</dt><dd>${esc(e.note)}</dd>` : ''}</dl>`; }).join('');
+    ${e.detail ? `<dt>${esc(DETAILS[e.key].label)}</dt><dd>${esc(e.detail)}</dd>` : ''}${e.trigger ? `<dt>Trigger</dt><dd>${esc(e.trigger)}</dd>` : ''}${e.triggerText ? `<dt>What triggered it</dt><dd>${esc(e.triggerText)}</dd>` : ''}${e.behaviorText ? `<dt>What the dog did</dt><dd>${esc(e.behaviorText)}</dd>` : ''}${e.timed ? `<dt>Duration</dt><dd>${durText(e)}</dd>` : ''}${e.episodeId ? `<dt>Part of</dt><dd>Grouped encounter</dd>` : ''}${e.outcome ? `<dt>Outcome</dt><dd>${esc(e.outcome)}</dd>` : ''}${e.note ? `<dt>Note</dt><dd>${esc(e.note)}</dd>` : ''}</dl>`; }).join('');
   screen.appendChild(p);
   const pw = p.offsetWidth, ph = p.offsetHeight;
   let left = ar.left + ar.width / 2 - sr.left - pw / 2; left = Math.max(10, Math.min(sr.width - pw - 10, left));
   let top = ar.top - sr.top - ph - 12; if (top < 50) top = ar.bottom - sr.top + 12;
   p.style.left = left + 'px'; p.style.top = top + 'px';
+}
+
+/* ── Understand My Dog: episodes, guided review, education ── */
+const ILLUSTRATIONS = {}; // indicator key -> image URL, supplied separately; text works without them
+const STATUS = { not_started: ['Not reviewed', '--sky'], partial: ['In progress', '--peach'], complete: ['Reviewed', '--mint'], skipped: ['Skipped', '--blush'] };
+const reviewKey = (kind, id) => kind + ':' + id;
+const atTime = (w, s) => clock(new Date(w.start.getTime() + s * 1000));
+function rerenderReport() { const v = $('#v-report'), st = v.scrollTop; renderReport(); v.scrollTop = st; }
+function subjectCtx(w, kind, id) {
+  if (kind === 'ep') {
+    const ep = w.episodes.find(x => x.id === id), evs = C.episodeEvents(w, id);
+    // A trigger that came from this review stays editable, so the trigger question keeps being asked.
+    const trigger = ep.triggerSource === 'reviewed' ? { value: null, source: 'unknown' } : C.episodeTrigger(w, ep);
+    return { kind, id, ep, events: evs, behaviorKeys: [...new Set(evs.map(e => e.key))], trigger, dog: ep.dog };
+  }
+  const e = w.events.find(x => x.id === id);
+  return { kind, id, events: [e], behaviorKeys: [e.key], trigger: e.trigger ? { value: e.trigger, source: 'logged' } : { value: null, source: 'unknown' }, dog: (e.dogs || [])[0] };
+}
+function statusOf(w, ctx) { const r = w.reviews[reviewKey(ctx.kind, ctx.id)]; return C.reviewStatus(r, C.reviewQuestions(ctx, r ? r.answers : {})); }
+const statusPill = st => `<span class="res" style="--t:var(${STATUS[st][1]})">${STATUS[st][0]}</span>`;
+function evSummaryText(evs) { return C.eventSummary(evs).map(b => TYPE[b.key].name + (b.count > 1 ? ` ×${b.count}` : '') + (b.known ? ` ${fmtTime(b.seconds)}` : '') + (b.unknown ? ' (time unknown)' : '')).join(' · '); }
+function epTriggerText(w, ep) {
+  const t = C.episodeTrigger(w, ep);
+  return t.value ? `Trigger: ${t.value}${t.source === 'reviewed' ? ' (from review)' : ''}` : t.source === 'mixed' ? 'Different triggers logged' : 'Trigger not recorded';
+}
+function breakdownSummary(w) {
+  const beh = w.events.filter(e => C.isBehavior(e.key) && !C.isSuccess(e.key)).length, calm = w.events.filter(e => C.isSuccess(e.key)).length, eps = (w.episodes || []).length;
+  return `<p class="muted small" style="margin:4px 0 0">${plural(beh, 'behavior')} logged${eps ? ` · ${eps} grouped encounter${eps === 1 ? '' : 's'}` : ''}${calm ? ` · ${calm} calm pass${calm === 1 ? '' : 'es'}` : ''}</p>`;
+}
+function umdSection(w) {
+  const sugg = C.suggestEpisodes(w.events, { mPerUnit: M_PER_U, dismissed: w.dismissed });
+  const eps = (w.episodes || []).map(ep => ({ ep, span: C.episodeSpan(w, ep.id) })).filter(x => x.span).sort((a, b) => a.span.start - b.span.start);
+  const singles = w.events.filter(e => C.isReviewable(e.key) && !e.episodeId).sort((a, b) => a.t - b.t);
+  const sugHtml = sugg.map((ids, i) => {
+    const evs = ids.map(id => w.events.find(e => e.id === id)), dogs = C.candidateDogs(evs);
+    const span = Math.round(Math.max(...evs.map(e => e.end ?? e.t)) - Math.min(...evs.map(e => e.t)));
+    return `<div class="umd-sug g" data-sg="${i}"><p class="small" style="margin:0"><b>Were these one encounter?</b> ${evs.length} behaviors within ${span} seconds, near the same spot, at ${atTime(w, evs[0].t)}.</p>
+      <p class="small muted" style="margin:4px 0 8px">${esc(evSummaryText(evs))}</p>
+      ${dogs.length > 1 ? `<p class="small" style="margin:0 0 6px">Which dog was it?</p><div class="chips" role="group" aria-label="Dog for this encounter">${dogs.map(d => `<button class="chip g lv-control" style="--t:var(--lav)" data-sgdog="${d}" aria-pressed="false">${DOG[d].name}</button>`).join('')}</div>` : ''}
+      <p class="small sg-err" style="color:var(--danger);margin:6px 0 0" hidden>Choose the dog first.</p>
+      <div class="row" style="gap:8px;margin-top:8px;flex-wrap:wrap"><button class="chip g lv-control tint press" style="--t:var(--sky)" data-sgok="${i}">Group as one encounter</button><button class="chip g lv-control press" data-sgno="${i}">Keep separate</button></div></div>`;
+  }).join('');
+  const epHtml = eps.map(({ ep, span }) => `<button class="li" data-ep="${ep.id}"><span class="grow"><span class="t1">Encounter · ${atTime(w, span.start)}</span> ${statusPill(statusOf(w, subjectCtx(w, 'ep', ep.id)))}<br><span class="t2">${DOG[ep.dog].name} · ${esc(epTriggerText(w, ep))} · ${esc(evSummaryText(C.episodeEvents(w, ep.id)))}</span></span>${icon('chev')}</button>`).join('');
+  const singleHtml = singles.map(e => { const t = TYPE[e.key]; return `<button class="li" data-rev="${e.id}"><svg class="shape" viewBox="-10 -10 20 20">${shapeSvg(t.cat.shape, 0, 0, t.cat.c, '', 'stroke="none"')}</svg><span class="grow"><span class="t1">${esc(evName(e))}</span> ${statusPill(statusOf(w, subjectCtx(w, 'ev', e.id)))}<br><span class="t2">${atTime(w, e.t)}${e.trigger ? ' · ' + esc(trigText(e)) : ''}${e.timed ? ' · ' + durText(e) : ''}${e.dogs && e.dogs.length ? ' · ' + dogNames(e.dogs) : ''}</span></span>${icon('chev')}</button>`; }).join('');
+  return `<section class="g lv-card" aria-label="Understand My Dog" id="umd">
+    <div class="row between"><h2 class="h-sec">Understand My Dog</h2><span class="sample">Optional</span></div>
+    <p class="muted small" style="margin:4px 0 0">Look back at what happened to learn more about your dog. Skip anything, save as you go, and come back later.</p>
+    ${sugHtml}
+    ${epHtml ? `<p class="h-sec" style="margin:14px 0 0">Encounters</p><div class="list">${epHtml}</div>` : ''}
+    ${singleHtml ? `<p class="h-sec" style="margin:14px 0 0">${epHtml ? 'Other behaviors' : 'Behaviors to review'}</p><div class="list">${singleHtml}</div>` : ''}
+    ${!sugHtml && !epHtml && !singleHtml ? '<p class="muted small" style="margin:10px 0 0">Nothing to review on this walk.</p>' : ''}
+  </section>`;
+}
+function bindUmd(v, w) {
+  const sugg = C.suggestEpisodes(w.events, { mPerUnit: M_PER_U, dismissed: w.dismissed });
+  v.querySelectorAll('[data-sgdog]').forEach(b => b.onclick = () => { const box = b.closest('[data-sg]'); box.dataset.dog = b.dataset.sgdog; box.querySelectorAll('[data-sgdog]').forEach(x => { const on = x === b; x.setAttribute('aria-pressed', on); x.classList.toggle('tint', on); }); box.querySelector('.sg-err').hidden = true; });
+  v.querySelectorAll('[data-sgok]').forEach(b => b.onclick = () => {
+    const box = b.closest('[data-sg]'), ids = sugg[+b.dataset.sgok], cands = C.candidateDogs(ids.map(id => w.events.find(e => e.id === id)));
+    const dog = box.dataset.dog || (cands.length === 1 ? cands[0] : null);
+    if (!dog) { box.querySelector('.sg-err').hidden = false; return; }
+    try { C.confirmEpisode(w, ids, dog, { origin: 'suggested', id: 'ep' + (uid++) }); } catch (err) { toast(esc(err.message)); return; }
+    rerenderReport(); toast('Grouped as one encounter. Every original log is kept.');
+  });
+  v.querySelectorAll('[data-sgno]').forEach(b => b.onclick = () => { w.dismissed.add(C.suggestionKey(sugg[+b.dataset.sgno])); rerenderReport(); toast('Kept as separate behaviors.'); });
+  v.querySelectorAll('[data-ep]').forEach(b => b.onclick = () => episodeSheet(w, b.dataset.ep));
+  v.querySelectorAll('[data-rev]').forEach(b => b.onclick = () => eventSheet(w, b.dataset.rev));
+  v.querySelectorAll('[data-dur]').forEach(b => b.onclick = () => durationSheet(w, b.dataset.dur));
+}
+function reviewButtons(w, kind, id) {
+  const st = statusOf(w, subjectCtx(w, kind, id));
+  return `<button class="btn primary full g tint press" id="sub-review">${st === 'not_started' || st === 'skipped' ? 'Start review' : st === 'partial' ? 'Continue review' : 'Edit answers'}</button>
+    ${st === 'partial' || st === 'complete' ? '<button class="btn full press" id="sub-summary">What this may mean</button>' : ''}`;
+}
+function bindReviewButtons(p, w, kind, id) {
+  $('#sub-review', p).onclick = () => reviewFlow(w, kind, id, 0);
+  const s2 = $('#sub-summary', p); if (s2) s2.onclick = () => summarySheet(w, kind, id);
+}
+function episodeSheet(w, epId) {
+  const ctx = subjectCtx(w, 'ep', epId), ep = ctx.ep, span = C.episodeSpan(w, epId);
+  const addable = w.events.filter(e => C.isReviewable(e.key) && !e.episodeId && (e.dogs || []).includes(ep.dog));
+  sheet(`<h3>Encounter · ${atTime(w, span.start)}</h3><p class="muted small" style="margin:0 0 8px">${DOG[ep.dog].name} · ${esc(epTriggerText(w, ep))}${span.end > span.start ? ` · about ${fmtTime(span.end - span.start)} from first to last` : ''}</p>
+    <div class="list">${ctx.events.map(e => `<div class="li"><span class="grow"><span class="t1">${esc(evName(e))}</span><br><span class="t2">${atTime(w, e.t)}${e.trigger ? ' · ' + esc(trigText(e)) : ''}${e.timed ? ' · ' + durText(e) : ''}</span></span><button class="chip g lv-control press" data-rm="${e.id}">Remove</button></div>`).join('')}</div>
+    ${addable.length ? `<p class="h-sec" style="margin:12px 0 4px">Add a behavior from this walk</p><div class="list">${addable.map(e => `<button class="li" data-add="${e.id}">${icon('plus', 'style="width:18px;height:18px;color:var(--accent)"')}<span class="grow"><span class="t1">${esc(evName(e))}</span><br><span class="t2">${atTime(w, e.t)}</span></span></button>`).join('')}</div>` : ''}
+    <div style="display:grid;gap:8px;margin-top:14px">${reviewButtons(w, 'ep', epId)}<button class="btn full press" id="ep-ungroup" style="color:var(--danger)">Ungroup (keeps every log)</button></div>`, p => {
+    bindReviewButtons(p, w, 'ep', epId);
+    p.querySelectorAll('[data-rm]').forEach(b => b.onclick = () => { C.removeFromEpisode(w, b.dataset.rm); rerenderReport(); if (w.episodes.some(x => x.id === epId)) episodeSheet(w, epId); else { closeSheet(); toast('Encounter removed. The behavior is still logged.'); } });
+    p.querySelectorAll('[data-add]').forEach(b => b.onclick = () => { try { C.addToEpisode(w, b.dataset.add, epId); } catch (err) { toast(esc(err.message)); return; } rerenderReport(); episodeSheet(w, epId); });
+    const ug = $('#ep-ungroup', p); ug.onclick = () => {
+      if (!ug.dataset.armed) { ug.dataset.armed = '1'; ug.textContent = 'Tap again to ungroup. Review answers for this encounter are removed; logs stay.'; return; }
+      C.ungroupEpisode(w, epId); delete w.interpretations[reviewKey('ep', epId)]; closeSheet(); rerenderReport(); toast('Ungrouped. Every behavior is still logged.');
+    };
+  });
+}
+function eventSheet(w, evId) {
+  const e = w.events.find(x => x.id === evId);
+  const compat = (w.episodes || []).filter(ep => (e.dogs || []).includes(ep.dog));
+  sheet(`<h3>${esc(evName(e))} · ${atTime(w, e.t)}</h3><p class="muted small" style="margin:0 0 8px">${e.trigger ? esc(trigText(e)) + ' · ' : 'Trigger not recorded · '}${e.timed ? durText(e) + ' · ' : ''}${e.dogs && e.dogs.length ? dogNames(e.dogs) : 'No dog assigned'}</p>
+    ${e.timed && !C.durationKnown(e) && e.timerStatus === 'not_ended' ? '<button class="chip g lv-control press" id="ev-dur" style="margin-bottom:8px">Add duration</button>' : ''}
+    ${compat.length ? `<p class="h-sec" style="margin:8px 0 4px">Add to an encounter</p><div class="list">${compat.map(ep => `<button class="li" data-toep="${ep.id}">${icon('plus', 'style="width:18px;height:18px;color:var(--accent)"')}<span class="grow"><span class="t1">Encounter · ${atTime(w, C.episodeSpan(w, ep.id).start)}</span><br><span class="t2">${esc(evSummaryText(C.episodeEvents(w, ep.id)))}</span></span></button>`).join('')}</div>` : ''}
+    <div style="display:grid;gap:8px;margin-top:14px">${reviewButtons(w, 'ev', evId)}</div>`, p => {
+    bindReviewButtons(p, w, 'ev', evId);
+    const d = $('#ev-dur', p); if (d) d.onclick = () => durationSheet(w, evId);
+    p.querySelectorAll('[data-toep]').forEach(b => b.onclick = () => { try { C.addToEpisode(w, evId, b.dataset.toep); } catch (err) { toast(esc(err.message)); return; } closeSheet(); rerenderReport(); toast('Added to the encounter.'); });
+  });
+}
+function reviewFlow(w, kind, id, step = 0, showMore = false) {
+  const ctx = subjectCtx(w, kind, id), key = reviewKey(kind, id);
+  const r = w.reviews[key] || (w.reviews[key] = { answers: {}, indicators: {}, notes: '', status: null });
+  if (r.status === 'skipped') r.status = null;
+  const qs = C.reviewQuestions(ctx, r.answers);
+  step = Math.max(0, Math.min(step, qs.length - 1));
+  const q = qs[step];
+  let body;
+  if (q.type === 'indicators') {
+    const keys = showMore ? [...q.primary, ...q.more] : q.primary;
+    body = `<p class="muted small" style="margin:0">${esc(q.help)}</p><div class="ind-list">${keys.map(k => { const I = C.INDICATOR[k], val = r.indicators[k], img = ILLUSTRATIONS[k];
+      return `<div class="ind g">${img ? `<img src="${img}" alt="Illustration: ${esc(I.name)}">` : ''}<span class="t1">${esc(I.name)}</span><span class="t2">${esc(I.desc)}</span>
+        <div class="seg3" role="group" aria-label="${esc(I.name)}">${[['yes', 'Yes'], ['no', 'No'], ['unsure', 'Not sure']].map(([vv, l]) => `<button class="chip g lv-control ${val === vv ? 'tint' : ''}" style="--t:var(--lav)" aria-pressed="${val === vv}" data-ind="${k}" data-v="${vv}">${l}</button>`).join('')}</div></div>`; }).join('')}</div>
+      ${!showMore ? `<button class="textlink" id="rv-more" style="margin-top:6px;padding-left:0">Show ${q.more.length} more signs</button>` : ''}`;
+  } else if (q.type === 'text') body = `<textarea class="tr-input g" id="rv-notes" rows="3" placeholder="Optional">${esc(r.notes || '')}</textarea>`;
+  else body = `${q.help ? `<p class="muted small" style="margin:0 0 8px">${esc(q.help)}</p>` : ''}<div class="opt-list">${q.options.map(([vv, l]) => `<button class="opt g lv-control ${r.answers[q.id] === vv ? 'tint' : ''}" style="--t:var(--sky)" aria-pressed="${r.answers[q.id] === vv}" data-opt="${vv}">${esc(l)}</button>`).join('')}</div>`;
+  const prune = () => { const valid = new Set(C.reviewQuestions(ctx, r.answers).map(x => x.id)); Object.keys(r.answers).forEach(k => { if (!valid.has(k)) delete r.answers[k]; }); };
+  const save = pp => { if (q.type === 'text') r.notes = $('#rv-notes', pp).value.trim(); prune();
+    if (kind === 'ep') { const a = r.answers.trigger; if (a && a !== 'not_sure') { ctx.ep.trigger = a; ctx.ep.triggerSource = 'reviewed'; } else if (ctx.ep.triggerSource === 'reviewed') { ctx.ep.trigger = null; ctx.ep.triggerSource = null; } } };
+  sheet(`<div class="row between"><span class="sample">Question ${step + 1} of ${qs.length}</span><button class="textlink" id="rv-later" style="padding:4px 0">Save and finish later</button></div>
+    <h3 style="margin-top:6px">${esc(q.prompt)}</h3>${body}
+    <div class="row between" style="margin-top:14px"><button class="btn press" id="rv-back" ${step === 0 ? 'disabled style="opacity:.4"' : ''}>Back</button>
+      <div class="row" style="gap:8px">${q.type !== 'text' ? '<button class="btn press" id="rv-skipq">Skip</button>' : ''}<button class="btn primary g tint press" id="rv-next">${step === qs.length - 1 ? 'Finish' : 'Next'}</button></div></div>
+    ${step === 0 ? '<button class="textlink" id="rv-skipall" style="margin-top:6px;padding-left:0">Skip this review</button>' : ''}`, p => {
+    p.querySelectorAll('[data-opt]').forEach(b => b.onclick = () => {
+      const cleared = r.answers[q.id] === b.dataset.opt;
+      if (cleared) delete r.answers[q.id]; else r.answers[q.id] = b.dataset.opt;
+      save(p);
+      if (cleared) { reviewFlow(w, kind, id, step); return; }
+      const nq = C.reviewQuestions(subjectCtx(w, kind, id), r.answers), ni = nq.findIndex(x => x.id === q.id);
+      b.classList.add('tint'); setTimeout(() => reviewFlow(w, kind, id, ni + 1), 160);
+    });
+    p.querySelectorAll('[data-ind]').forEach(b => b.onclick = () => { const k = b.dataset.ind; if (r.indicators[k] === b.dataset.v) delete r.indicators[k]; else r.indicators[k] = b.dataset.v; reviewFlow(w, kind, id, step, showMore); });
+    const more = $('#rv-more', p); if (more) more.onclick = () => reviewFlow(w, kind, id, step, true);
+    $('#rv-back', p).onclick = () => { if (step) { save(p); reviewFlow(w, kind, id, step - 1); } };
+    const sq = $('#rv-skipq', p); if (sq) sq.onclick = () => { save(p); reviewFlow(w, kind, id, step + 1); };
+    $('#rv-next', p).onclick = () => { save(p); if (step >= qs.length - 1) { closeSheet(); rerenderReport(); summarySheet(w, kind, id); } else reviewFlow(w, kind, id, step + 1); };
+    $('#rv-later', p).onclick = () => { save(p); closeSheet(); rerenderReport(); toast('Saved. You can finish this review any time from the report.'); };
+    const sk = $('#rv-skipall', p); if (sk) sk.onclick = () => { r.status = 'skipped'; closeSheet(); rerenderReport(); toast('Review skipped. It stays available on this report.'); };
+  });
+}
+function summarySheet(w, kind, id) {
+  const ctx = subjectCtx(w, kind, id), key = reviewKey(kind, id), r = w.reviews[key];
+  const I = C.interpret(Object.assign({}, ctx, { trigger: kind === 'ep' ? C.episodeTrigger(w, ctx.ep) : ctx.trigger }), r);
+  w.interpretations[key] = Object.assign({ generatedAt: Date.now() }, I); // stored apart from the observations it was derived from
+  const sec = (title, items, cls = '') => `<div class="edu ${cls}"><p class="h-sec" style="margin:0 0 4px">${title}</p><ul>${items.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>`;
+  const title = kind === 'ep' ? `Encounter · ${atTime(w, C.episodeSpan(w, id).start)}` : `${evName(ctx.events[0])} · ${atTime(w, ctx.events[0].t)}`;
+  sheet(`<h3>What this may mean</h3><p class="muted small" style="margin:0 0 10px">${esc(title)}${ctx.dog ? ' · ' + DOG[ctx.dog].name : ''}</p>
+    ${sec('What you recorded', I.facts)}
+    ${sec('What was happening', I.context.length ? I.context : ['Nothing recorded about the situation yet.'])}
+    ${sec('Possible explanations', I.possible.length ? I.possible : ['Not enough information yet to suggest explanations. Knowing what happened just before and afterward helps.'], I.possible.length ? '' : 'thin')}
+    ${I.missing.length ? sec('Still unknown', I.missing) : ''}
+    ${sec('Watch for next time', I.watch)}
+    <div class="edu safety g">${I.safety.map(esc).join(' ')}</div>
+    <p class="muted small" style="margin:10px 0 0">Educational information based only on what you recorded. It is not a diagnosis. Draft content (${I.contentVersion}) pending review by a qualified professional.</p>
+    <div style="display:grid;gap:8px;margin-top:12px"><button class="btn primary full g tint press" id="sm-done">Done</button><button class="btn full press" id="sm-edit">Edit answers</button></div>`, p => {
+    $('#sm-done', p).onclick = closeSheet; $('#sm-edit', p).onclick = () => reviewFlow(w, kind, id, 0);
+  });
+}
+function durationSheet(w, evId) {
+  const e = w.events.find(x => x.id === evId);
+  sheet(`<h3>How long did it last?</h3><p class="muted small" style="margin:0 0 12px">The ${esc(TYPE[e.key].name.toLowerCase())} timer started at ${atTime(w, e.t)} but was not ended, so its duration is unknown. If you know roughly how long it lasted, add it here. Otherwise leave it unknown.</p>
+    <div class="row" style="gap:10px"><label class="dur g lv-control"><input id="dur-m" type="number" min="0" max="59" inputmode="numeric" placeholder="0" aria-label="Minutes"> min</label><label class="dur g lv-control"><input id="dur-s" type="number" min="0" max="59" inputmode="numeric" placeholder="0" aria-label="Seconds"> sec</label></div>
+    <p class="small" id="dur-err" style="color:var(--danger);margin:8px 0 0" hidden>Enter a time longer than zero.</p>
+    <div style="display:grid;gap:8px;margin-top:14px"><button class="btn primary full g tint press" id="dur-save">Save duration</button><button class="btn full press" id="dur-cancel">Leave unknown</button></div>`, p => {
+    $('#dur-cancel', p).onclick = closeSheet;
+    $('#dur-save', p).onclick = () => { const secs = (+$('#dur-m', p).value || 0) * 60 + (+$('#dur-s', p).value || 0);
+      try { C.correctDuration(e, secs); } catch (err) { $('#dur-err', p).hidden = false; return; }
+      closeSheet(); rerenderReport(); toast(`Duration saved as ${fmtTime(e.duration)}. The report notes it was added later.`); };
+  });
 }
 
 /* ── Calendar (sample data) ── */
@@ -1288,27 +1565,100 @@ function renderProfile() {
   v.querySelectorAll('[data-inc]').forEach(b => b.onclick = () => { reportWalk = SAMPLE; go('report', { focus: b.dataset.inc }); });
 }
 
-/* ── Insights (sample data) ── */
-let insRange = 'month';
-const INS = {
-  week: { label: 'week', exposure: [6, 8.4, 3.2], x: ['Mon', 'Wed', 'Fri', 'Sun'], rows: [['pulling', 9, [1, 2, 1, 2, 0, 2, 1], 'n/a'], ['barking', 4, [0, 1, 1, 0, 1, 1, 0], 'Human (2)'], ['reactivity', 5, [1, 0, 1, 1, 0, 1, 1], 'Dog (3)']] },
-  month: { label: 'month', exposure: [27, 36.9, 14.6], x: ['Wk 1', 'Wk 2', 'Wk 3', 'Wk 4'], rows: [['pulling', 31, [11, 8, 7, 5], 'n/a'], ['barking', 17, [5, 5, 4, 3], 'Human (7)'], ['reactivity', 19, [6, 5, 4, 4], 'Dog (12)']] },
-  year: { label: 'year', exposure: [302, 418.5, 166.0], x: ['Jan', 'Apr', 'Jul', 'Oct'], rows: [['pulling', 284, [34, 31, 30, 28, 27, 25, 24, 22, 21, 18, 14, 10], 'n/a'], ['barking', 176, [18, 17, 16, 16, 15, 15, 14, 14, 13, 13, 13, 12], 'Human (71)'], ['reactivity', 203, [22, 20, 19, 18, 18, 17, 17, 16, 15, 14, 14, 13], 'Dog (118)']] },
-};
+/* ── Insights: computed from logged records (sample history + this session) ── */
+let insF = { range: '3m', dog: 'all', behavior: 'all', trigger: 'all' };
+let HISTORY = null;
+const POOLS = { juno: ['barking', 'lunging', 'growling', 'reactivity', 'pulling'], maple: ['pulling', 'guarding', 'freezing'], pepper: ['barking', 'growling', 'teeth', 'snapping'], olive: ['freezing', 'retreating', 'trembling', 'fear'] };
+function buildHistory() {
+  const r = rng(77), now = Date.now(), day = 864e5, out = [], pick = a => a[Math.floor(r() * a.length)];
+  for (let i = 0; i < 36; i++) {
+    const dogs = pick([['juno'], ['maple'], ['juno', 'maple'], ['pepper'], ['olive'], ['juno']]);
+    const w = { id: 'h' + i, start: new Date(now - (86 - i * 2.4) * day), dogs, events: [], episodes: [], reviews: {} };
+    const encounters = Math.floor(r() * 3);
+    for (let k = 0; k < encounters; k++) {
+      const dog = pick(dogs), trig = pick(['Dog', 'Dog', 'Human', 'Other', null]), base = 300 + k * 600 + Math.floor(r() * 200), xy = [80 + r() * 240, 260 + r() * 360];
+      const n = 1 + Math.floor(r() * 3), ids = [];
+      for (let j = 0; j < n; j++) {
+        const e = { id: `h${i}e${k}${j}`, key: pick(POOLS[dog]), t: base + j * 7, xy, dogs: [dog], trigger: trig };
+        if (j === 0 && ['growling', 'barking', 'trembling', 'freezing'].includes(e.key) && r() < 0.6) { C.startTimed(e, e.t, xy); if (r() < 0.8) C.endTimed(e, e.t + 5 + Math.floor(r() * 50), xy); else C.finalizeTimers([e]); }
+        w.events.push(e); ids.push(e.id);
+      }
+      if (n > 1 && r() < 0.75) C.confirmEpisode(w, ids, dog, { id: `hep${i}${k}`, origin: 'suggested' });
+      if (r() < 0.55) {
+        const ep = w.episodes.find(x => x.id === `hep${i}${k}`), rk = ep ? 'ep:' + ep.id : 'ev:' + ids[0];
+        const a = {}; if (r() < 0.8) a.distance = pick(['far', 'across_street', 'few_feet', 'very_close', 'not_sure']);
+        a.after = pick(['settled_distance', 'settled_changed', 'continued', 'other_left', 'not_sure']);
+        if (C.SETTLED.has(a.after) && r() < 0.75) a.recovery = pick(['under_10s', 's10_30', 's30_120', 'over_2m', 'not_sure']);
+        w.reviews[rk] = { answers: a, indicators: {}, notes: '' };
+      }
+    }
+    if (dogs.includes('juno') && r() < 0.6) w.events.push({ id: `h${i}calm`, key: 'calm', t: 1500, xy: [200, 400], dogs: ['juno'], trigger: 'Dog' });
+    if (r() < 0.5) w.events.push({ id: `h${i}pull`, key: 'pulling', t: 900, xy: [150, 500], dogs: [dogs[0]], trigger: null });
+    out.push(w);
+  }
+  return out;
+}
+const toAW = w => ({ id: w.id, startMs: w.start.getTime(), dogs: w.dogs, events: w.events, episodes: w.episodes || [], reviews: w.reviews || {} });
+function insightWalks() { if (!HISTORY) HISTORY = buildHistory(); return [...HISTORY, SAMPLE, ...doneWalks].map(toAW); }
+function hbars(rows, total) { const mx = Math.max(1, ...rows.map(x => x[1])); return rows.map(([l, n, extra]) => `<div class="hbar"><span class="hl">${esc(l)}</span><span class="hb"><i style="width:${Math.max(n ? 4 : 0, n / mx * 100)}%"></i></span><span class="hv num">${n}${extra || ''}</span></div>`).join(''); }
 function renderInsights() {
-  const D = INS[insRange], [walks, mi, hrs] = D.exposure;
+  const day = 864e5, now = Date.now();
+  const from = { '2w': now - 14 * day, '1m': now - 30 * day, '3m': now - 92 * day, all: null }[insF.range];
+  const r = C.analytics(insightWalks(), { dog: insF.dog, behavior: insF.behavior, trigger: insF.trigger, fromMs: from });
+  const recL = Object.fromEntries(C.RECOVERY), disL = Object.fromEntries(C.DISTANCE);
+  const behKeys = Object.keys(C.BEHAVIORS).filter(k => !C.isSuccess(k));
+  const sel = (id, label, opts, val) => `<label class="flt"><span class="sample">${label}</span><select id="${id}" class="g lv-control">${opts.map(([v, l]) => `<option value="${v}" ${v === val ? 'selected' : ''}>${esc(l)}</option>`).join('')}</select></label>`;
+  const weeks = Object.keys(r.weekly).map(Number).sort((a, b) => a - b).slice(-12);
+  const wmx = Math.max(1, ...weeks.map(k => r.weekly[k].encounters));
+  const reactions = r.encounters - r.calmPasses;
+  const timedRows = Object.entries(r.durations.byBehavior).map(([k, d]) => [TYPE[k].name, d.known, d.known ? ` · avg ${fmtTime(Math.round(d.totalS / d.known))}${d.unknown ? `, ${d.unknown} unknown` : ''}` : (d.unknown ? ` · ${d.unknown} unknown` : '')]);
   $('#v-insights').innerHTML = `
     <div class="stack">
       <h1 class="h-title">Insights</h1>
-      <div class="chips" role="group" aria-label="Time range">${[['week', 'Past week'], ['month', 'Past month'], ['year', 'Past year']].map(([k, l]) => `<button class="chip g lv-control ${insRange === k ? 'tint' : ''}" style="--t:var(--lav)" aria-pressed="${insRange === k}" data-r="${k}">${l}</button>`).join('')}</div>
-      <section class="g lv-card irid"><p class="h-sec" style="margin:0">All dogs · past ${D.label}</p><p class="num" style="font-size:24px;margin:4px 0 0">${walks} walks · ${mi} mi · ${hrs} h</p><p class="small" style="margin:4px 0 0;color:var(--text2)">Every rate below is measured against this much walking.</p></section>
-      ${D.rows.map(([k, n, series, trig]) => { const t = TYPE[k], mx = Math.max(...series); return `<section class="g lv-card" style="--c:var(${t.cat.c})"><div class="row between"><div class="row" style="gap:8px">${legendShape(t.cat)}<h2 style="margin:0;font-size:17px;font-weight:800">${esc(t.name)}</h2></div><span class="sample">Sample</span></div>
-        <div class="kv"><div><div class="v num">${n}</div><div class="l">${NOUN(k)}s</div></div><div><div class="v num">${(n / mi).toFixed(2)}</div><div class="l">per mile</div></div><div><div class="v num">${(n / hrs).toFixed(1)}</div><div class="l">per hour</div></div></div>
-        <div class="bars" aria-label="Trend">${series.map(v => `<i style="height:${Math.max(4, v / mx * 100)}%"></i>`).join('')}</div><div class="bar-x">${D.x.map(x => `<span>${x}</span>`).join('')}</div>
-        ${trig !== 'n/a' ? `<p class="small" style="margin:10px 0 0"><span class="muted">Most common trigger:</span> <b>${trig}</b></p>` : ''}</section>`; }).join('')}
-      <p class="foot">Based on what you recorded. Counts depend on how often you log and are not a behavioral diagnosis. Comparisons stay hidden until there are enough walks to compare.</p>
+      <div class="chips" role="group" aria-label="Date range">${[['2w', '2 weeks'], ['1m', 'Month'], ['3m', '3 months'], ['all', 'All time']].map(([k, l]) => `<button class="chip g lv-control ${insF.range === k ? 'tint' : ''}" style="--t:var(--lav)" aria-pressed="${insF.range === k}" data-r="${k}">${l}</button>`).join('')}</div>
+      <div class="flts">${sel('f-dog', 'Dog', [['all', 'All dogs'], ...DOGS.map(d => [d.id, d.name])], insF.dog)}${sel('f-beh', 'Behavior', [['all', 'All behaviors'], ...behKeys.map(k => [k, C.BEHAVIORS[k].name])], insF.behavior)}${sel('f-trig', 'Trigger', [['all', 'All triggers'], ['Dog', 'Dog'], ['Human', 'Human'], ['Other', 'Other'], ['none', 'Not recorded']], insF.trigger)}</div>
+      <section class="g lv-card irid"><p class="h-sec" style="margin:0">From what you logged</p>
+        <div class="kv" style="margin:8px 0 4px"><div><div class="v num">${r.walks}</div><div class="l">walks</div></div><div><div class="v num">${r.encounters}</div><div class="l">encounters</div></div><div><div class="v num">${r.behaviorEvents}</div><div class="l">behaviors</div></div></div>
+        <p class="small" style="margin:0;color:var(--text2)">An encounter is one situation. A grouped encounter with growling, barking and lunging counts once here and as three behaviors. <span class="sample">Sample history</span></p></section>
+      <section class="g lv-card"><h2 class="h-sec">Behaviors logged</h2>${r.behaviorEvents ? hbars(Object.entries(r.byBehavior).sort((a, b) => b[1] - a[1]).map(([k, n]) => [TYPE[k].name, n])) : '<p class="muted small">No behaviors logged for these filters.</p>'}</section>
+      <section class="g lv-card"><h2 class="h-sec">Encounters</h2>
+        ${hbars([['Settled afterward', r.managed.settled], ['Kept reacting', r.managed.continued], ['Outcome not reported', r.managed.afterUnknown], ['Calm passes', r.managed.calmPasses]])}
+        <p class="small" style="margin:8px 0 0">${r.encounters ? `${reactions} of the ${r.encounters} encounters you logged included a reaction.` : 'No encounters logged for these filters.'} <span class="muted">Only logged encounters are counted; encounters you did not log are unknown, not zero.</span></p></section>
+      <section class="g lv-card"><h2 class="h-sec">How long behaviors lasted</h2>
+        ${r.durations.known + r.durations.unknown ? `<p class="small" style="margin:6px 0">${r.durations.known} timed with a known duration${r.durations.known ? ` (average ${fmtTime(Math.round(r.durations.totalS / r.durations.known))})` : ''}. ${r.durations.unknown} timer${r.durations.unknown === 1 ? ' was' : 's were'} not ended, so ${r.durations.unknown === 1 ? 'its duration is' : 'those durations are'} unknown.</p>${hbars(timedRows)}` : '<p class="muted small">No timed behaviors for these filters.</p>'}</section>
+      <section class="g lv-card"><h2 class="h-sec">Time to settle (you reported)</h2>
+        ${hbars([...C.RECOVERY.filter(x => x[0] !== 'not_sure').map(([k, l]) => [l, r.recovery.reported[k] || 0]), ['Not sure', r.recovery.notSure], ['Not reported', r.recovery.notReported]])}
+        <p class="muted small" style="margin:8px 0 0">Separate from how long the behavior itself lasted.</p></section>
+      <section class="g lv-card"><h2 class="h-sec">Triggers recorded</h2>${hbars([['Dog', r.triggers.Dog], ['Human', r.triggers.Human], ['Other', r.triggers.Other], ['Not recorded', r.triggers.none]])}</section>
+      <section class="g lv-card"><h2 class="h-sec">How close (your estimates)</h2>
+        ${hbars([...C.DISTANCE.filter(x => x[0] !== 'not_sure').map(([k, l]) => [l, r.distance.reported[k] || 0]), ['Not sure', r.distance.notSure], ['Not reported', r.distance.notReported]])}
+        <p class="muted small" style="margin:8px 0 0">Owner estimates from reviews, not GPS measurements.</p></section>
+      <section class="g lv-card"><h2 class="h-sec">Over time</h2>
+        ${weeks.length ? `<div class="bars" style="--c:var(--c-behavior)">${weeks.map(k => `<i style="height:${Math.max(4, r.weekly[k].encounters / wmx * 100)}%" title="${r.weekly[k].encounters} encounters, ${r.weekly[k].walks} walks"></i>`).join('')}</div>
+        <div class="bar-x"><span>${weeks.length} weeks ago</span><span>this week</span></div>
+        <p class="small" style="margin:8px 0 0">Encounters per week, alongside ${weeks.reduce((a, k) => a + r.weekly[k].walks, 0)} walks. Fewer logged behaviors does not by itself mean improvement: it can also mean fewer encounters, different routes, or logging less often.</p>` : '<p class="muted small">No walks in this range.</p>'}</section>
+      <p class="foot">Based only on what was logged and reported. Not a behavioral diagnosis. Missing answers are shown as "not reported", never as zero.</p>
     </div>`;
-  $('#v-insights').querySelectorAll('[data-r]').forEach(b => b.onclick = () => { insRange = b.dataset.r; renderInsights(); });
+  const v = $('#v-insights');
+  v.querySelectorAll('[data-r]').forEach(b => b.onclick = () => { insF.range = b.dataset.r; renderInsights(); });
+  $('#f-dog', v).onchange = e => { insF.dog = e.target.value; renderInsights(); };
+  $('#f-beh', v).onchange = e => { insF.behavior = e.target.value; renderInsights(); };
+  $('#f-trig', v).onchange = e => { insF.trigger = e.target.value; renderInsights(); };
+}
+
+/* ── Settings: logging mode ── */
+function setMode(m) {
+  prefs.loggingMode = m;
+  document.querySelectorAll('#ctl-mode button').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === m));
+}
+function settingsSheet() {
+  const mode = C.resolveMode(prefs);
+  const opts = [['beginner', 'Beginner', 'Plain, observable actions: barking, growling, lunging, freezing, retreating and more, plus calm passes.'], ['professional', 'Professional', 'Behavior classifications: Pulling, Reactivity, Resource Guarding, Fear / Anxiety, Aggression, Barking.']];
+  sheet(`<h3>Settings</h3><p class="h-sec" style="margin:8px 0">Behavior logging</p>
+    <div class="opt-list">${opts.map(([k, n, d]) => `<button class="opt g lv-control ${mode === k ? 'tint' : ''}" style="--t:var(--lav)" aria-pressed="${mode === k}" data-mode="${k}"><b>${n}</b>${k === C.RECOMMENDED_MODE_NEW_USER ? ' <span class="res" style="--t:var(--mint)">Recommended for new users</span>' : ''}<br><span class="small" style="font-weight:500;color:var(--text2)">${d}</span></button>`).join('')}</div>
+    <p class="muted small" style="margin:10px 0 0">Switching only changes what Quick Log and Timed Log show. Everything already logged stays exactly as recorded, and both modes feed the same history and insights.</p>`, p => {
+    p.querySelectorAll('[data-mode]').forEach(b => b.onclick = () => { setMode(b.dataset.mode); settingsSheet(); toast(`${b.dataset.mode === 'beginner' ? 'Beginner' : 'Professional'} logging is on.`, [], true); });
+  });
 }
 
 /* ── Ambient background: pastel light + procedural dappled leaf shadows ── */
@@ -1339,6 +1689,7 @@ function drawAmbient() {
 function setPressed(group, btn) { group.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b === btn)); }
 $('#ctl-theme').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; setPressed($('#ctl-theme'), b); const v = b.dataset.v; if (v === 'system') document.documentElement.removeAttribute('data-theme'); else document.documentElement.setAttribute('data-theme', v); requestAnimationFrame(drawAmbient); });
 $('#ctl-glass').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; setPressed($('#ctl-glass'), b); screen.classList.toggle('tier-solid', b.dataset.v === 'solid'); });
+$('#ctl-mode').addEventListener('click', e => { const b = e.target.closest('button'); if (b) setMode(b.dataset.v); });
 $('#ctl-motion').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; setPressed($('#ctl-motion'), b); screen.classList.toggle('reduce-motion', b.dataset.v === 'reduced'); });
 $('#ctl-jump').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; const v = b.dataset.v; if (v === 'active') { if (!walk || walk.status === 'ended') startWalk(); else go('active'); } else if (v === 'report') { reportWalk = lastDone || SAMPLE; go('report'); } else go(v); });
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => requestAnimationFrame(drawAmbient));

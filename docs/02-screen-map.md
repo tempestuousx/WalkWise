@@ -87,7 +87,7 @@ Full-screen map with the route polyline and event markers. Glass overlays:
 │ │ 1.84 mi  32:14  17'26"/mi│ │  metrics panel (tabular numerals, large)
 │ │ (Biscuit)(Juno)  [+ Dog] │ │
 │ └──────────────────────────┘ │
-│  [ ❚❚ ]     ( QUICK LOG )   [■ End] │  thumb zone
+│  [ ❚❚ ]   ( QUICK LOG ) (⏱ Timed) [■ End] │  thumb zone; running timers show above the stats panel
 └──────────────────────────────┘
 ```
 
@@ -138,6 +138,8 @@ Additional category: Voice note (hold to record, release to save; transcribed la
 Quick Log categories: Nature, Behavior, Additional. Training was moved out of Quick Log to the report card (too much to log during a walk). Default Nature events: Pee, Poop, Marking, Drinking water, Resting, Other. Sniffing was removed from the default Quick Log at your request; anyone who wants it can add it back as a custom event.
 
 Customization (Settings > Quick Log): reorder categories and events, hide defaults, add custom events and triggers, choose icons, set handedness, and choose gesture vs tap as default.
+
+> **Behavior logging update:** Beginner / Professional modes, the Timed Log beside Quick Log, behavior episodes, the post-walk "Understand My Dog" review, and the new analytics are specified in [08-behavior-observation-system.md](08-behavior-observation-system.md). They extend the screens above and below without changing Quick Log's gesture or the Nature menu.
 
 ### Walk Summary and Report Card
 1. Header: dog photo(s) and names (or "Unassigned walk" with an Assign button), date, start to end time.

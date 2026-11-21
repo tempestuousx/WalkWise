@@ -1,5 +1,7 @@
 # 3. Database Schema
 
+> Migration [`schema/0002_behavior_episodes.sql`](schema/0002_behavior_episodes.sql) adds logging modes, timed behaviors, behavior episodes, guided reviews, body-language observations and interpretations. It is backward compatible and tested against legacy data ([`schema/tests/0002_migration_test.sql`](schema/tests/0002_migration_test.sql)). Details: [08-behavior-observation-system.md](08-behavior-observation-system.md#87-data-model-migration-0002).
+
 The full DDL is in [`schema/proposed_schema.sql`](schema/proposed_schema.sql). It has been applied to Postgres 16 + PostGIS 3 locally and smoke tested for: per-user RLS isolation, rejection of spoofed `user_id`, rejection of cross-user dog references, and idempotent replay of GPS point uploads.
 
 ## 3.1 Entity map

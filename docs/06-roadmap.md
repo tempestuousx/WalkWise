@@ -50,6 +50,15 @@ Acceptance:
 - [ ] Voice note recorded offline is saved immediately and transcribed later; no network AI service is called.
 - [ ] Custom event created in Settings appears in the menu and in analytics.
 
+### Phase 3 additions: behavior observation system (doc 08)
+
+- [ ] Logging mode setting; existing users stay Professional, new users see Beginner recommended; switching never alters stored events.
+- [ ] Timed Log beside Quick Log with the same gesture; start/end times and GPS saved; unfinished timers stored as not ended with unknown duration; Quick Log usable while timers run.
+- [ ] Episode suggestions (same dog, 90 s, 40 m) that users confirm, reject, split, or reassign; ungrouping keeps every event.
+- [ ] Optional post-walk review with conditional questions, body-language indicators (Yes / No / Not sure), partial saves, and the education summary rules in 8.5.
+- [ ] Analytics separate walks, encounters, and behavior events; durations, recovery, triggers, distances, and missing data shown distinctly.
+- [ ] `node --test` logic suite and the 0002 migration test pass in CI.
+
 ## Phase 4: Profiles and reports
 
 Scope: report card Training section (ideas from logged behavior plus manual entry), Dogs directory (contacts-style), dog form, clients, profile with walking overview and Walk Behavior section, behavior drill-down to focused walk map, report card, timeline, exports (image, PDF with optional appendix), share sheet, revocable share links with expiry and route trimming, web report viewer (Edge Function rendered), professional fields (classification, price, payment status, booking source).
