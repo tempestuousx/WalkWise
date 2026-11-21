@@ -105,10 +105,23 @@ Gesture model (single continuous press-and-drag):
 
 1. **Press and hold** Quick Log for 180ms. Haptic tick. Ring 1 (categories: Nature, Behavior, Additional) springs open.
 2. **Drag** toward a category. The sector under the thumb highlights (glass brightens, icon scales). Selection haptic on each sector change.
-3. Crossing ring 1's outer radius opens **ring 2** as an outer arc with that category's events (up to 11 items; Behavior has 10 plus Other).
+3. Crossing ring 1's outer radius opens **ring 2** as an outer arc with that category's events (Nature 6, Behavior 6, Additional 3).
 4. **Release on an event**: event saved immediately with timestamp, last GPS fix, walk id, current dogs. Success haptic and a small glass toast: "Pulling logged · Add trigger".
-5. **Optional trigger, still in the same gesture**: push the thumb outward past the event ring (about 26 pt), or hold still on the event for 0.9 s while a progress line fills along it. The event "locks" into the center label and ring 2 is replaced by the trigger ring (Another dog, Person, Bicycle, Vehicle, Wildlife, Loud noise, Unfamiliar environment, Food, Unknown, custom). Release on a trigger saves event + trigger. Release in the center dead zone saves the event without a trigger.
+5. **Optional trigger, still in the same gesture**: push the thumb outward past the event ring (about 26 pt), or hold still on the event for 0.9 s while a progress line fills along it. The event "locks" into the center label and ring 2 is replaced by the behavior's **slide-out**: **Dog, Human, Other**. Release on an option saves the behavior with that trigger. Release in the center dead zone saves it without one; the slide-out is always optional.
 5b. **Detail rings for specific events**: some events have their own nested ring instead of the trigger ring, reached the same way (push out, or hold still for 0.9 s). **Poop** opens a **Consistency** ring: Normal, Soft, Runny. Release on an option saves Poop with that consistency; release in the center saves Poop without one. Consistency is optional, can be added later from the toast chip or the report, and appears in the report breakdown (for example "Poop: 3 events, Normal 2 · Soft 1"). In tap mode, tapping Poop opens the Consistency ring as the next level and tapping the center logs it without one. The mechanism is data driven (`event_type_details`), so other events can get detail rings later without new code.
+5c. **Behavior list and slide-outs** (updated per the Behavior Logging Updates request; this is the complete list, so Calm, Jumping, Lunging, Freezing, Distraction, Loose-leash walking and Behavior "Other" are removed):
+
+   | Behavior | Slide-out options |
+   |---|---|
+   | Pulling | None (release logs it) |
+   | Reactivity | Dog, Human, Other |
+   | Resource Guarding | Dog, Human, Other |
+   | Fear / Anxiety | Dog, Human, Other |
+   | Aggression | Dog, Human, Other |
+   | Barking | Dog, Human, Other |
+
+   "Human" is used everywhere in the app, never "Person" or "People". In tap mode, tapping a behavior reveals its slide-out (tapping the center logs it with no trigger); tapping Pulling logs it immediately.
+5d. **Other → "What triggered this behavior?"**: when Other is chosen, the behavior is saved right away with its timestamp and GPS location, exactly like any other log. Then a small glass card appears above the map (no dimmed backdrop, the walk stays fully usable) with a multiline text box: "What triggered this behavior?" Save stores the text with that event (`walk_events.trigger_description`); Skip, or starting another Quick Log, leaves it blank. The keyboard's dictation works in the box. The description shows in the timeline, the map marker details, the dog's behavior history, and shared reports (for example: Reactivity · Other: "Skateboard rolling past"). It can be added or edited later from the report.
 6. **Cancel**: drag back into the center dead zone and release, or drag off-screen. A "Cancelled" toast confirms nothing was saved.
 7. Releasing on a category (without reaching ring 2) switches to **tap mode** with that category open.
 
@@ -131,10 +144,10 @@ Customization (Settings > Quick Log): reorder categories and events, hide defaul
 2. Hero stats: duration, distance, pace, walker steps (measured or labeled estimate).
 3. **Interactive route map**: route plus every event marker visible immediately, category legend, clusters for overlapping events that expand to a stacked list.
 4a. **Training** (recorded after the walk, not in Quick Log): a list of what the walker worked on, each with an optional result (Went well, Mixed, Needs work), an optional note, and the dogs it applies to. Two ways to add:
-   - **Ideas from this walk**: up to four practice ideas picked from what was logged, each showing why (for example "Heel · Logged: Pulling 3"). Tap one to record it; recorded ideas disappear from the list. Ideas come from simple, editable rules (Pulling → Heel, Loose-leash practice; Lunging, Barking, Reactivity → Leave it, Redirection; Jumping → Sit; Distraction → Responded to cue, Recall). They are labeled as suggestions, not a training plan, and are never included in shared reports.
+   - **Ideas from this walk**: up to four practice ideas picked from what was logged, each showing why (for example "Heel · Logged: Pulling 3"). Tap one to record it; recorded ideas disappear from the list. Ideas come from simple, editable rules (Pulling → Heel, Loose-leash practice; Reactivity, Barking → Redirection, Leave it). No ideas are generated for Resource Guarding, Fear / Anxiety, or Aggression, which call for a qualified trainer or behavior professional rather than an app suggestion. They are labeled as suggestions, not a training plan, and are never included in shared reports.
    - **Add**: pick from Heel, Loose-leash practice, Leave it, Redirection, Recall, Sit, Responded to cue, or Other with your own name.
    Recorded training is part of the shared report. Training recorded before a dog is assigned is attributed when the dog is assigned.
-4. Behavior breakdown: totals by category, then per event type ("Pulling: 4 incidents", "Loose-leash walking: 6 observations").
+4. Behavior breakdown: totals by category, then per event type ("Pulling: 4 incidents", "Reactivity: 3 incidents, Dog 2 · Other 1").
 5. Weather strip: start and end conditions, high/low, wind, UV, any alert. "Weather unavailable" or "Entered manually" when relevant.
 6. Timeline: chronological events; tapping one focuses the map on it.
 7. Photos, walker notes, classification and business fields (professional mode only).

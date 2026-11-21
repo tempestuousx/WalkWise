@@ -40,6 +40,9 @@ Acceptance:
 - [ ] Gesture runs at 60 fps (120 on ProMotion) with no JS-thread dependency during the drag (verified with the performance monitor).
 - [ ] Event saved on release even when offline and with no dog assigned; timestamp and nearest fix (with fix age) recorded.
 - [ ] Triggers and outcomes are never required; release in the dead zone after dwell saves the event without trigger.
+- [ ] Behavior ring shows exactly Pulling, Reactivity, Resource Guarding, Fear / Anxiety, Aggression, Barking; all but Pulling offer an optional Dog / Human / Other slide-out by gesture and by tap.
+- [ ] Choosing Other saves the event first, then shows "What triggered this behavior?"; the text is optional, skippable, stored on that event (with its time and GPS), and appears in history and shared reports.
+- [ ] The word "Person" or "People" appears nowhere in the UI; "Human" is used.
 - [ ] Lingering under 0.9 s never opens a nested ring; resting a thumb on the line between two options does not flip between them.
 - [ ] Poop can be logged as Normal, Soft, or Runny in one gesture (hold on Poop) or in tap mode, and without a consistency; the report shows the consistency counts.
 - [ ] VoiceOver and TalkBack users can log every event type through the list alternative.

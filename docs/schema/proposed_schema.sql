@@ -293,6 +293,7 @@ create table public.walk_events (
   geog               geography(Point, 4326)
                        generated always as (case when lat is null then null
                          else st_setsrid(st_makepoint(lng, lat), 4326)::geography end) stored,
+  trigger_description text,              -- optional free text after choosing the 'Other' trigger
   note               text,
   source             public.event_source not null,
   created_at         timestamptz not null default now(),

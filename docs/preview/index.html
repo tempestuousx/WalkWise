@@ -320,6 +320,8 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
 .tr-input { width: 100%; margin-top: 10px; padding: 12px 16px; border-radius: 18px; font: inherit; color: var(--text); outline: none; resize: vertical; }
 .tr-input::placeholder { color: var(--text3); }
 textarea.tr-input { border-radius: 18px; }
+.why { position: absolute; left: 12px; right: 12px; top: 100px; z-index: 62; padding: 14px 16px; border-radius: 26px; display: grid; gap: 4px; animation: toastin 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.why.low { top: auto; bottom: 104px; }
 .pop { position: absolute; z-index: 65; width: 240px; padding: 12px 14px; border-radius: 20px; font-size: 13.5px; animation: toastin 0.28s cubic-bezier(0.34, 1.56, 0.64, 1); }
 .pop dl { margin: 6px 0 0; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 3px 10px; }
 .pop dt { color: var(--text2); font-weight: 600; }
@@ -401,7 +403,7 @@ textarea.tr-input { border-radius: 18px; }
     <ol class="try">
       <li>Tap <b>Start</b>. The walk is simulated and runs 6 times faster than real time.</li>
       <li><b>Press and hold Quick Log</b>, slide up into a category, keep sliding outward onto an event, and let go to log it.</li>
-      <li>On a <b>Behavior</b> or <b>Training</b> event, hold still for a moment to get the trigger ring. Drag down to cancel.</li>
+      <li>On a <b>Behavior</b> (all except Pulling), push your thumb further out or hold still to pick <b>Dog, Human, or Other</b>. Pick Other and you can type what triggered it. Drag down to cancel.</li>
       <li><b>Tap</b> Quick Log instead to use the tap-only menu.</li>
       <li><b>Hold End</b> to finish. With no dog assigned you get the "Who did you walk?" step, then the report card.</li>
     </ol>
@@ -494,13 +496,16 @@ const icon = (n, extra = '') => `<svg class="icon" viewBox="0 0 24 24" aria-hidd
 /* ── Taxonomy ── */
 const CATS = [
   { key: 'nature', name: 'Nature', c: '--c-nature', shape: 'circle', trig: false, items: [['pee','Pee','Pee'],['poop','Poop','Poop'],['marking','Marking','Mark'],['drinking','Drinking water','Drink'],['resting','Resting','Rest'],['n-other','Other','Other']] },
-  { key: 'behavior', name: 'Behavior', c: '--c-behavior', shape: 'tri', trig: true, items: [['pulling','Pulling','Pull'],['barking','Barking','Bark'],['lunging','Lunging','Lunge'],['jumping','Jumping','Jump'],['freezing','Freezing','Freeze'],['reactivity','Reactivity','React'],['distraction','Distraction','Distract'],['loose','Loose-leash walking','Loose'],['calm','Calm behavior','Calm'],['b-other','Other','Other']] },
+  { key: 'behavior', name: 'Behavior', c: '--c-behavior', shape: 'tri', trig: true, items: [['pulling','Pulling','Pulling'],['reactivity','Reactivity','Reactivity'],['guarding','Resource Guarding','Guarding'],['fear','Fear / Anxiety','Fear'],['aggression','Aggression','Aggression'],['barking','Barking','Barking']] },
   { key: 'custom', name: 'Additional', c: '--c-custom', shape: 'diamond', trig: false, items: [['voice','Voice note','Voice'],['photo','Photo','Photo'],['custom','Custom event','Custom']] },
 ];
 const TYPE = {}; CATS.forEach((c, ci) => c.items.forEach(([k, n, s]) => TYPE[k] = { key: k, name: n, short: s, cat: c, ci }));
-const NOUN = k => { const c = TYPE[k].cat.key; if (c === 'behavior') return (k === 'loose' || k === 'calm') ? 'observation' : 'incident'; if (c === 'training') return 'observation'; return 'event'; };
+const NOUN = k => { const c = TYPE[k].cat.key; if (c === 'behavior') return 'incident'; if (c === 'training') return 'observation'; return 'event'; };
 const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
-const TRIGGERS = [['Another dog','Dog'],['Person','Person'],['Bicycle','Bike'],['Vehicle','Vehicle'],['Wildlife','Wildlife'],['Loud noise','Noise'],['Unfamiliar environment','New place'],['Food','Food'],['Unknown','Unknown']];
+// Behavior slide-out: who or what it was directed at. 'Human' is used everywhere (never Person/People).
+const TRIGGERS = [['Dog', 'Dog'], ['Human', 'Human'], ['Other', 'Other']];
+const NO_TRIGGER = new Set(['pulling']);
+const trigText = e => !e.trigger ? '' : e.trigger === 'Other' && e.triggerText ? `Other: “${e.triggerText}”` : e.trigger;
 const OUTCOMES = ['Successfully redirected', 'Continued behavior', 'Settled independently', 'Required assistance'];
 // Training is recorded on the report card after the walk, not in Quick Log.
 const TRAINING = [['heel', 'Heel'], ['loose-practice', 'Loose-leash practice'], ['leaveit', 'Leave it'], ['redirect', 'Redirection'], ['recall', 'Recall'], ['sit', 'Sit'], ['cue', 'Responded to cue'], ['t-other', 'Other']];
@@ -508,7 +513,8 @@ const TR = Object.fromEntries(TRAINING);
 const RESULTS = [['well', 'Went well', '--mint'], ['mixed', 'Mixed', '--peach'], ['work', 'Needs work', '--blush']];
 const RES = Object.fromEntries(RESULTS.map(r => [r[0], r]));
 // Which practice ideas to show for which logged behaviors. Simple, editable rules; not advice.
-const TRAIN_RULES = { pulling: ['heel', 'loose-practice'], lunging: ['leaveit', 'redirect'], barking: ['redirect', 'leaveit'], reactivity: ['redirect', 'leaveit'], jumping: ['sit'], distraction: ['cue', 'recall'] };
+// No ideas are generated for Resource Guarding, Fear / Anxiety or Aggression: those warrant a professional, not an app suggestion.
+const TRAIN_RULES = { pulling: ['heel', 'loose-practice'], reactivity: ['redirect', 'leaveit'], barking: ['redirect', 'leaveit'] };
 function suggestTraining(w) {
   const from = {};
   w.events.forEach(e => (TRAIN_RULES[e.key] || []).forEach(t => { from[t] = from[t] || {}; from[t][e.key] = (from[t][e.key] || 0) + 1; }));
@@ -520,7 +526,7 @@ function suggestTraining(w) {
 // Nested detail rings for specific event types (optional, like triggers).
 const DETAILS = { poop: { label: 'Consistency', opts: [['Normal', 'Normal'], ['Soft', 'Soft'], ['Runny', 'Runny']] } };
 const deepFor = k => DETAILS[k] ? { kind: 'detail', label: DETAILS[k].label, opts: DETAILS[k].opts, c: TYPE[k].cat.c }
-  : (TYPE[k].cat.trig && k.indexOf('other') === -1 ? { kind: 'trigger', label: 'Trigger', opts: TRIGGERS, c: '--lav' } : null);
+  : (TYPE[k].cat.trig && !NO_TRIGGER.has(k) ? { kind: 'trigger', label: 'Trigger', opts: TRIGGERS, c: '--lav' } : null);
 
 /* ── Sample dogs ── */
 const DOGS = [
@@ -612,10 +618,12 @@ function jitter([x, y], seed) { const a = (seed * 137.5) % 360 * Math.PI / 180; 
 function sampleWalk() {
   const start = new Date(); start.setHours(17, 12, 0, 0);
   const evs = [
-    ['marking', 60, 140], ['pee', 140, 260, ], ['pulling', 250, 420, { trigger: 'Another dog', outcome: 'Successfully redirected' }],
-    ['loose', 420, 700], ['barking', 520, 830, { trigger: 'Bicycle', outcome: 'Settled independently' }], ['lunging', 600, 980, { trigger: 'Another dog', outcome: 'Successfully redirected' }],
-    ['poop', 760, 1240, { detail: 'Normal' }], ['pulling', 900, 1480, { trigger: 'Wildlife', outcome: 'Continued behavior', note: 'Squirrel on the fence line.' }],
-    ['loose', 1040, 1700], ['jumping', 1180, 1900, { trigger: 'Person' }], ['pulling', 1300, 2080, { trigger: 'Another dog' }], ['poop', 1360, 2200, { detail: 'Soft' }], ['drinking', 1400, 2300], ['calm', 1500, 2480],
+    ['marking', 60, 140], ['pee', 140, 260], ['pulling', 250, 420, { outcome: 'Successfully redirected' }],
+    ['barking', 520, 830, { trigger: 'Other', triggerText: 'Bicycle passing close on the sidewalk', outcome: 'Settled independently' }],
+    ['reactivity', 600, 980, { trigger: 'Dog', outcome: 'Successfully redirected' }], ['poop', 760, 1240, { detail: 'Normal' }],
+    ['pulling', 900, 1480, { note: 'Squirrel on the fence line.' }], ['fear', 1040, 1700, { trigger: 'Other', triggerText: 'Garbage truck brakes hissing' }],
+    ['barking', 1180, 1900, { trigger: 'Human' }], ['pulling', 1300, 2080], ['poop', 1360, 2200, { detail: 'Soft' }], ['drinking', 1400, 2300],
+    ['guarding', 1500, 2480, { trigger: 'Dog', note: 'Stick at the park entrance.' }],
   ];
   return { id: 'sample', sample: true, start, sim: 2580, distM: ROUTE_M, u: TOTAL, dogs: ['juno', 'maple'], cls: 'Private client',
     training: [{ id: 'tr1', key: 'heel', name: 'Heel', result: 'mixed', note: 'Better after the park loop.', source: 'suggested', dogs: ['juno', 'maple'] }],
@@ -652,7 +660,7 @@ function closePop() { $('.pop', screen)?.remove(); }
 /* ── Navigation ── */
 const VIEWS = ['home', 'active', 'report', 'calendar', 'dogs', 'profile', 'insights'];
 function go(name, opts = {}) {
-  current = name; closePop(); closeSheet(); closeRadial();
+  current = name; closePop(); closeSheet(); closeRadial(); closeWhy();
   VIEWS.forEach(v => { $('#v-' + v).hidden = v !== name; });
   $('#tabbar').hidden = name === 'active' || name === 'profile';
   document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-current', t.dataset.tab === name ? 'page' : 'false'));
@@ -707,7 +715,7 @@ function renderHome() {
   const unassigned = lastDone && !lastDone.dogs.length;
   const counts = {}; recent.events.forEach(e => counts[e.key] = (counts[e.key] || 0) + 1);
   const chips = Object.entries(counts).slice(0, 5).map(([k, n]) => `<span class="ev-chip" style="--c:var(${TYPE[k].cat.c})">${esc(TYPE[k].short)} ${n}</span>`).join('');
-  const obs = [...recent.events].reverse().slice(0, 4).map(e => { const t = TYPE[e.key]; return `<button class="li" data-open-ev="${e.id}"><svg class="shape" viewBox="-10 -10 20 20">${shapeSvg(t.cat.shape, 0, 0, t.cat.c, '', 'stroke="none"')}</svg><span class="grow"><span class="t1">${esc(t.name)}</span><br><span class="t2">${e.detail ? esc(e.detail) + ' · ' : ''}${e.trigger ? 'Trigger: ' + esc(e.trigger) + ' · ' : ''}${clock(new Date(recent.start.getTime() + e.t * 1000))}${e.dogs && e.dogs.length ? ' · ' + dogNames(e.dogs) : ''}</span></span></button>`; }).join('') || '<p class="muted small" style="margin:6px 0">Nothing logged on this walk.</p>';
+  const obs = [...recent.events].reverse().slice(0, 4).map(e => { const t = TYPE[e.key]; return `<button class="li" data-open-ev="${e.id}"><svg class="shape" viewBox="-10 -10 20 20">${shapeSvg(t.cat.shape, 0, 0, t.cat.c, '', 'stroke="none"')}</svg><span class="grow"><span class="t1">${esc(t.name)}</span><br><span class="t2">${e.detail ? esc(e.detail) + ' · ' : ''}${e.trigger ? esc(trigText(e)) + ' · ' : ''}${clock(new Date(recent.start.getTime() + e.t * 1000))}${e.dogs && e.dogs.length ? ' · ' + dogNames(e.dogs) : ''}</span></span></button>`; }).join('') || '<p class="muted small" style="margin:6px 0">Nothing logged on this walk.</p>';
   $('#v-home').innerHTML = `
     <div class="stack">
       <div class="greet"><div><p class="h-sec" style="margin-bottom:2px">${dateLong(new Date())}</p><h1 class="h-title">${hello}</h1></div>
@@ -956,15 +964,15 @@ function onTapRadial(e) {
   if (ring === '1') { R.cat = i; R.level = 2; R.hover = null; drawRadial(false, true); return; }
   if (ring === '2') {
     const k = CATS[R.cat].items[i][0];
-    // Tap mode opens detail rings (consistency) as the next level; triggers stay a post-log chip to keep taps low.
-    if (DETAILS[k]) { R.locked = k; R.level = 'deep'; R.hover = null; drawRadial(); return; }
+    // Tap mode: tapping an event with a slide-out (behavior target, poop consistency) reveals it; tap the center to log without.
+    if (deepFor(k)) { R.locked = k; R.level = 'deep'; R.hover = null; drawRadial(); return; }
     closeRadial(); logEvent(k, null);
   }
 }
 function bindQuickLog(btn) {
   btn.addEventListener('pointerdown', e => {
     e.preventDefault(); try { btn.setPointerCapture(e.pointerId); } catch (_) {}
-    gs = { x0: e.clientX, y0: e.clientY, opened: false };
+    closeWhy(); gs = { x0: e.clientX, y0: e.clientY, opened: false };
     btn.style.transform = 'scale(0.94)';
     holdT = setTimeout(() => { if (gs) { gs.opened = true; openRadial('gesture'); buzz(); } }, 180);
   });
@@ -987,14 +995,35 @@ function logEvent(key, trigger, detail = null) {
   if (t.cat.trig && !trigger) acts.push({ label: 'Add trigger', run: () => pickFor(ev, 'trigger') });
   if (t.cat.trig) acts.push({ label: 'Outcome', run: () => pickFor(ev, 'outcome') });
   acts.push({ label: 'Undo', run: () => { walk.events = walk.events.filter(x => x !== ev); refreshLiveMap(); toast('Removed.'); } });
+  if (trigger === 'Other') { askWhy(ev); return; }
   toast(`<b>${esc(t.name)}</b> logged${detail ? ' · ' + esc(detail) : ''}${trigger ? ' · ' + esc(trigger) : ''}`, acts);
 }
+// After an 'Other' behavior is logged (already saved with time and GPS), ask what triggered it. Optional; never blocks the walk.
+function askWhy(ev) {
+  closeWhy(); $('.toast', screen)?.remove(); clearTimeout(toastTimer);
+  const inWalk = current === 'active';
+  const card = document.createElement('div');
+  card.className = 'why g lv-panel ' + (inWalk ? 'outdoor' : 'low');
+  card.setAttribute('role', 'dialog'); card.setAttribute('aria-labelledby', 'why-q');
+  card.innerHTML = `<p class="small" style="margin:0 0 2px"><b>${esc(TYPE[ev.key].name)}</b> logged · Other</p>
+    <label id="why-q" for="why-text" style="font-weight:800;font-size:16px">What triggered this behavior?</label>
+    <textarea class="tr-input g" id="why-text" rows="3" placeholder="Optional. For example: skateboard rolling past">${esc(ev.triggerText || '')}</textarea>
+    <div class="row" style="justify-content:flex-end;gap:8px;margin-top:10px"><button class="btn press" id="why-skip">Skip</button><button class="btn primary g tint press" id="why-save">Save</button></div>`;
+  screen.appendChild(card);
+  $('#why-skip', card).onclick = () => { closeWhy(); toast(`<b>${esc(TYPE[ev.key].name)}</b> saved · Other`); };
+  $('#why-save', card).onclick = () => {
+    const v = $('#why-text', card).value.trim(); ev.triggerText = v || null; closeWhy();
+    toast(v ? 'Trigger description saved.' : `<b>${esc(TYPE[ev.key].name)}</b> saved · Other`);
+    if (current === 'report') { const st = $('#v-report').scrollTop; renderReport(); $('#v-report').scrollTop = st; }
+  };
+}
+function closeWhy() { $('.why', screen)?.remove(); }
 function pickFor(ev, field) {
   const opts = field === 'trigger' ? TRIGGERS.map(t => t[0]) : field === 'detail' ? DETAILS[ev.key].opts.map(o => o[0]) : OUTCOMES;
   const title = field === 'trigger' ? 'Trigger' : field === 'detail' ? DETAILS[ev.key].label : 'Outcome';
   sheet(`<h3>${title} <span class="muted small" style="font-weight:600">(optional)</span></h3><p class="muted small" style="margin:0 0 12px">For ${esc(TYPE[ev.key].name)}. You can also edit this later from the report.</p>
     <div style="display:flex;flex-wrap:wrap;gap:8px">${opts.map((o, i) => `<button class="chip g lv-control press" data-o="${i}">${esc(o)}</button>`).join('')}</div>`, p => {
-    p.querySelectorAll('[data-o]').forEach(b => b.onclick = () => { ev[field] = opts[+b.dataset.o]; closeSheet(); toast(`${title} saved: ${esc(ev[field])}`); });
+    p.querySelectorAll('[data-o]').forEach(b => b.onclick = () => { ev[field] = opts[+b.dataset.o]; closeSheet(); if (field === 'trigger' && ev[field] === 'Other') { askWhy(ev); return; } if (field === 'trigger') ev.triggerText = null; toast(`${title} saved: ${esc(ev[field])}`); if (current === 'report') { const st = $('#v-report').scrollTop; renderReport(); $('#v-report').scrollTop = st; } });
   });
 }
 
@@ -1004,7 +1033,7 @@ function renderReport(opts = {}) {
   const end = new Date(w.start.getTime() + w.sim * 1000);
   const byCat = CATS.map(c => ({ c, rows: Object.entries(w.events.filter(e => TYPE[e.key].cat === c).reduce((a, e) => (a[e.key] = (a[e.key] || 0) + 1, a), {})) })).filter(x => x.rows.length);
   const steps = Math.round(miles(w.distM) * 2100);
-  const timeline = [...w.events].sort((a, b) => a.t - b.t).map(e => { const t = TYPE[e.key]; return `<button class="li" data-tl="${e.id}"><svg class="shape" viewBox="-10 -10 20 20">${shapeSvg(t.cat.shape, 0, 0, t.cat.c, '', 'stroke="none"')}</svg><span class="grow"><span class="t1">${esc(t.name)}</span><br><span class="t2">${clock(new Date(w.start.getTime() + e.t * 1000))}${e.detail ? ' · ' + esc(e.detail) : ''}${e.trigger ? ' · ' + esc(e.trigger) : ''}${e.outcome ? ' · ' + esc(e.outcome) : ''}</span></span>${icon('chev')}</button>`; }).join('');
+  const timeline = [...w.events].sort((a, b) => a.t - b.t).map(e => { const t = TYPE[e.key]; return `<button class="li" data-tl="${e.id}"><svg class="shape" viewBox="-10 -10 20 20">${shapeSvg(t.cat.shape, 0, 0, t.cat.c, '', 'stroke="none"')}</svg><span class="grow"><span class="t1">${esc(t.name)}</span><br><span class="t2">${clock(new Date(w.start.getTime() + e.t * 1000))}${e.detail ? ' · ' + esc(e.detail) : ''}${e.trigger ? ' · ' + esc(trigText(e)) : ''}${e.outcome ? ' · ' + esc(e.outcome) : ''}</span></span>${icon('chev')}</button>`; }).join('');
   $('#v-report').innerHTML = `
     <div class="stack">
       <div class="topbar"><button class="icon-btn g lv-orb press" id="r-back" aria-label="Back">${icon('back')}</button><span class="h-sec" style="flex:1">Walk report</span>${w.sample ? '<span class="sample">Sample</span>' : ''}</div>
@@ -1102,6 +1131,11 @@ function trainingSheet(w, preset = null, existing = null) {
   });
 }
 function detailLine(w, k) {
+  if (deepFor(k) && deepFor(k).kind === 'trigger') {
+    const evs = w.events.filter(e => e.key === k), parts = TRIGGERS.map(([o]) => [o, evs.filter(e => e.trigger === o).length]).filter(x => x[1]);
+    const none = evs.filter(e => !e.trigger).length;
+    return parts.length ? `<div class="muted small" style="margin:-4px 0 4px">${parts.map(([o, n]) => `${o} ${n}`).join(' · ')}${none ? ` · no trigger ${none}` : ''}</div>` : '';
+  }
   if (!DETAILS[k]) return '';
   const evs = w.events.filter(e => e.key === k), counts = DETAILS[k].opts.map(([o]) => [o, evs.filter(e => e.detail === o).length]).filter(x => x[1]);
   const none = evs.filter(e => !e.detail).length;
@@ -1114,7 +1148,7 @@ function showPop(w, items, anchor) {
   const p = document.createElement('div'); p.className = 'pop g lv-card'; p.setAttribute('role', 'dialog');
   p.innerHTML = items.map((e, i) => { const t = TYPE[e.key]; return `${i ? '<hr style="border:0;border-top:1px solid var(--glass-border);margin:10px 0">' : ''}<div class="row" style="gap:8px"><svg class="shape" viewBox="-10 -10 20 20">${shapeSvg(t.cat.shape, 0, 0, t.cat.c, '', 'stroke="none"')}</svg><b>${esc(t.name)}</b></div>
     <dl><dt>Time</dt><dd>${clock(new Date(w.start.getTime() + e.t * 1000))}</dd><dt>Dog</dt><dd>${e.dogs && e.dogs.length ? dogNames(e.dogs) : 'Not assigned'}</dd>
-    ${e.detail ? `<dt>${esc(DETAILS[e.key].label)}</dt><dd>${esc(e.detail)}</dd>` : ''}${e.trigger ? `<dt>Trigger</dt><dd>${esc(e.trigger)}</dd>` : ''}${e.outcome ? `<dt>Outcome</dt><dd>${esc(e.outcome)}</dd>` : ''}${e.note ? `<dt>Note</dt><dd>${esc(e.note)}</dd>` : ''}</dl>`; }).join('');
+    ${e.detail ? `<dt>${esc(DETAILS[e.key].label)}</dt><dd>${esc(e.detail)}</dd>` : ''}${e.trigger ? `<dt>Trigger</dt><dd>${esc(e.trigger)}</dd>` : ''}${e.triggerText ? `<dt>What triggered it</dt><dd>${esc(e.triggerText)}</dd>` : ''}${e.outcome ? `<dt>Outcome</dt><dd>${esc(e.outcome)}</dd>` : ''}${e.note ? `<dt>Note</dt><dd>${esc(e.note)}</dd>` : ''}</dl>`; }).join('');
   screen.appendChild(p);
   const pw = p.offsetWidth, ph = p.offsetHeight;
   let left = ar.left + ar.width / 2 - sr.left - pw / 2; left = Math.max(10, Math.min(sr.width - pw - 10, left));
@@ -1203,12 +1237,12 @@ function renderDogs() {
 /* ── Dog profile ── */
 let profileId = 'juno'; let openBeh = null;
 const BEH = {
-  juno: [['pulling', 12, [3, 2, 2, 1, 2, 1, 1, 0]], ['barking', 7, [1, 2, 1, 1, 0, 1, 1, 0]], ['loose', 18, [1, 2, 2, 3, 2, 3, 2, 3]], ['lunging', 5, [1, 1, 0, 1, 1, 0, 1, 0]]],
-  maple: [['loose', 22, [2, 3, 3, 3, 2, 3, 3, 3]], ['marking', 31, [4, 3, 4, 5, 3, 4, 4, 4]], ['freezing', 4, [1, 0, 1, 0, 1, 0, 1, 0]]],
-  biscuit: [['jumping', 6, [2, 1, 1, 1, 0, 1, 0, 0]], ['pulling', 9, [2, 2, 1, 1, 1, 1, 1, 0]], ['calm', 14, [1, 1, 2, 2, 2, 2, 2, 2]]],
-  olive: [['freezing', 5, [1, 1, 0, 1, 0, 1, 1, 0]], ['loose', 16, [2, 2, 2, 2, 2, 2, 2, 2]]],
-  pepper: [['barking', 11, [2, 2, 1, 2, 1, 1, 1, 1]], ['reactivity', 6, [1, 1, 1, 1, 0, 1, 1, 0]], ['jumping', 8, [2, 1, 1, 1, 1, 1, 1, 0]]],
-  ziggy: [['marking', 40, [5, 5, 4, 6, 5, 5, 5, 5]], ['distraction', 13, [3, 2, 2, 2, 1, 1, 1, 1]], ['pulling', 9, [2, 1, 2, 1, 1, 1, 1, 0]]],
+  juno: [['pulling', 12, [3, 2, 2, 1, 2, 1, 1, 0]], ['barking', 7, [1, 2, 1, 1, 0, 1, 1, 0]], ['reactivity', 5, [1, 1, 0, 1, 1, 0, 1, 0]], ['fear', 3, [1, 0, 0, 1, 0, 1, 0, 0]]],
+  maple: [['marking', 31, [4, 3, 4, 5, 3, 4, 4, 4]], ['pulling', 6, [1, 1, 1, 0, 1, 1, 1, 0]], ['guarding', 3, [0, 1, 0, 1, 0, 0, 1, 0]]],
+  biscuit: [['pulling', 9, [2, 2, 1, 1, 1, 1, 1, 0]], ['barking', 4, [1, 0, 1, 1, 0, 1, 0, 0]]],
+  olive: [['fear', 5, [1, 1, 0, 1, 0, 1, 1, 0]], ['reactivity', 3, [1, 0, 1, 0, 0, 1, 0, 0]]],
+  pepper: [['barking', 11, [2, 2, 1, 2, 1, 1, 1, 1]], ['reactivity', 6, [1, 1, 1, 1, 0, 1, 1, 0]], ['aggression', 2, [0, 1, 0, 0, 1, 0, 0, 0]]],
+  ziggy: [['marking', 40, [5, 5, 4, 6, 5, 5, 5, 5]], ['pulling', 9, [2, 1, 2, 1, 1, 1, 1, 0]]],
 };
 const OVER = { juno: [58, 71.4, 39.8], maple: [52, 60.2, 37.1], biscuit: [96, 118.0, 62.5], olive: [21, 31.6, 13.2], pepper: [30, 22.4, 15.9], ziggy: [44, 49.7, 30.3] };
 function renderProfile() {
@@ -1218,7 +1252,7 @@ function renderProfile() {
     const t = TYPE[k], mx = Math.max(...s, 1);
     const open = openBeh === k;
     const hist = SAMPLE.events.filter(e => e.key === k).slice(0, 3);
-    const inc = !open ? '' : !hist.length ? '<p class="muted small" style="margin:0 0 10px 26px">The preview only has detailed history for Juno and Maple\'s sample walk.</p>' : `<div class="incidents">${hist.map(e => `<button class="incident g" data-inc="${e.id}"><b>Today · ${clock(new Date(SAMPLE.start.getTime() + e.t * 1000))}</b><span class="muted">Trigger: ${esc(e.trigger || 'not recorded')} · Outcome: ${esc(e.outcome || 'not recorded')}</span><span class="muted">Open on the walk map ›</span></button>`).join('')}</div>`;
+    const inc = !open ? '' : !hist.length ? '<p class="muted small" style="margin:0 0 10px 26px">The preview only has detailed history for Juno and Maple\'s sample walk.</p>' : `<div class="incidents">${hist.map(e => `<button class="incident g" data-inc="${e.id}"><b>Today · ${clock(new Date(SAMPLE.start.getTime() + e.t * 1000))}</b><span class="muted">Trigger: ${esc(trigText(e) || 'not recorded')} · Outcome: ${esc(e.outcome || 'not recorded')}</span><span class="muted">Open on the walk map ›</span></button>`).join('')}</div>`;
     return `<button class="li beh" data-beh="${k}" aria-expanded="${open}"><svg class="shape" viewBox="-10 -10 20 20">${shapeSvg(t.cat.shape, 0, 0, t.cat.c, '', 'stroke="none"')}</svg><span class="grow"><span class="t1">${esc(t.name)}</span><br><span class="t2">${plural(n, NOUN(k))} recorded</span></span><span class="spark" style="--c:var(${t.cat.c})" aria-hidden="true">${s.map(v => `<i style="height:${Math.max(8, v / mx * 100)}%"></i>`).join('')}</span>${icon(open ? 'down' : 'chev')}</button>${inc}`;
   }).join('');
   $('#v-profile').innerHTML = `
@@ -1257,9 +1291,9 @@ function renderProfile() {
 /* ── Insights (sample data) ── */
 let insRange = 'month';
 const INS = {
-  week: { label: 'week', exposure: [6, 8.4, 3.2], x: ['Mon', 'Wed', 'Fri', 'Sun'], rows: [['pulling', 9, [1, 2, 1, 2, 0, 2, 1], 'Another dog (5)'], ['barking', 4, [0, 1, 1, 0, 1, 1, 0], 'Bicycle (2)'], ['loose', 14, [2, 2, 1, 3, 2, 2, 2], 'n/a']] },
-  month: { label: 'month', exposure: [27, 36.9, 14.6], x: ['Wk 1', 'Wk 2', 'Wk 3', 'Wk 4'], rows: [['pulling', 31, [11, 8, 7, 5], 'Another dog (14)'], ['barking', 17, [5, 5, 4, 3], 'Bicycle (6)'], ['loose', 52, [9, 12, 14, 17], 'n/a']] },
-  year: { label: 'year', exposure: [302, 418.5, 166.0], x: ['Jan', 'Apr', 'Jul', 'Oct'], rows: [['pulling', 284, [34, 31, 30, 28, 27, 25, 24, 22, 21, 18, 14, 10], 'Another dog (121)'], ['barking', 176, [18, 17, 16, 16, 15, 15, 14, 14, 13, 13, 13, 12], 'Bicycle (58)'], ['loose', 498, [22, 28, 33, 36, 40, 42, 45, 47, 49, 51, 52, 53], 'n/a']] },
+  week: { label: 'week', exposure: [6, 8.4, 3.2], x: ['Mon', 'Wed', 'Fri', 'Sun'], rows: [['pulling', 9, [1, 2, 1, 2, 0, 2, 1], 'n/a'], ['barking', 4, [0, 1, 1, 0, 1, 1, 0], 'Human (2)'], ['reactivity', 5, [1, 0, 1, 1, 0, 1, 1], 'Dog (3)']] },
+  month: { label: 'month', exposure: [27, 36.9, 14.6], x: ['Wk 1', 'Wk 2', 'Wk 3', 'Wk 4'], rows: [['pulling', 31, [11, 8, 7, 5], 'n/a'], ['barking', 17, [5, 5, 4, 3], 'Human (7)'], ['reactivity', 19, [6, 5, 4, 4], 'Dog (12)']] },
+  year: { label: 'year', exposure: [302, 418.5, 166.0], x: ['Jan', 'Apr', 'Jul', 'Oct'], rows: [['pulling', 284, [34, 31, 30, 28, 27, 25, 24, 22, 21, 18, 14, 10], 'n/a'], ['barking', 176, [18, 17, 16, 16, 15, 15, 14, 14, 13, 13, 13, 12], 'Human (71)'], ['reactivity', 203, [22, 20, 19, 18, 18, 17, 17, 16, 15, 14, 14, 13], 'Dog (118)']] },
 };
 function renderInsights() {
   const D = INS[insRange], [walks, mi, hrs] = D.exposure;
