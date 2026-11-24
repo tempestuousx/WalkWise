@@ -16,6 +16,8 @@ export interface JobFilters {
   /** Max miles from originZip. null = any distance. */
   distance: number | null;
   originZip: string | null;
+  /** Overrides originZip, e.g. the center of a searched city. */
+  originPoint: { lat: number; lng: number } | null;
   payMin: number | null;
   date: DateWindow;
   workType: WorkType;
@@ -31,6 +33,7 @@ export const EMPTY_FILTERS: JobFilters = {
   zips: null,
   distance: null,
   originZip: null,
+  originPoint: null,
   payMin: null,
   date: 'any',
   workType: 'any',
@@ -38,11 +41,11 @@ export const EMPTY_FILTERS: JobFilters = {
   sort: 'relevant',
 };
 
-/** Rough hourly-equivalent so fixed and hourly jobs can be compared on one pay filter/sort. */
+/** Estimated total for the job, so fixed and hourly listings share one pay filter and sort. */
 export function payValue(job: Pick<Job, 'pay_type' | 'pay_min' | 'pay_max' | 'duration_hours'>): number {
   const top = job.pay_max ?? job.pay_min;
-  if (job.pay_type === 'hourly') return top;
-  return job.duration_hours ? top / job.duration_hours : top / 4;
+  if (job.pay_type === 'fixed') return top;
+  return top * (job.duration_hours ?? 4);
 }
 
 function inDateWindow(jobDate: string, w: DateWindow, now: Date): boolean {
@@ -122,7 +125,7 @@ export function filterJobs(
   const profile = opts.profile ?? null;
   const q = filters.q.trim().toLowerCase();
   const groupCats = filters.group ? new Set(opts.categories.filter((c) => c.group === filters.group).map((c) => c.id)) : null;
-  const origin = areaForZip(filters.originZip ?? profile?.home_zip ?? null);
+  const origin = filters.originPoint ?? areaForZip(filters.originZip ?? profile?.home_zip ?? null);
 
   const out: RankedJob[] = [];
   for (const job of jobs) {
@@ -138,7 +141,7 @@ export function filterJobs(
     const area = areaForZip(job.zip);
     const distance = origin && area ? milesBetween(origin, area) : null;
     if (filters.distance !== null && (distance === null || distance > filters.distance)) continue;
-    if (filters.payMin !== null && payValue(job) < filters.payMin && (job.pay_max ?? job.pay_min) < filters.payMin) continue;
+    if (filters.payMin !== null && payValue(job) < filters.payMin) continue;
     if (!inDateWindow(job.job_date, filters.date, now)) continue;
     if (filters.workType === 'recurring' && !job.is_recurring) continue;
     if (filters.workType === 'one_time' && job.is_recurring) continue;

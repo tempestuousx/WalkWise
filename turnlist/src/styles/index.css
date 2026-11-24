@@ -1,0 +1,164 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Turnlist design system. Tokens live in tailwind.config.js; this file holds
+ * the handful of component classes reused across every screen.
+ *
+ * Type scale (Manrope): display clamp(40–76px)/700, h1 28–38/650, h2 20/600,
+ * h3 16/600, body 15/1.6, small 13/1.5, micro 12/1.35 (never lighter than ink-muted).
+ * Spacing: 4px base. Section rhythm 48/64/80. Card padding 20. Control height 44 (40 compact).
+ * Radius: controls 10, cards 14, chips 8. No pills except avatars and status dots.
+ */
+
+@layer base {
+  :root {
+    color-scheme: light;
+    -webkit-tap-highlight-color: transparent;
+  }
+  html {
+    font-family: theme('fontFamily.sans');
+    font-feature-settings: 'ss01', 'cv11';
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    @apply bg-canvas text-ink;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  h1, h2, h3, h4 {
+    @apply text-navy;
+    font-weight: 650;
+    letter-spacing: -0.012em;
+  }
+  ::selection {
+    background: #cfe9e5;
+  }
+  /* One focus style everywhere: a 2px teal ring offset from the element. */
+  :focus-visible {
+    outline: 2px solid theme('colors.teal.DEFAULT');
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-[1240px] px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Buttons */
+  .btn {
+    @apply inline-flex h-11 select-none items-center justify-center gap-2 whitespace-nowrap rounded-ctl px-4 text-[14.5px] font-semibold transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply btn bg-navy text-white hover:bg-navy-700 active:bg-navy;
+  }
+  .btn-secondary {
+    @apply btn border border-line-strong bg-white text-navy hover:border-navy/40 hover:bg-canvas-alt;
+  }
+  .btn-ghost {
+    @apply btn text-ink-muted hover:bg-canvas-alt hover:text-navy;
+  }
+  .btn-danger {
+    @apply btn border border-danger/40 bg-white text-danger hover:bg-danger-50;
+  }
+  /* Declared after the variants so the compact size wins. */
+  .btn-sm {
+    @apply h-9 px-3 text-[13.5px];
+  }
+  .link {
+    @apply font-semibold text-teal-700 underline-offset-4 hover:underline;
+  }
+
+  /* Form controls */
+  .label {
+    @apply mb-1.5 block text-[13.5px] font-semibold text-navy;
+  }
+  .hint {
+    @apply mt-1.5 text-[13px] leading-snug text-ink-muted;
+  }
+  .error-text {
+    @apply mt-1.5 flex items-start gap-1.5 text-[13px] font-medium leading-snug text-danger;
+  }
+  .input {
+    @apply h-11 w-full rounded-ctl border border-line-strong bg-white px-3.5 text-[15px] text-ink transition-colors placeholder:text-ink-faint hover:border-ink-faint focus:border-teal focus:outline-none focus:ring-[3px] focus:ring-teal/15 disabled:bg-canvas-alt;
+  }
+  .input[aria-invalid='true'] {
+    @apply border-danger focus:ring-danger/15;
+  }
+  textarea.input {
+    @apply h-auto py-2.5 leading-relaxed;
+  }
+  select.input {
+    @apply appearance-none bg-no-repeat pr-9;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%23667587' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E");
+    background-position: right 0.75rem center;
+  }
+
+  /* Surfaces */
+  .card {
+    @apply rounded-card border border-line bg-white shadow-card;
+  }
+  .panel {
+    @apply rounded-card border border-line bg-white;
+  }
+  .divider {
+    @apply border-t border-line;
+  }
+
+  /* Small labels */
+  .tag {
+    @apply inline-flex h-6 items-center gap-1.5 whitespace-nowrap rounded-md px-2 text-[12px] font-semibold leading-none;
+  }
+  .eyebrow {
+    @apply text-[12.5px] font-semibold uppercase tracking-[0.08em] text-ink-muted;
+  }
+  .chip {
+    @apply inline-flex h-9 items-center gap-1.5 rounded-lg border border-line-strong bg-white px-3 text-[13.5px] font-medium text-ink transition-colors hover:border-navy/30;
+  }
+  .chip[aria-pressed='true'],
+  .chip[aria-checked='true'] {
+    @apply border-teal bg-teal-50 text-teal-700;
+  }
+
+  /* Tables */
+  .table {
+    @apply w-full border-collapse text-left text-[14px];
+  }
+  .table th {
+    @apply border-b border-line px-4 py-3 text-[12.5px] font-semibold text-ink-muted;
+  }
+  .table td {
+    @apply border-b border-line px-4 py-3.5 align-middle;
+  }
+  .table tbody tr:last-child td {
+    @apply border-b-0;
+  }
+  .table tbody tr {
+    @apply transition-colors hover:bg-canvas-alt/60;
+  }
+}
+
+@layer utilities {
+  .scrollbar-none {
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+  .text-balance {
+    text-wrap: balance;
+  }
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}

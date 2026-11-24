@@ -1,3 +1,5 @@
+> **Also in this repository:** [`turnlist/`](turnlist/README.md), a local property maintenance and turnover job marketplace (React + Supabase), developed separately from Walkwise.
+
 # Walkwise
 
 GPS dog-walk tracking, one-handed behavioral logging, weather context, analytics, and shareable walk reports, for dog owners and professional walkers. iOS and Android, built with Expo (React Native) and Supabase.
