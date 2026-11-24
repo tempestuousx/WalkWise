@@ -26,7 +26,13 @@ src/pages/      Route screens by audience: public, contractor, employer, shared,
 supabase/       Migrations, generated seed, edge function, database tests.
 ```
 
-The UI never imports an adapter directly; `src/data/index.ts` picks one at startup from `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
+The UI never imports an adapter directly; `src/data/index.ts` picks one at startup:
+
+| Mode | When | What users see |
+| --- | --- | --- |
+| `supabase` | `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` set (always wins) | Real data. No demo bar, no sample listings. |
+| `demo` | `npm run dev`, or a build with `VITE_DEMO_MODE=true` (`npm run build:demo`) | Sample data labeled Example, demo bar (one line on phones, dismissible, restorable from the footer). |
+| `unconfigured` | Production build with neither | A "not connected" screen. Sample listings are never served to real visitors by accident. |
 
 ## Where rules are enforced
 

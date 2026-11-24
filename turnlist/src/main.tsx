@@ -7,7 +7,8 @@ import './styles/index.css';
 import App from './App';
 import { AuthProvider } from './lib/auth';
 import { ToastProvider } from './lib/toast';
-import { ApiError, demoApi } from './data';
+import { ApiError, appMode, demoApi } from './data';
+import SetupRequired from './pages/public/SetupRequired';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -21,7 +22,9 @@ const queryClient = new QueryClient({
 // Demo mode runs the same housekeeping the database schedules (expiry, reminders).
 void demoApi?.runMaintenance();
 
-createRoot(document.getElementById('root')!).render(
+const root = createRoot(document.getElementById('root')!);
+if (appMode === 'unconfigured') root.render(<SetupRequired />);
+else root.render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>

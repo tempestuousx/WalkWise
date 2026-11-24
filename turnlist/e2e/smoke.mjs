@@ -1,6 +1,6 @@
 // End-to-end smoke test of the core marketplace loop in demo mode, in a real
 // browser at phone and desktop sizes. Run against `npm run preview`:
-//   npm run build && npx vite preview --port 4173 & npm run test:e2e
+//   npm run build:demo && npx vite preview --port 4173 & npm run test:e2e
 import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 const { chromium } = require('playwright');
@@ -32,6 +32,18 @@ try {
     await page.goto(`${BASE}/demo-reset-check`);
     await page.evaluate(() => localStorage.clear());
 
+    // Demo bar: one compact line, dismissible, restorable from the footer
+    await page.goto(BASE);
+    const bar = page.getByRole('region', { name: 'Demo controls' });
+    const box = await bar.boundingBox();
+    assert(box && box.height <= 44, `demo bar is one line (${box?.height}px)`);
+    await page.getByRole('button', { name: 'Hide demo bar' }).click();
+    await page.reload();
+    assert((await bar.count()) === 0, 'demo bar stays hidden after reload');
+    await page.getByRole('button', { name: 'Show demo controls' }).click();
+    await bar.waitFor();
+    ok('demo bar is compact, dismissible, and restorable');
+
     // Public discovery
     await page.goto(BASE);
     await page.getByRole('heading', { name: 'Local jobs. Real opportunities.' }).waitFor();
@@ -44,10 +56,19 @@ try {
     await page.getByRole('button', { name: 'Search Jobs' }).first().click();
     await page.waitForURL(/\/jobs\?q=cleaning&loc=Henderson/);
     const count = await page.locator('#results-heading').innerText();
-    assert(/\d+ available jobs?/.test(count), 'result count shown');
+    assert(/\d+ jobs? accepting applications/.test(count), 'result count shown');
     assert(await page.getByRole('button', { name: /Remove filter: Henderson/ }).isVisible(), 'active filter chip shown');
     await noOverflow('find work');
     ok(`search with location (${count.trim()})`);
+
+    // Availability and freshness on the job page
+    await page.goto(`${BASE}/jobs/job_1`);
+    await page.getByText('Accepting applications', { exact: true }).first().waitFor();
+    await page.getByText(/Applications close at the end of/).waitFor();
+    await page.getByText(/^Posted .* ago, /).waitFor();
+    await page.goto(`${BASE}/jobs/job_15`);
+    await page.getByText(/Not accepting applications: filled/).waitFor();
+    ok('job page states whether it is accepting applications, when it closes, and when it was posted');
 
     // Employer: quick post
     await signInAs('Property manager');
@@ -68,8 +89,21 @@ try {
     await page.getByRole('heading', { name: title }).waitFor();
     ok('quick post publishes and opens the listing');
 
-    // Contractor: find, apply
+    // Contractor: matches come before everything else
     await signInAs('Contractor');
+    await page.goto(`${BASE}/jobs`);
+    const matchesH = page.getByRole('heading', { name: /^Matches for you/ });
+    const othersH = page.getByRole('heading', { name: /^Other available jobs/ });
+    await matchesH.waitFor();
+    assert((await matchesH.boundingBox()).y < (await othersH.boundingBox()).y, 'matches are listed above other jobs');
+    await page.goto(`${BASE}/jobs?matches=1`);
+    await matchesH.waitFor();
+    assert((await othersH.count()) === 0, 'matches-only hides other jobs');
+    await page.goto(BASE);
+    await page.getByRole('heading', { name: 'Matches for you' }).waitFor();
+    ok('contractor sees profile matches first on Find Work and home');
+
+    // Contractor: find, apply
     await page.goto(`${BASE}/jobs/${jobId}`);
     await page.getByRole('button', { name: 'Apply for Job' }).click();
     await page.getByRole('button', { name: 'Send application' }).click();

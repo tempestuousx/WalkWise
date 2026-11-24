@@ -8,10 +8,11 @@ import { EmptyState, ErrorState } from '@/components/ui';
 import { useAvailableJobs, useCategories, useSavedJobIds } from '@/lib/queries';
 import { useAuth } from '@/lib/auth';
 import { groupName } from '@/domain/categories';
-import { EMPTY_FILTERS, filterJobs } from '@/domain/jobs';
+import { EMPTY_FILTERS, filterJobs, partitionByMatch, type RankedJob } from '@/domain/jobs';
+import { freshness } from '@/domain/freshness';
 import { areaForZip } from '@/domain/market';
 import { api } from '@/data';
-import { useAction } from '@/lib/queries';
+import { useAction, useMyAccount } from '@/lib/queries';
 
 export default function Home() {
   const navigate = useNavigate();
@@ -22,9 +23,26 @@ export default function Home() {
   const [group, setGroup] = useState<string | null>(null);
   const toggleSave = useAction((id: string) => api.toggleSaveJob(id), { success: (on) => (on ? 'Saved to your list' : 'Removed from saved jobs') });
 
+  const account = useMyAccount();
+  const profile = session?.user.role === 'contractor' ? account.data?.contractor ?? null : null;
+  const hasProfile = Boolean(profile?.category_ids.length && profile?.home_zip);
   const categories = cats.data ?? [];
-  const available = useMemo(() => filterJobs(jobs.data ?? [], { ...EMPTY_FILTERS, sort: 'newest' }, { categories }), [jobs.data, categories]);
-  const visible = group ? available.filter((r) => categories.find((c) => c.id === r.job.category_id)?.group === group) : available;
+  const available = useMemo(() => filterJobs(jobs.data ?? [], { ...EMPTY_FILTERS, sort: 'newest' }, { categories, profile }), [jobs.data, categories, profile]);
+  const inGroup = group ? available.filter((r) => categories.find((c) => c.id === r.job.category_id)?.group === group) : available;
+  // Relevance: a contractor's matches lead; everything else follows under "Recently posted".
+  const { matches, others } = hasProfile ? partitionByMatch(inGroup) : { matches: [] as RankedJob[], others: inGroup };
+  const visible = hasProfile && matches.length ? others : inGroup;
+  const postedToday = inGroup.filter((r) => freshness(r.job).isNew).length;
+  const card = (r: RankedJob) => (
+    <JobCard
+      key={r.job.id}
+      job={r.job}
+      category={categories.find((c) => c.id === r.job.category_id)}
+      distance={hasProfile ? r.distance : undefined}
+      saved={saved.data?.includes(r.job.id)}
+      onToggleSave={session?.user.role === 'contractor' ? () => toggleSave.mutate(r.job.id) : undefined}
+    />
+  );
   const counts = useMemo(() => {
     const m: Record<string, number> = {};
     for (const r of available) {
@@ -81,14 +99,38 @@ export default function Home() {
         <CategoryStrip value={group} onChange={setGroup} counts={jobs.data ? counts : undefined} />
       </div>
 
+      {hasProfile && matches.length > 0 && (
+        <section className="container-page mt-12" aria-labelledby="matches-heading">
+          <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <h2 id="matches-heading" className="text-[22px] font-semibold tracking-tight">
+                Matches for you
+              </h2>
+              <p className="mt-1 text-[14px] text-ink-muted tabular">
+                {matches.length} {group ? `${groupName(group).toLowerCase()} ` : ''}
+                {matches.length === 1 ? 'job' : 'jobs'} in your services within {profile!.service_radius_miles} mi, newest first
+              </p>
+            </div>
+            <Link to="/jobs?matches=1" className="link inline-flex items-center gap-1 text-[14px]">
+              All your matches <ArrowRight className="h-4 w-4" aria-hidden />
+            </Link>
+          </div>
+          <JobGrid>{matches.slice(0, 8).map(card)}</JobGrid>
+        </section>
+      )}
+
       <section className="container-page mt-12" aria-labelledby="available-heading">
         <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
           <div>
             <h2 id="available-heading" className="text-[22px] font-semibold tracking-tight">
-              {group ? `${groupName(group)} jobs` : 'Available jobs'}
+              {hasProfile && matches.length ? 'Recently posted' : group ? `${groupName(group)} jobs` : 'Available jobs'}
             </h2>
             <p className="mt-1 text-[14px] text-ink-muted tabular">
-              {jobs.isLoading ? 'Loading listings' : `${visible.length} open ${visible.length === 1 ? 'listing' : 'listings'}${group ? '' : ' across the valley'}, newest first`}
+              {jobs.isLoading
+                ? 'Loading listings'
+                : hasProfile && matches.length
+                  ? `${visible.length} more accepting applications, outside your services or radius`
+                  : `${visible.length} accepting applications${group ? '' : ' across the valley'}${postedToday ? `, ${postedToday} posted in the last day` : ''}`}
             </p>
           </div>
           <Link to={group ? `/jobs?group=${group}` : '/jobs'} className="link inline-flex items-center gap-1 text-[14px]">
@@ -100,22 +142,14 @@ export default function Home() {
           <ErrorState error={jobs.error} onRetry={() => jobs.refetch()} />
         ) : jobs.isLoading ? (
           <JobGrid>{Array.from({ length: 8 }, (_, i) => <JobCardSkeleton key={i} />)}</JobGrid>
+        ) : visible.length === 0 && hasProfile && matches.length > 0 ? (
+          <p className="text-[14.5px] text-ink-muted">Every open job in this category matches your profile.</p>
         ) : visible.length === 0 ? (
           <EmptyState icon={<Search />} title={group ? `No ${groupName(group).toLowerCase()} jobs right now` : 'No open jobs right now'} action={group ? <button className="btn-secondary" onClick={() => setGroup(null)}>Show all categories</button> : <Link to="/employer/post" className="btn-primary">Post the first job</Link>}>
             {group ? 'New listings appear here as soon as they are posted.' : 'Listings appear here as soon as businesses post them.'}
           </EmptyState>
         ) : (
-          <JobGrid>
-            {visible.slice(0, 8).map((r) => (
-              <JobCard
-                key={r.job.id}
-                job={r.job}
-                category={categories.find((c) => c.id === r.job.category_id)}
-                saved={saved.data?.includes(r.job.id)}
-                onToggleSave={session?.user.role === 'contractor' ? () => toggleSave.mutate(r.job.id) : undefined}
-              />
-            ))}
-          </JobGrid>
+          <JobGrid>{visible.slice(0, hasProfile && matches.length ? 4 : 8).map(card)}</JobGrid>
         )}
 
         {byArea.length > 0 && (

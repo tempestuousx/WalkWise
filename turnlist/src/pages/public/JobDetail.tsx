@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Bookmark, BookmarkCheck, Building2, Check, CircleAlert, Flag, Lock, MapPin, MessageSquare, ShieldCheck } from 'lucide-react';
 import { AppStatusTag, ExampleTag, JobStatusTag, ModerationTag, UrgencyTag, VerifiedBadges } from '@/components/badges';
-import { Button, Dialog, ErrorState, Field, Input, Notice, PageLoading, Textarea, cx } from '@/components/ui';
+import { Button, Dialog, ErrorState, Field, Input, PageLoading, Textarea, cx } from '@/components/ui';
 import { useAuth } from '@/lib/auth';
 import { useAction, useCategories, useJob, useMyAccount } from '@/lib/queries';
 import { api } from '@/data';
@@ -11,6 +11,7 @@ import { formatDate, formatDuration, formatPay, MATERIALS_LABEL, payQualifier, P
 import { areaForZip } from '@/domain/market';
 import { qualify } from '@/domain/jobs';
 import { applicationInputSchema, fieldErrors } from '@/domain/validation';
+import { closesSentence, freshness } from '@/domain/freshness';
 import type { Job } from '@/domain/types';
 
 export default function JobDetail() {
@@ -66,7 +67,7 @@ export default function JobDetail() {
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-[13px] font-semibold text-ink-muted">{category?.name}</span>
             <UrgencyTag urgency={job.urgency} />
-            {status !== 'open' && <JobStatusTag status={status} />}
+            {(isOwner || !available) && status !== 'open' && <JobStatusTag status={status} />}
             <ModerationTag status={job.moderation_status} />
             {job.is_demo && <ExampleTag />}
           </div>
@@ -75,16 +76,9 @@ export default function JobDetail() {
             <MapPin className="h-4 w-4" aria-hidden />
             {job.neighborhood}
             {area && area.city !== job.neighborhood ? `, ${area.city}` : ''} {job.zip}
-            <span aria-hidden>·</span> Posted {timeAgo(job.created_at)}
           </p>
 
-          {!available && !isOwner && (
-            <div className="mt-6">
-              <Notice tone="info" icon={<CircleAlert />}>
-                {job.moderation_status !== 'approved' ? 'This listing is not public.' : status === 'expired' ? 'This listing has expired and is no longer accepting applications.' : `This job is ${status.replace('_', ' ')} and no longer accepting applications.`}
-              </Notice>
-            </div>
-          )}
+          <AvailabilityStrip job={job} applicants={isOwner ? job.application_count : null} />
 
           {/* Pay and schedule first: the two things people scan for */}
           <div className="mt-8 rounded-card border border-line bg-white">
@@ -217,6 +211,35 @@ export default function JobDetail() {
 
       <ApplyDialog open={applyOpen} onClose={() => setApplyOpen(false)} job={job} />
       <ReportDialog open={reportOpen} onClose={() => setReportOpen(false)} jobId={job.id} />
+    </div>
+  );
+}
+
+/** Answers "can I still apply?" before anything else on the page. */
+function AvailabilityStrip({ job, applicants }: { job: Job; applicants: number | null }) {
+  const f = freshness(job);
+  const posted = new Date(job.created_at).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+  return (
+    <div
+      className={cx(
+        'mt-6 flex flex-col gap-1.5 rounded-ctl border px-4 py-3 text-[14px] sm:flex-row sm:items-center sm:justify-between sm:gap-4',
+        !f.accepting ? 'border-line bg-canvas-alt' : f.closingSoon ? 'border-amber/50 bg-amber-50' : 'border-teal/30 bg-teal-50/70',
+      )}
+    >
+      <p className="flex items-start gap-2">
+        <span aria-hidden className={cx('mt-[7px] h-2 w-2 shrink-0 rounded-full', !f.accepting ? 'bg-ink-faint' : f.closingSoon ? 'bg-amber' : 'bg-teal')} />
+        <span>
+          <span className="font-semibold text-navy">{f.accepting ? 'Accepting applications' : `Not accepting applications: ${f.closedReason?.toLowerCase()}`}</span>
+          {f.accepting && <span className={cx(f.closingSoon ? 'font-semibold text-amber-800' : 'text-ink')}>. {closesSentence(job.expires_at)}.</span>}
+          {applicants !== null && <span className="text-ink-muted"> {applicants} {applicants === 1 ? 'applicant' : 'applicants'} so far.</span>}
+        </span>
+      </p>
+      <p className="flex shrink-0 items-center gap-2 pl-4 text-[13.5px] text-ink-muted sm:pl-0">
+        {f.isNew && <span className="tag h-5 bg-white px-1.5 text-[11px] text-teal-700">New</span>}
+        <time dateTime={job.created_at} title={new Date(job.created_at).toLocaleString()}>
+          Posted {f.postedAgo}, {posted}
+        </time>
+      </p>
     </div>
   );
 }

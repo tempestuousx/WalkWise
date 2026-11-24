@@ -3,7 +3,8 @@ import { isJobAvailable, URGENCY_RANK } from './status';
 import { parseDay, toDayString, addDays } from './format';
 import type { Category, ContractorProfile, Job, Urgency } from './types';
 
-export type SortKey = 'relevant' | 'newest' | 'pay' | 'soonest';
+export type SortKey = 'relevant' | 'newest' | 'closing' | 'soonest' | 'pay';
+export type PostedWindow = 'any' | '24h' | '3d' | '7d';
 export type DateWindow = 'any' | 'today' | 'next_48h' | 'this_week' | 'later';
 export type WorkType = 'any' | 'one_time' | 'recurring';
 
@@ -22,6 +23,10 @@ export interface JobFilters {
   date: DateWindow;
   workType: WorkType;
   urgency: Urgency[];
+  /** How recently the listing was posted. */
+  posted: PostedWindow;
+  /** Contractors only: hide jobs outside their services, area, or license. */
+  matchesOnly: boolean;
   sort: SortKey;
 }
 
@@ -38,6 +43,8 @@ export const EMPTY_FILTERS: JobFilters = {
   date: 'any',
   workType: 'any',
   urgency: [],
+  posted: 'any',
+  matchesOnly: false,
   sort: 'relevant',
 };
 
@@ -56,6 +63,8 @@ function inDateWindow(jobDate: string, w: DateWindow, now: Date): boolean {
   if (w === 'this_week') return jobDate <= toDayString(addDays(now, 7));
   return jobDate > toDayString(addDays(now, 7));
 }
+
+const POSTED_HOURS: Record<Exclude<PostedWindow, 'any'>, number> = { '24h': 24, '3d': 72, '7d': 168 };
 
 export interface Qualification {
   categoryMatch: boolean;
@@ -146,7 +155,9 @@ export function filterJobs(
     if (filters.workType === 'recurring' && !job.is_recurring) continue;
     if (filters.workType === 'one_time' && job.is_recurring) continue;
     if (filters.urgency.length && !filters.urgency.includes(job.urgency)) continue;
+    if (filters.posted !== 'any' && now.getTime() - new Date(job.created_at).getTime() > POSTED_HOURS[filters.posted] * 3_600_000) continue;
     const qualification = profile ? qualify(job, profile, opts.categories) : null;
+    if (filters.matchesOnly && qualification && !qualification.qualified) continue;
     out.push({ job, distance, qualification, score: relevanceScore(job, qualification, now) });
   }
 
@@ -154,10 +165,23 @@ export function filterJobs(
   const sorters: Record<SortKey, (a: RankedJob, b: RankedJob) => number> = {
     relevant: (a, b) => b.score - a.score || byNewest(a, b),
     newest: byNewest,
+    closing: (a, b) => a.job.expires_at.localeCompare(b.job.expires_at) || byNewest(a, b),
     pay: (a, b) => payValue(b.job) - payValue(a.job) || byNewest(a, b),
     soonest: (a, b) => a.job.job_date.localeCompare(b.job.job_date) || byNewest(a, b),
   };
   return out.sort(sorters[filters.sort]);
+}
+
+/**
+ * Splits ranked results into jobs that fit the contractor's profile (services,
+ * service area, license) and everything else, keeping each group's order.
+ * Without a profile every job lands in `others`.
+ */
+export function partitionByMatch(ranked: RankedJob[]): { matches: RankedJob[]; others: RankedJob[] } {
+  const matches: RankedJob[] = [];
+  const others: RankedJob[] = [];
+  for (const r of ranked) (r.qualification?.qualified ? matches : others).push(r);
+  return { matches, others };
 }
 
 /** Contractors to notify about a newly approved job. Mirrors public.notify_matching_contractors(). */

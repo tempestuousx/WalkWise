@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { Bell, Bookmark, Briefcase, FileText, LayoutDashboard, LogOut, Menu, MessageSquare, Plus, Search, Settings, ShieldCheck, User, Users } from 'lucide-react';
+import { X, Bell, Bookmark, Briefcase, FileText, LayoutDashboard, LogOut, Menu, MessageSquare, Plus, Search, Settings, ShieldCheck, User, Users } from 'lucide-react';
 import { api, demoApi, isDemo } from '@/data';
 import { DEMO_ACCOUNTS } from '@/data/demoSeed';
 import { homeFor, useAuth } from '@/lib/auth';
@@ -310,7 +310,28 @@ function MobileTabs() {
   );
 }
 
-function DemoBanner() {
+const DEMO_HIDDEN_KEY = 'turnlist-demo-banner-hidden';
+function readDemoHidden() {
+  try {
+    return localStorage.getItem(DEMO_HIDDEN_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+function writeDemoHidden(v: boolean) {
+  try {
+    if (v) localStorage.setItem(DEMO_HIDDEN_KEY, '1');
+    else localStorage.removeItem(DEMO_HIDDEN_KEY);
+  } catch {
+    /* storage blocked: the choice lasts for this page view */
+  }
+}
+
+/**
+ * Demo builds only (never rendered when connected to Supabase). One line on
+ * phones, dismissible everywhere; the footer brings it back.
+ */
+function DemoBanner({ onHide }: { onHide: () => void }) {
   const { session } = useAuth();
   const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
@@ -322,35 +343,56 @@ function DemoBanner() {
     setBusy(false);
     navigate(homeFor(s.user.role));
   };
+  const reset = async () => {
+    if (!confirm('Reset the demo? Anything you created in this browser will be removed.')) return;
+    await demo.reset();
+    navigate('/');
+  };
   return (
-    <div className="border-b border-line bg-canvas-alt">
-      <div className="container-page flex flex-col gap-2 py-2 text-[13px] sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-ink">
-          <span className="font-semibold text-navy">Demo mode.</span> <span className="sm:hidden">Listings marked Example are sample data.</span>
+    <div className="border-b border-line bg-canvas-alt" role="region" aria-label="Demo controls">
+      <div className="container-page flex h-10 items-center justify-between gap-3 text-[13px]">
+        <p className="min-w-0 truncate text-ink">
+          <span className="font-semibold text-navy">Demo</span>
+          <span className="sm:hidden"> · sample data</span>
           <span className="hidden sm:inline">
-            Jobs, businesses, and people marked <span className="font-semibold">Example</span> are sample data, not real opportunities. Data stays in this browser.
+            {' '}
+            mode. Jobs, businesses, and people marked <span className="font-semibold">Example</span> are sample data, not real opportunities.
           </span>
         </p>
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-          <span className="hidden text-ink-muted sm:inline">View as</span>
-          {DEMO_ACCOUNTS.map((a) => (
-            <button key={a.id} disabled={busy} onClick={() => switchTo(a.id)} className={cx('font-semibold underline-offset-4 hover:underline', session?.user.id === a.id ? 'text-teal-700 underline' : 'text-navy')}>
-              {a.label}
+        <div className="flex shrink-0 items-center gap-x-3">
+          <span className="hidden text-ink-muted lg:inline">View as</span>
+          <div className="hidden items-center gap-x-3 md:flex">
+            {DEMO_ACCOUNTS.map((a) => (
+              <button key={a.id} disabled={busy} onClick={() => switchTo(a.id)} className={cx('font-semibold underline-offset-4 hover:underline', session?.user.id === a.id ? 'text-teal-700 underline' : 'text-navy')}>
+                {a.label}
+              </button>
+            ))}
+            <button disabled={busy} className="font-semibold text-ink-muted underline-offset-4 hover:text-navy hover:underline" onClick={reset}>
+              Reset
             </button>
-          ))}
-          <span className="text-line-strong" aria-hidden>
-            |
-          </span>
-          <button
+          </div>
+          <select
+            aria-label="View the demo as"
+            className="h-7 rounded-md border border-line-strong bg-white pl-2 pr-1 text-[12.5px] font-semibold text-navy md:hidden"
+            value=""
             disabled={busy}
-            className="font-semibold text-ink-muted underline-offset-4 hover:text-navy hover:underline"
-            onClick={async () => {
-              if (!confirm('Reset the demo? Anything you created in this browser will be removed.')) return;
-              await demo.reset();
-              navigate('/');
+            onChange={(e) => {
+              const v = e.target.value;
+              if (v === 'reset') void reset();
+              else if (v) void switchTo(v);
             }}
           >
-            Reset
+            <option value="">View as…</option>
+            {DEMO_ACCOUNTS.map((a) => (
+              <option key={a.id} value={a.id}>
+                {a.label}
+                {session?.user.id === a.id ? ' (current)' : ''}
+              </option>
+            ))}
+            <option value="reset">Reset demo data</option>
+          </select>
+          <button type="button" onClick={onHide} className="-mr-1.5 rounded-md p-1.5 text-ink-muted hover:bg-white hover:text-navy" aria-label="Hide demo bar">
+            <X className="h-4 w-4" />
           </button>
         </div>
       </div>
@@ -358,7 +400,7 @@ function DemoBanner() {
   );
 }
 
-function Footer({ flush }: { flush?: boolean }) {
+function Footer({ flush, onShowDemo }: { flush?: boolean; onShowDemo?: () => void }) {
   return (
     <footer className={cx(flush ? 'mt-0' : 'mt-24', 'border-t border-line bg-white pb-24 md:pb-0')}>
       <div className="container-page grid gap-10 py-12 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
@@ -368,6 +410,11 @@ function Footer({ flush }: { flush?: boolean }) {
           <p className="mt-4 max-w-sm text-[12.5px] leading-relaxed text-ink-muted">
             Turnlist lists independent contractor opportunities. We are not an employer, staffing agency, or payment processor, and we do not guarantee work, quality, or payment.
           </p>
+          {onShowDemo && (
+            <button onClick={onShowDemo} className="link mt-4 text-[13px]">
+              Show demo controls
+            </button>
+          )}
         </div>
         <FooterCol title="Work" links={[['/jobs', 'Find Work'], ['/categories', 'Browse Categories'], ['/signup?role=contractor', 'Create a contractor profile']]} />
         <FooterCol title="Hire" links={[['/employer/post', 'Post a Job'], ['/how-it-works', 'How It Works'], ['/signup?role=employer', 'Create a business account']]} />
@@ -395,20 +442,25 @@ function FooterCol({ title, links }: { title: string; links: [string, string][] 
 
 export function AppLayout() {
   const loc = useLocation();
+  const [demoHidden, setDemoHidden] = useState(readDemoHidden);
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [loc.pathname]);
+  const toggleDemo = (hidden: boolean) => {
+    writeDemoHidden(hidden);
+    setDemoHidden(hidden);
+  };
   return (
     <div className="flex min-h-screen flex-col">
       <a href="#main" className="sr-only z-50 rounded-md bg-navy px-3 py-2 text-white focus:not-sr-only focus:fixed focus:left-3 focus:top-3">
         Skip to content
       </a>
-      <DemoBanner />
+      {isDemo && !demoHidden && <DemoBanner onHide={() => toggleDemo(true)} />}
       <Header />
       <main id="main" className="flex-1 pb-20 md:pb-0">
         <Outlet />
       </main>
-      <Footer flush={loc.pathname === '/'} />
+      <Footer flush={loc.pathname === '/'} onShowDemo={isDemo && demoHidden ? () => toggleDemo(false) : undefined} />
       <MobileTabs />
     </div>
   );

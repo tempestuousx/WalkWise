@@ -20,6 +20,18 @@ Turnlist is a local job board for property maintenance and rental turnover work,
 
 **Complete.** The business marks the job in progress and completed, then can leave a review. If the selected contractor withdraws, or the business reopens the listing, the job returns to open.
 
+## Freshness, availability, and relevance
+
+These three questions are answered on every listing without opening it.
+
+**Is it fresh?** Cards show "New" with the age (for example "New · 3h ago") during a listing's first 24 hours, then "Posted 2d ago". Find Work can filter by posting time (24 hours, 3 days, 7 days) and sort by newest. The job page shows the age and the posting date. Contractors see how many of their matches are new today.
+
+**Can I still apply?** Every card ends with an availability line: a teal dot and "Applications open" with when they close ("Closes Fri", "Closes tomorrow"). Under 24 hours the dot and closing time turn amber. Closed listings say why: Filled, Completed, Canceled, Expired, Awaiting review. The job page opens with a strip that says "Accepting applications. Applications close at the end of Thursday, Nov 26." or "Not accepting applications: filled". Feeds only ever list jobs that are accepting applications, and Find Work's count says so. Employers see the closing time on their dashboard and listings, with the number of applicants so far.
+
+Applications close at the end of the finish-by date, or the end of the date needed if there is none (`expires_at`), unless the job is filled first.
+
+**Is it for me?** Once a contractor has services and a home ZIP, Find Work splits results into "Matches for you" (services, travel radius, and license requirements all fit) and "Other available jobs", each in the chosen sort order. "Only jobs that match my profile" hides the rest. The home page leads with their matches and follows with "Recently posted". If nothing matches, they are told so and pointed to their radius and services rather than shown an empty page.
+
 ## Statuses
 
 Job (stored): `open`, `filled`, `in_progress`, `completed`, `canceled`, `expired`. "Applications received" is derived (open with at least one active application) so it never drifts from the data.
@@ -42,7 +54,7 @@ In-app and email, per type, per user: new matching job, application received, sh
 
 ## Demo mode
 
-Without Supabase configuration the app runs entirely in the browser with example data. Every example listing, business, and person is flagged `is_demo` and labeled **Example**, and a banner explains it on every page. Example dates are generated relative to today. "View as" switches between a property manager, a contractor, and an administrator; "Reset" restores the sample data. Uploaded verification documents are never stored in demo mode. Production seed data contains no listings or people.
+Development and preview builds (`npm run dev`, `npm run build:demo`) run entirely in the browser with example data. Every example listing, business, and person is flagged `is_demo` and labeled **Example**. A one-line bar explains it and can be dismissed (the footer brings it back). Launch builds connected to Supabase never show the bar or sample data, and a production build without Supabase settings refuses to fall back to demo data. Example dates are generated relative to today. "View as" switches between a property manager, a contractor, and an administrator; "Reset" restores the sample data. Uploaded verification documents are never stored in demo mode. Production seed data contains no listings or people.
 
 ## Metrics
 

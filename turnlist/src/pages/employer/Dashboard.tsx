@@ -8,6 +8,7 @@ import { useQuery } from '@tanstack/react-query';
 import { api } from '@/data';
 import { formatNeededDay, formatPay, timeAgo } from '@/domain/format';
 import { jobDisplayStatus } from '@/domain/status';
+import { freshness } from '@/domain/freshness';
 import { zipDistance } from '@/domain/market';
 
 export default function EmployerDashboard() {
@@ -114,7 +115,7 @@ export default function EmployerDashboard() {
                       </div>
                       <div className="mt-1.5 flex items-center justify-between gap-3 text-[13px] text-ink-muted">
                         <span className="truncate tabular">
-                          {formatPay(j)} · {formatNeededDay(j.job_date)}
+                          {formatPay(j)} · needed {formatNeededDay(j.job_date).toLowerCase()} · {(freshness(j).closesLabel ?? 'closed').toLowerCase()}
                         </span>
                         <JobStatusTag status={jobDisplayStatus(j)} />
                       </div>
@@ -128,6 +129,7 @@ export default function EmployerDashboard() {
                     <tr>
                       <th scope="col">Listing</th>
                       <th scope="col">Needed</th>
+                      <th scope="col">Applications</th>
                       <th scope="col">Pay</th>
                       <th scope="col" className="text-right">Applicants</th>
                       <th scope="col">Status</th>
@@ -143,6 +145,7 @@ export default function EmployerDashboard() {
                           <span className="text-[13px] text-ink-muted">{j.neighborhood}</span>
                         </td>
                         <td className="whitespace-nowrap">{formatNeededDay(j.job_date)}</td>
+                        <td className={freshness(j).closingSoon ? 'whitespace-nowrap font-semibold text-amber-800' : 'whitespace-nowrap text-ink-muted'}>{freshness(j).closesLabel ?? 'Closed'}</td>
                         <td className="whitespace-nowrap tabular">{formatPay(j)}</td>
                         <td className="text-right font-semibold tabular">{j.application_count}</td>
                         <td>

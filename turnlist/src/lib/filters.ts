@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { EMPTY_FILTERS, type DateWindow, type JobFilters, type SortKey, type WorkType } from '@/domain/jobs';
+import { EMPTY_FILTERS, type DateWindow, type JobFilters, type PostedWindow, type SortKey, type WorkType } from '@/domain/jobs';
 import { AREAS, resolveLocation } from '@/domain/market';
 import type { Urgency } from '@/domain/types';
 
@@ -30,6 +30,8 @@ export function useJobFilters(defaultOriginZip: string | null) {
       date: (params.get('date') as DateWindow) ?? 'any',
       workType: (params.get('type') as WorkType) ?? 'any',
       urgency: (params.get('urg')?.split(',').filter(Boolean) as Urgency[]) ?? [],
+      posted: (params.get('posted') as PostedWindow) ?? 'any',
+      matchesOnly: params.get('matches') === '1',
       sort: (params.get('sort') as SortKey) ?? 'relevant',
       locationLabel: resolved?.label ?? null,
       locationUnknown: Boolean(loc) && !resolved,

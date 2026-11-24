@@ -17,8 +17,18 @@ function safeLocalStorage() {
   }
 }
 
-/** Supabase when configured; otherwise the self-contained demo. */
-export const api: DataApi = url && key ? createSupabaseApi(url, key) : createDemoApi({ storage: safeLocalStorage(), latencyMs: 160 });
-export const isDemo = api.mode === 'demo';
+/**
+ * Which backend this build talks to:
+ *  - supabase:     VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are set. Real users,
+ *                  no demo banner, no sample data. Always wins.
+ *  - demo:         local development, or a build with VITE_DEMO_MODE=true (previews).
+ *  - unconfigured: a production build with neither. The app shows a setup screen
+ *                  instead of silently serving sample listings to real visitors.
+ */
+export const appMode: 'supabase' | 'demo' | 'unconfigured' =
+  url && key ? 'supabase' : import.meta.env.DEV || import.meta.env.VITE_DEMO_MODE === 'true' ? 'demo' : 'unconfigured';
+
+export const api: DataApi = appMode === 'supabase' ? createSupabaseApi(url!, key!) : createDemoApi({ storage: safeLocalStorage(), latencyMs: 160 });
+export const isDemo = appMode === 'demo';
 export const demoApi = (isDemo ? api : null) as DemoApi | null;
 export * from './api';

@@ -7,6 +7,7 @@ import { Page } from '@/components/Layout';
 import { useMyJobs } from '@/lib/queries';
 import { formatNeededDay, formatPay, timeAgo } from '@/domain/format';
 import { jobDisplayStatus } from '@/domain/status';
+import { freshness } from '@/domain/freshness';
 import type { Job } from '@/domain/types';
 
 const TABS = [
@@ -61,6 +62,9 @@ export default function Listings() {
                 </Link>
                 <p className="mt-0.5 text-[13.5px] text-ink-muted tabular">
                   {j.neighborhood} · {formatPay(j)} · needed {formatNeededDay(j.job_date)} · posted {timeAgo(j.created_at)}
+                  {freshness(j).closesLabel && (
+                    <span className={freshness(j).closingSoon ? 'font-semibold text-amber-800' : undefined}> · {freshness(j).closesLabel?.toLowerCase()}</span>
+                  )}
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-2">

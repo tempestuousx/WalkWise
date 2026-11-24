@@ -1,10 +1,12 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, Bookmark, BookmarkCheck, Calendar, Clock, MapPin, Repeat } from 'lucide-react';
 import { areaForZip } from '@/domain/market';
-import { formatDuration, formatNeededDay, formatPay, payQualifier, timeAgo } from '@/domain/format';
+import { formatDuration, formatNeededDay, formatPay, payQualifier } from '@/domain/format';
+import { isJobAvailable } from '@/domain/status';
 import type { Application, Category, Job } from '@/domain/types';
 import { AppStatusTag, ExampleTag, UrgencyTag } from './badges';
 import { cx } from './ui';
+import { AvailabilityLine, PostedLabel } from './Availability';
 
 interface Props {
   job: Job;
@@ -25,6 +27,7 @@ export function JobCard({ job, category, distance, application, saved, onToggleS
   const H = headingLevel;
   const area = areaForZip(job.zip);
   const duration = formatDuration(job.duration_hours);
+  const open = isJobAvailable(job);
   return (
     <article className="group relative flex flex-col rounded-card border border-line bg-white shadow-card transition-[box-shadow,border-color] duration-150 focus-within:border-teal hover:border-line-strong hover:shadow-lift">
       {job.photos[0] && (
@@ -35,7 +38,7 @@ export function JobCard({ job, category, distance, application, saved, onToggleS
       <div className="flex flex-1 flex-col p-5">
         <div className="mb-3 flex min-h-6 items-center justify-between gap-2">
           <span className="truncate text-[12.5px] font-semibold text-ink-muted">{category?.name ?? 'General'}</span>
-          <UrgencyTag urgency={job.urgency} compact />
+          <PostedLabel createdAt={job.created_at} />
         </div>
 
         <H className="text-[16.5px] font-semibold leading-snug text-navy">
@@ -53,7 +56,7 @@ export function JobCard({ job, category, distance, application, saved, onToggleS
         </p>
 
         <p className="mt-4 flex items-baseline gap-1.5">
-          <span className="text-[20px] font-bold tracking-tight text-ink tabular">{formatPay(job)}</span>
+          <span className={cx('text-[20px] font-bold tracking-tight tabular', open ? 'text-ink' : 'text-ink-muted')}>{formatPay(job)}</span>
           <span className="text-[13px] text-ink-muted">{payQualifier(job)}</span>
         </p>
 
@@ -61,6 +64,7 @@ export function JobCard({ job, category, distance, application, saved, onToggleS
           <li className="flex items-center gap-1.5">
             <Calendar className="h-3.5 w-3.5 text-ink-muted" aria-hidden />
             Needed {formatNeededDay(job.job_date).replace(/^(Today|Tomorrow)$/, (m) => m.toLowerCase())}
+            <UrgencyTag urgency={job.urgency} compact />
           </li>
           {duration && (
             <li className="flex items-center gap-1.5">
@@ -78,10 +82,12 @@ export function JobCard({ job, category, distance, application, saved, onToggleS
 
         <p className="mt-3 line-clamp-2 text-[13.5px] leading-relaxed text-ink-muted">{job.description}</p>
 
-        <div className="mt-auto flex items-center justify-between gap-2 pt-4">
-          <div className="flex min-w-0 items-center gap-2 text-[12.5px] text-ink-muted">
+        <div className="mt-auto pt-4">
+          <AvailabilityLine job={job} applied={application ? <AppStatusTag status={application.status} /> : undefined} className="border-t border-line pt-3" />
+        </div>
+        <div className="mt-1.5 flex min-h-9 items-center justify-between gap-2">
+          <div className="flex min-w-0 items-center gap-2">
             {job.is_demo && <ExampleTag />}
-            {application ? <AppStatusTag status={application.status} /> : <span className="whitespace-nowrap">{job.is_demo ? '' : 'Posted '}{timeAgo(job.created_at)}</span>}
           </div>
           <div className="flex items-center gap-1">
             {onToggleSave && (

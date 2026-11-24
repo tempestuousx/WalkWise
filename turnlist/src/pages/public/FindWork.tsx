@@ -11,7 +11,9 @@ import { useJobFilters } from '@/lib/filters';
 import { useAction, useAvailableJobs, useCategories, useMyAccount, useMyApplications, useSavedJobIds } from '@/lib/queries';
 import { api } from '@/data';
 import { BROWSE_GROUPS, groupName } from '@/domain/categories';
-import { filterJobs, type DateWindow, type SortKey, type WorkType } from '@/domain/jobs';
+import { filterJobs, partitionByMatch, type DateWindow, type PostedWindow, type RankedJob, type SortKey, type WorkType } from '@/domain/jobs';
+import { freshness } from '@/domain/freshness';
+import { areaForZip } from '@/domain/market';
 import { URGENCY_LABEL } from '@/domain/status';
 import { contractorCompletion } from '@/domain/profile';
 import { formatNeededDay } from '@/domain/format';
@@ -20,7 +22,8 @@ import type { Category, Urgency } from '@/domain/types';
 const DIST_OPTIONS = [null, 5, 10, 15, 25] as const;
 const PAY_OPTIONS = [null, 100, 250, 500, 1000] as const;
 const DATE_OPTIONS: Array<[DateWindow, string]> = [['any', 'Any date'], ['today', 'Today'], ['next_48h', 'Next 48 hours'], ['this_week', 'Next 7 days'], ['later', 'Later']];
-const SORT_OPTIONS: Array<[SortKey, string]> = [['relevant', 'Most relevant'], ['newest', 'Newest'], ['soonest', 'Date needed'], ['pay', 'Highest pay']];
+const SORT_OPTIONS: Array<[SortKey, string]> = [['relevant', 'Most relevant'], ['newest', 'Newest first'], ['closing', 'Closing soon'], ['soonest', 'Date needed'], ['pay', 'Highest pay']];
+const POSTED_OPTIONS: Array<[PostedWindow, string]> = [['any', 'Any time'], ['24h', 'Last 24 hours'], ['3d', 'Last 3 days'], ['7d', 'Last 7 days']];
 
 export default function FindWork() {
   const { session } = useAuth();
@@ -38,9 +41,30 @@ export default function FindWork() {
   const categories = cats.data ?? [];
   const results = useMemo(() => filterJobs(jobs.data ?? [], filters, { categories, profile }), [jobs.data, filters, categories, profile]);
   const appByJob = new Map(apps.data?.map((a) => [a.job.id, a.application]) ?? []);
+  // Relevance: once a contractor has services and a ZIP, their matches come first.
+  const hasProfile = Boolean(profile?.category_ids.length && profile?.home_zip);
+  const { matches, others } = hasProfile ? partitionByMatch(results) : { matches: [] as RankedJob[], others: results };
+  const newMatches = matches.filter((r) => freshness(r.job).isNew).length;
+  const home = areaForZip(profile?.home_zip);
 
   const chips = activeChips(filters, categories);
-  const filterPanel = <FilterPanel filters={filters} set={set} categories={categories} hasOrigin={Boolean(profile?.home_zip || filters.originPoint)} />;
+  const filterPanel = <FilterPanel filters={filters} set={set} categories={categories} hasOrigin={Boolean(profile?.home_zip || filters.originPoint)} hasProfile={hasProfile} />;
+  const grid = (list: RankedJob[]) => (
+    <JobGrid columns={3}>
+      {list.map((r) => (
+        <JobCard
+          key={r.job.id}
+          job={r.job}
+          headingLevel="h3"
+          category={categories.find((c) => c.id === r.job.category_id)}
+          distance={r.distance}
+          application={appByJob.get(r.job.id)}
+          saved={saved.data?.includes(r.job.id)}
+          onToggleSave={isContractor ? () => toggleSave.mutate(r.job.id) : undefined}
+        />
+      ))}
+    </JobGrid>
+  );
 
   return (
     <div className="container-page pt-8 sm:pt-10">
@@ -48,7 +72,7 @@ export default function FindWork() {
 
       <div className="mb-6 flex flex-col gap-1">
         <h1 className="text-h1">Find Work</h1>
-        <p className="text-[15px] text-ink-muted">Property maintenance, cleaning, and turnover jobs across the Las Vegas valley.</p>
+        <p className={cx('text-[15px] text-ink-muted', isContractor && 'hidden sm:block')}>Property maintenance, cleaning, and turnover jobs across the Las Vegas valley.</p>
       </div>
       <div className="mb-6">
         <SearchBar size="md" key={`${filters.q}|${filters.location}`} initialQ={filters.q} initialLoc={filters.location} onSearch={(q, loc) => set({ q, loc })} />
@@ -67,7 +91,7 @@ export default function FindWork() {
         <section aria-labelledby="results-heading" className="min-w-0">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <h2 id="results-heading" className="text-[15px] font-semibold text-navy tabular" aria-live="polite">
-              {jobs.isLoading ? 'Loading jobs' : `${results.length} available ${results.length === 1 ? 'job' : 'jobs'}`}
+              {jobs.isLoading ? 'Loading jobs' : `${results.length} ${results.length === 1 ? 'job' : 'jobs'} accepting applications`}
               {filters.locationLabel && !filters.distance && <span className="font-medium text-ink-muted"> in {filters.locationLabel}</span>}
             </h2>
             <div className="flex items-center gap-2">
@@ -109,21 +133,47 @@ export default function FindWork() {
             <EmptyState icon={<Search />} title="No jobs match these filters" action={chips.length ? <button className="btn-secondary" onClick={clear}>Clear filters</button> : undefined}>
               {chips.length ? 'Try a wider distance, a different date, or fewer filters.' : 'There are no open listings right now. New jobs show up here as soon as they are posted.'}
             </EmptyState>
+          ) : hasProfile ? (
+            <div className="space-y-12">
+              <section aria-labelledby="matches-heading">
+                <div className="mb-4 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-line pb-3">
+                  <h3 id="matches-heading" className="text-[17px] font-semibold">
+                    Matches for you <span className="font-medium text-ink-muted tabular">{matches.length}</span>
+                    {newMatches > 0 && <span className="tag ml-2 h-5 bg-teal-50 px-1.5 align-middle text-[11px] text-teal-700">{newMatches} new today</span>}
+                  </h3>
+                  <p className="text-[13.5px] text-ink-muted">
+                    Your services, within {profile!.service_radius_miles} mi of {home?.neighborhood ?? profile!.home_zip}.{' '}
+                    <Link to="/contractor/profile" className="link">
+                      Edit
+                    </Link>
+                  </p>
+                </div>
+                {matches.length ? (
+                  grid(matches)
+                ) : (
+                  <p className="rounded-card border border-dashed border-line-strong bg-white px-5 py-6 text-[14.5px] text-ink-muted">
+                    No open jobs match your services and travel radius{chips.length ? ' with these filters' : ' right now'}. You will get a notification when one is posted. You can also{' '}
+                    <Link to="/contractor/profile" className="link">
+                      widen your radius or add services
+                    </Link>
+                    .
+                  </p>
+                )}
+              </section>
+              {!filters.matchesOnly && others.length > 0 && (
+                <section aria-labelledby="others-heading">
+                  <div className="mb-4 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-line pb-3">
+                    <h3 id="others-heading" className="text-[17px] font-semibold">
+                      Other available jobs <span className="font-medium text-ink-muted tabular">{others.length}</span>
+                    </h3>
+                    <p className="text-[13.5px] text-ink-muted">Outside your services, travel radius, or licenses.</p>
+                  </div>
+                  {grid(others)}
+                </section>
+              )}
+            </div>
           ) : (
-            <JobGrid columns={3}>
-              {results.map((r) => (
-                <JobCard
-                  key={r.job.id}
-                  job={r.job}
-                  headingLevel="h3"
-                  category={categories.find((c) => c.id === r.job.category_id)}
-                  distance={r.distance}
-                  application={appByJob.get(r.job.id)}
-                  saved={saved.data?.includes(r.job.id)}
-                  onToggleSave={isContractor ? () => toggleSave.mutate(r.job.id) : undefined}
-                />
-              ))}
-            </JobGrid>
+            grid(results)
           )}
           {!session && results.length > 0 && (
             <p className="mt-8 text-center text-[14px] text-ink-muted">
@@ -145,10 +195,15 @@ export default function FindWork() {
 
 type SetFn = (patch: Record<string, string | number | null | string[]>) => void;
 
-function FilterPanel({ filters, set, categories, hasOrigin }: { filters: ReturnType<typeof useJobFilters>['filters']; set: SetFn; categories: Category[]; hasOrigin: boolean }) {
+function FilterPanel({ filters, set, categories, hasOrigin, hasProfile }: { filters: ReturnType<typeof useJobFilters>['filters']; set: SetFn; categories: Category[]; hasOrigin: boolean; hasProfile: boolean }) {
   const groupCats = filters.group ? categories.filter((c) => c.group === filters.group) : [];
   return (
     <div className="space-y-7">
+      {hasProfile && (
+        <div className="rounded-ctl border border-line bg-canvas-alt p-3">
+          <Checkbox label="Only jobs that match my profile" description="Your services, travel radius, and licenses." checked={filters.matchesOnly} onChange={(on) => set({ matches: on ? '1' : null })} />
+        </div>
+      )}
       <FilterGroup title="Category">
         <div className="space-y-0.5">
           <RadioRow checked={!filters.group} onClick={() => set({ group: null, cats: null })} label="All categories" />
@@ -196,6 +251,14 @@ function FilterPanel({ filters, set, categories, hasOrigin }: { filters: ReturnT
         <div className="space-y-0.5">
           {DATE_OPTIONS.map(([v, l]) => (
             <RadioRow key={v} checked={filters.date === v} onClick={() => set({ date: v })} label={l} />
+          ))}
+        </div>
+      </FilterGroup>
+
+      <FilterGroup title="Posted">
+        <div className="space-y-0.5">
+          {POSTED_OPTIONS.map(([v, l]) => (
+            <RadioRow key={v} checked={filters.posted === v} onClick={() => set({ posted: v })} label={l} />
           ))}
         </div>
       </FilterGroup>
@@ -255,6 +318,8 @@ function activeChips(f: ReturnType<typeof useJobFilters>['filters'], categories:
   if (f.payMin) out.push({ key: 'pay', label: `$${f.payMin.toLocaleString()}+`, clear: { pay: null } });
   if (f.date !== 'any') out.push({ key: 'date', label: DATE_OPTIONS.find(([v]) => v === f.date)?.[1] ?? f.date, clear: { date: null } });
   if (f.workType !== 'any') out.push({ key: 'type', label: f.workType === 'recurring' ? 'Recurring' : 'One-time', clear: { type: null } });
+  if (f.posted !== 'any') out.push({ key: 'posted', label: `Posted: ${POSTED_OPTIONS.find(([v]) => v === f.posted)?.[1].toLowerCase()}`, clear: { posted: null } });
+  if (f.matchesOnly) out.push({ key: 'matches', label: 'My matches only', clear: { matches: null } });
   for (const u of f.urgency) out.push({ key: u, label: URGENCY_LABEL[u], clear: { urg: f.urgency.filter((x) => x !== u) } });
   return out;
 }
@@ -274,7 +339,7 @@ function ContractorOverview() {
   const needsProfile = !profile?.category_ids.length || !profile?.home_zip;
 
   return (
-    <section aria-label="Your work" className="mb-10">
+    <section aria-label="Your work" className="mb-6 md:mb-10">
       {needsProfile ? (
         <Notice tone="warn">
           <p>
@@ -285,7 +350,25 @@ function ContractorOverview() {
           </p>
         </Notice>
       ) : (
-        <div className="grid overflow-hidden rounded-card border border-line bg-white md:grid-cols-[1.3fr_1fr_1fr]">
+        <>
+        {/* Phones: one compact row so matching jobs stay near the top of the screen. */}
+        <div className="grid grid-cols-3 divide-x divide-line overflow-hidden rounded-card border border-line bg-white md:hidden">
+          <Link to={upcoming[0] ? `/jobs/${upcoming[0].job.id}` : '/contractor/applications'} className="px-3 py-2.5">
+            <span className="block text-[11.5px] font-semibold text-ink-muted">Upcoming</span>
+            <span className="block truncate text-[13.5px] font-semibold text-navy">{upcoming[0] ? formatNeededDay(upcoming[0].job.job_date) : 'None'}</span>
+          </Link>
+          <Link to="/contractor/applications" className="px-3 py-2.5">
+            <span className="block text-[11.5px] font-semibold text-ink-muted">In review</span>
+            <span className="block text-[13.5px] font-semibold text-navy tabular">
+              {pending.length} {pending.length === 1 ? 'application' : 'applications'}
+            </span>
+          </Link>
+          <Link to="/contractor/profile" className="px-3 py-2.5">
+            <span className="block text-[11.5px] font-semibold text-ink-muted">Profile</span>
+            <span className="block text-[13.5px] font-semibold text-navy tabular">{completion.percent}% complete</span>
+          </Link>
+        </div>
+        <div className="hidden overflow-hidden rounded-card border border-line bg-white md:grid md:grid-cols-[1.3fr_1fr_1fr]">
           <div className="border-b border-line p-5 md:border-b-0 md:border-r">
             <h2 className="text-[14px] font-semibold">Upcoming assignments</h2>
             {upcoming.length ? (
@@ -343,6 +426,7 @@ function ContractorOverview() {
             </Link>
           </div>
         </div>
+        </>
       )}
     </section>
   );

@@ -7,6 +7,7 @@ import { Page } from '@/components/Layout';
 import { useAction, useCategories, useMyApplications, useSavedJobIds } from '@/lib/queries';
 import { api } from '@/data';
 import { isJobAvailable } from '@/domain/status';
+import { freshness } from '@/domain/freshness';
 
 export default function SavedJobs() {
   const ids = useSavedJobIds();
@@ -48,8 +49,9 @@ export default function SavedJobs() {
               <ul className="divide-y divide-line rounded-card border border-line bg-white">
                 {closed.map((j) => (
                   <li key={j.id} className="flex items-center justify-between gap-3 px-5 py-3 text-[14px]">
-                    <Link to={`/jobs/${j.id}`} className="truncate text-ink-muted hover:text-navy">
+                    <Link to={`/jobs/${j.id}`} className="min-w-0 truncate text-ink-muted hover:text-navy">
                       {j.title}
+                      <span className="ml-2 text-[12.5px]">{freshness(j).closedReason}</span>
                     </Link>
                     <button className="link shrink-0 text-[13px]" onClick={() => toggle.mutate(j.id)}>
                       Remove
