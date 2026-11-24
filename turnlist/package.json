@@ -10,7 +10,8 @@
     "typecheck": "tsc -b",
     "test": "vitest run",
     "test:e2e": "node e2e/smoke.mjs",
-    "test:db": "bash supabase/tests/run.sh"
+    "test:db": "bash supabase/tests/run.sh",
+    "gen:seed": "vite-node scripts/write-seed.ts"
   },
   "dependencies": {
     "@fontsource-variable/manrope": "^5.1.0",
